@@ -1,0 +1,16 @@
+# swagger setting
+springdoc:
+  version: '@project.version@'  # springdoc 라이브러리 버전 설정
+  api-docs:
+    path: /api-docs # api 문서가 제공될 경로
+  default-consumes-media-type: application/json # API에서 사용할 기본 미디어 유형
+  default-produces-media-type: application/json # API에서 사용할 기본 미디어 유형
+  swagger-ui:
+    operations-sorter: alpha  # UI에서 작업을 알파벳 순으로 정렬함
+    tags-sorter: alpha  # UI에서 태그를 알파벳 순으로 정렬함
+    path: /swagger-ui.html  # swagger ui에 접근하기 위한 기본 경로 (ex. localhost:8080/swagger-ui.html)
+    disable-swagger-default-url: true # 기본 Swagger URL을 비활성화하고 명시적인 경로 /swagger-ui.html로만 접근하도록 함
+    display-query-params-without-oauth2: true # UI에서 OAuth2 없이 쿼리 매개변수를 표시한다.
+    doc-expansion: none
+  paths-to-match: # API 문서화에 포함할 경로 패턴을 설정
+    - /sample/**
