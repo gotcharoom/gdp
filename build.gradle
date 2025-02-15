@@ -24,13 +24,21 @@ repositories {
 }
 
 dependencies {
-	// 초기 설정 라이브러리
+	// Spring Data JPA
 //	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-//	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-//	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// Spring Starter Web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// Spring Starter Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// Spring Security
+//	implementation 'org.springframework.boot:spring-boot-starter-security'
 //	testImplementation 'org.springframework.security:spring-security-test'
+
+	// OAuth2
+	//	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
 	// JUnit - test
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -47,6 +55,9 @@ dependencies {
 
 	// Validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// WebClient
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 	// Log
 //	implementation 'org.springframework.boot:spring-boot-starter-logging'
