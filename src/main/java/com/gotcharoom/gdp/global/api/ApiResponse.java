@@ -2,10 +2,12 @@ package com.gotcharoom.gdp.global.api;
 
 import com.gotcharoom.gdp.global.exception.common.CustomException;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+@Getter
 @NoArgsConstructor
 public class ApiResponse<T> implements Serializable {
     private Integer code;
