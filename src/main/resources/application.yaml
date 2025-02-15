@@ -1,13 +1,15 @@
 # 공통 설정
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   web:
     resources:
       add-mappings: false # Disable static resource mapping (For NoHandlerFoundException)
 
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://${DB_URL}:${DB_PORT}/${DB_NAME}?characterEncoding=UTF-8&serverTimezone=UTC
+    url: jdbc:mariadb://${DB_URL}:${DB_PORT:30306}/${DB_NAME}?characterEncoding=UTF-8&serverTimezone=UTC
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
