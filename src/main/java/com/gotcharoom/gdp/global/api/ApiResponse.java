@@ -16,8 +16,8 @@ public class ApiResponse<T> implements Serializable {
 
     @Builder
     public ApiResponse(Integer code, String message, T data) {
-        this.code = code != null ? code : SuccessResponse.SUCCESS.getCode();
-        this.message = message != null ? message : SuccessResponse.SUCCESS.getMessage();
+        this.code = code;
+        this.message = message;
         this.data = data;
     }
 
