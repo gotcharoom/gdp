@@ -7,7 +7,7 @@ spring:
 
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://${DB_NAME}:${DB_PORT}/gdp-db?characterEncoding=UTF-8&serverTimezone=UTC
+    url: jdbc:mariadb://${DB_URL}:${DB_PORT}/${DB_NAME}?characterEncoding=UTF-8&serverTimezone=UTC
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
