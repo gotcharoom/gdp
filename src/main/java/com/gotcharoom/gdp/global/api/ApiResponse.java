@@ -1,5 +1,6 @@
 package com.gotcharoom.gdp.global.api;
 
+import com.gotcharoom.gdp.global.exception.common.CustomException;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
@@ -30,7 +31,8 @@ public class ApiResponse<T> implements Serializable {
         return new ApiResponse<>(errorResponse.getCode(), errorResponse.getMessage(), null);
     }
 
-    public static <T> ApiResponse<T> error(ErrorResponse errorResponse, T data) {
-        return new ApiResponse<>(errorResponse.getCode(), errorResponse.getMessage(), data);
+    public static <T> ApiResponse<T> error(CustomException exception) {
+        ErrorResponse errorResponse = exception.getErrorResponse();
+        return new ApiResponse<>(errorResponse.getCode(), errorResponse.getMessage(), null);
     }
 }
