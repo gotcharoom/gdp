@@ -5,6 +5,21 @@ spring:
     resources:
       add-mappings: false # Disable static resource mapping (For NoHandlerFoundException)
 
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://${DB_NAME}:${DB_PORT}/gdp-db?characterEncoding=UTF-8&serverTimezone=UTC
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    database-platform: org.hibernate.dialect.MariaDBDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true #To beautify or pretty print the SQL
+        show_sql: true #show sql
+
 # swagger setting
 springdoc:
   version: '@project.version@'  # springdoc 라이브러리 버전 설정
