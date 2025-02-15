@@ -1,9 +1,12 @@
-package com.gotcharoom.gdp.sample;
+package com.gotcharoom.gdp.sample.controller;
 
 import com.gotcharoom.gdp.global.api.ApiResponse;
 import com.gotcharoom.gdp.global.api.ErrorResponse;
+import com.gotcharoom.gdp.sample.model.SampleModel;
+import com.gotcharoom.gdp.sample.service.SampleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Sample", description = "Sample API 입니다")
 @RestController
 public class SampleController {
+
+    SampleService sampleService;
+
+    SampleController(SampleService sampleService) {
+        this.sampleService = sampleService;
+    }
 
     @Operation(
             summary = "테스트",
@@ -44,8 +53,10 @@ public class SampleController {
             description = "테스트합니다"
     )
     @GetMapping("/response/success/data")
-    public ApiResponse<String> responseTestSuccessData() {
-        return ApiResponse.success("데이터");
+    public ApiResponse<SampleModel> responseTestSuccessData() {
+        SampleModel sampleModel = sampleService.getSampleData();
+
+        return ApiResponse.success(sampleModel);
     }
 
     @Operation(
