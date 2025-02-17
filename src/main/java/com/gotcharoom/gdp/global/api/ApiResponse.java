@@ -29,6 +29,11 @@ public class ApiResponse<T> implements Serializable {
         return new ApiResponse<>(SuccessResponse.SUCCESS.getCode(), SuccessResponse.SUCCESS.getMessage(), data);
     }
 
+    public static <T> ApiResponse<T> error() {
+        ErrorResponse errorResponse = ErrorResponse.INTERNAL_SERVER_ERROR;
+        return new ApiResponse<>(errorResponse.getCode(), errorResponse.getMessage(), null);
+    }
+
     public static <T> ApiResponse<T> error(ErrorResponse errorResponse) {
         return new ApiResponse<>(errorResponse.getCode(), errorResponse.getMessage(), null);
     }
