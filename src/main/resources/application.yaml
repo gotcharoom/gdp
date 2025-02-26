@@ -22,6 +22,7 @@ spring:
         format_sql: true #To beautify or pretty print the SQL
         show_sql: true #show sql
 
+
 # swagger setting
 springdoc:
   version: '@project.version@'  # springdoc 라이브러리 버전 설정
@@ -37,6 +38,7 @@ springdoc:
     display-query-params-without-oauth2: true # UI에서 OAuth2 없이 쿼리 매개변수를 표시한다.
     doc-expansion: none
   paths-to-match: # API 문서화에 포함할 경로 패턴을 설정
+    - /api/v1/**
     - /sample/**
 
 
@@ -44,3 +46,15 @@ sample:
   covid:
     url: ${COVID_API_URL}
     api-key: ${COVID_API_KEY}
+
+
+jwt:
+  secret: ${JWT_SECRET}
+  token:
+    access-expiration-time: ${ACCESS_TOKEN_EXPIRATION_TIME}
+    refresh-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME}
+
+data:
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
