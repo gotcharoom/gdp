@@ -1,7 +1,8 @@
 package com.gotcharoom.gdp.global.util;
 
+import com.gotcharoom.gdp.auth.model.RefreshTokenRequest;
+import com.gotcharoom.gdp.auth.repository.RefreshTokenRepository;
 import com.gotcharoom.gdp.global.security.CustomUserDetailsService;
-import com.gotcharoom.gdp.login.model.JwtToken;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -9,7 +10,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
@@ -33,12 +32,12 @@ public class JwtUtil {
     @Value("${jwt.token.refresh-expiration-time}")
     private Long refreshExpirationTime;
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final CustomUserDetailsService customUserDetailsService;
 
 
-    public JwtUtil(RedisTemplate<String, String> redisTemplate, CustomUserDetailsService customUserDetailsService) {
-        this.redisTemplate = redisTemplate;
+    public JwtUtil(RefreshTokenRepository refreshTokenRepository, CustomUserDetailsService customUserDetailsService) {
+        this.refreshTokenRepository = refreshTokenRepository;
         this.customUserDetailsService = customUserDetailsService;
     }
 
@@ -85,13 +84,14 @@ public class JwtUtil {
                 .signWith(convertedSecretKey)
                 .compact();
 
+        RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder()
+                .authName(authentication.getName())
+                .refreshToken(refreshToken)
+                .ttl(refreshExpirationTime)
+                .build();
+
         // redis에 저장
-        redisTemplate.opsForValue().set(
-                authentication.getName(),
-                refreshToken,
-                refreshExpirationTime,
-                TimeUnit.MILLISECONDS
-        );
+        refreshTokenRepository.save(refreshTokenRequest.toEntity());
 
         return refreshToken;
     }
@@ -135,9 +135,9 @@ public class JwtUtil {
                     .getPayload();
 
             return true;
-        } catch(ExpiredJwtException EXPIRED_JWT) {
-            log.error(EXPIRED_JWT.getMessage());
-            throw new RuntimeException(EXPIRED_JWT);
+        } catch(ExpiredJwtException e) {
+            log.error(e.getMessage());
+            throw e;
         } catch(Exception e) {
             log.error(e.getMessage());
             throw new RuntimeException(e);

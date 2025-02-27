@@ -1,4 +1,4 @@
-package com.gotcharoom.gdp.login.model;
+package com.gotcharoom.gdp.auth.model;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
