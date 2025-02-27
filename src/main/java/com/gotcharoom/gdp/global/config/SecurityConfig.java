@@ -21,7 +21,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity(debug = true)
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
@@ -34,15 +33,9 @@ public class SecurityConfig {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 
-    // 임시 주석처리
-//    @Bean
-//    BCryptPasswordEncoder bCryptPasswordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-
     @Bean
-    PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+    BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -54,7 +47,6 @@ public class SecurityConfig {
     // TODO. [TR-YOO] csrf 및 sessionManagement 끄는 이유 확인하기
     // TODO. [TR-YOO] Jwt Exception Handling 부분 수정하기
     // TODO. [TR-YOO] SignUp / Oauth2 관련 url 추가하기
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -68,9 +60,15 @@ public class SecurityConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authRequest ->
                         authRequest
-                                .requestMatchers("/api/v1/gdp/login").permitAll()
+                                .requestMatchers(
+                                        "/api/v1/auth/login",
+                                        "/api/v1/auth/refresh",
+                                        "/api/v1/user/sign-up"
+                                )
+                                    .permitAll()
 //                                .requestMatchers("/api/v1/user/**").hasRole()
-                                .anyRequest().authenticated())
+                                .anyRequest()
+                                    .authenticated())
                 .exceptionHandling(configurer -> {
                     configurer
                             .accessDeniedHandler(jwtAccessDeniedHandler)
