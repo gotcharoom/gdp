@@ -14,15 +14,15 @@ public class GdpUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
-    @Column(nullable = false, unique = true)
+    @Column(name="id", nullable = false, unique = true)
     private String id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name="nick_name", nullable = false)
     private String nickName;
 
-    @Column(nullable = false, unique = true)
+    @Column(name="name", nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(name="password", nullable = false)
     private String password;
 }
