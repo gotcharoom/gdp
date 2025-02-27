@@ -1,8 +1,11 @@
 package com.gotcharoom.gdp.global.util;
 
+import com.gotcharoom.gdp.auth.entity.BlacklistedToken;
+import com.gotcharoom.gdp.auth.entity.RefreshToken;
 import com.gotcharoom.gdp.auth.model.RefreshTokenRequest;
 import com.gotcharoom.gdp.auth.model.AccessTokenEnum;
 import com.gotcharoom.gdp.auth.model.TokenLocationEnum;
+import com.gotcharoom.gdp.auth.repository.BlacklistedTokenRepository;
 import com.gotcharoom.gdp.auth.repository.RefreshTokenRepository;
 import com.gotcharoom.gdp.global.security.CustomUserDetailsService;
 import io.jsonwebtoken.*;
@@ -40,10 +43,15 @@ public class JwtUtil {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final CustomUserDetailsService customUserDetailsService;
+    private final BlacklistedTokenRepository blacklistedTokenRepository;
 
-    public JwtUtil(RefreshTokenRepository refreshTokenRepository, CustomUserDetailsService customUserDetailsService) {
+    public JwtUtil(RefreshTokenRepository refreshTokenRepository,
+                   CustomUserDetailsService customUserDetailsService,
+                   BlacklistedTokenRepository blacklistedTokenRepository
+    ) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.customUserDetailsService = customUserDetailsService;
+        this.blacklistedTokenRepository = blacklistedTokenRepository;
     }
 
     @PostConstruct
@@ -137,7 +145,7 @@ public class JwtUtil {
 
     // Cookie에서 Token 추출
     public String resolveFromCookie(HttpServletRequest req) {
-        Cookie[] cookies = req.getCookies();
+
         if (req.getCookies() != null) {
             for (Cookie cookie : req.getCookies()) {
                 String accessTokenStr = AccessTokenEnum.AccessToken.getType();
@@ -169,5 +177,25 @@ public class JwtUtil {
             log.error(e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    public void removeRefreshToken(Authentication auth) {
+        RefreshToken refreshToken = refreshTokenRepository.findByAuthName(auth.getName())
+                .orElseThrow();
+
+        refreshTokenRepository.delete(refreshToken);
+    }
+
+    public void addToBlacklist(String token) {
+        if (token == null) { throw new RuntimeException(); }
+
+        Long expirationTime = System.currentTimeMillis() + accessExpirationTime;
+        BlacklistedToken blacklistedToken = new BlacklistedToken(token, expirationTime);
+        blacklistedTokenRepository.save(blacklistedToken);
+    }
+
+    public boolean isBlacklisted(String token) {
+
+        return token != null && blacklistedTokenRepository.existsByToken(token);
     }
 }

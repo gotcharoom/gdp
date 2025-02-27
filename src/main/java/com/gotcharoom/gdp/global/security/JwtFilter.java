@@ -26,9 +26,10 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = jwtUtil.resolveToken(request);
+        boolean isBlocked = jwtUtil.isBlacklisted(token);
 
         try {
-            if (token != null && jwtUtil.validateToken(token)) {
+            if (token != null && jwtUtil.validateToken(token) && !isBlocked) {
                 Authentication auth = jwtUtil.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(auth); // 정상 토큰이면 SecurityContext에 저장
             }

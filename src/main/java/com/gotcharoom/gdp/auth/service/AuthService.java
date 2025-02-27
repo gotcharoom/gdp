@@ -63,6 +63,27 @@ public class AuthService {
         }
     }
 
+
+    // TODO. [TR-YOO] Exception 변경하기
+    @Transactional
+    public void executeLogout(HttpServletRequest request) {
+
+        try {
+            String accessToken = jwtUtil.resolveToken(request);
+            Authentication auth = jwtUtil.getAuthentication(accessToken);
+
+            // AccessToken Blacklist 처리
+            jwtUtil.addToBlacklist(accessToken);
+
+            // Refresh Token 삭제
+            jwtUtil.removeRefreshToken(auth);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
+
+
+
     public LoginUserInfoResponse getLoginUserDetail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -119,5 +140,15 @@ public class AuthService {
 
         // cookie 방식 사용 시 Token 노출 지우기 위함
         jwtToken = null;
+    }
+
+    public void removeAccessTokenCookie(HttpServletResponse response) {
+
+        String accessTokenStr = AccessTokenEnum.AccessToken.getType();
+        Cookie cookie = new Cookie(accessTokenStr, null);
+        cookie.setHttpOnly(true); // CSRF 방지
+        cookie.setPath("/"); // Cookie가 유효한 경로
+        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
+        response.addCookie(cookie);
     }
 }

@@ -71,11 +71,11 @@ public class AuthController {
             description = "로그아웃 API API"
     )
     @PostMapping("/logout")
-    public ApiResponse<Void> logout() {
+    public ApiResponse<Void> logout(HttpServletRequest request, HttpServletResponse response) {
 
         try {
-
-            //JwtToken jwtToken = authService.replaceJwtToken(request);
+            authService.executeLogout(request);
+            authService.removeAccessTokenCookie(response);
 
             return ApiResponse.success();
         } catch (Exception e) {
@@ -99,13 +99,10 @@ public class AuthController {
                 authService.setAccessTokenCookie(jwtToken, response);
             }
 
-
             return ApiResponse.success(jwtToken);
         } catch (Exception e) {
 
             throw new RuntimeException("로그인 실패");
         }
     }
-
-
 }
