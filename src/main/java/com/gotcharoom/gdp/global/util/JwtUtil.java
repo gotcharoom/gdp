@@ -1,12 +1,15 @@
 package com.gotcharoom.gdp.global.util;
 
 import com.gotcharoom.gdp.auth.model.RefreshTokenRequest;
+import com.gotcharoom.gdp.auth.model.AccessTokenEnum;
+import com.gotcharoom.gdp.auth.model.TokenLocationEnum;
 import com.gotcharoom.gdp.auth.repository.RefreshTokenRepository;
 import com.gotcharoom.gdp.global.security.CustomUserDetailsService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,9 +35,11 @@ public class JwtUtil {
     @Value("${jwt.token.refresh-expiration-time}")
     private Long refreshExpirationTime;
 
+    @Value("${auth.token.location:COOKIE}")
+    private TokenLocationEnum tokenLocation;
+
     private final RefreshTokenRepository refreshTokenRepository;
     private final CustomUserDetailsService customUserDetailsService;
-
 
     public JwtUtil(RefreshTokenRepository refreshTokenRepository, CustomUserDetailsService customUserDetailsService) {
         this.refreshTokenRepository = refreshTokenRepository;
@@ -113,11 +118,33 @@ public class JwtUtil {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    // Header에서 Token 추출
     public String resolveToken(HttpServletRequest req) {
+
+        return switch(tokenLocation) {
+            case HEADER -> resolveFromHeader(req);
+            case COOKIE -> resolveFromCookie(req);
+        };
+    }
+
+    // Header에서 Token 추출
+    public String resolveFromHeader(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
+        }
+        return null;
+    }
+
+    // Cookie에서 Token 추출
+    public String resolveFromCookie(HttpServletRequest req) {
+        Cookie[] cookies = req.getCookies();
+        if (req.getCookies() != null) {
+            for (Cookie cookie : req.getCookies()) {
+                String accessTokenStr = AccessTokenEnum.AccessToken.getType();
+                if (accessTokenStr.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
         }
         return null;
     }

@@ -1,6 +1,7 @@
 package com.gotcharoom.gdp.auth.service;
 
 import com.gotcharoom.gdp.auth.entity.RefreshToken;
+import com.gotcharoom.gdp.auth.model.AccessTokenEnum;
 import com.gotcharoom.gdp.auth.repository.RefreshTokenRepository;
 import com.gotcharoom.gdp.global.util.JwtUtil;
 import com.gotcharoom.gdp.auth.model.GdpLoginRequest;
@@ -8,7 +9,9 @@ import com.gotcharoom.gdp.auth.model.JwtToken;
 import com.gotcharoom.gdp.auth.model.LoginUserInfoResponse;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -103,5 +106,18 @@ public class AuthService {
                 .refreshToken(refreshToken.getRefreshToken())
                 .accessToken(jwtUtil.createAccessToken(auth))
                 .build();
+    }
+
+    public void setAccessTokenCookie(JwtToken jwtToken, HttpServletResponse response) {
+
+        String accessTokenStr = AccessTokenEnum.AccessToken.getType();
+        Cookie cookie = new Cookie(accessTokenStr, jwtToken.getAccessToken());
+        cookie.setHttpOnly(true); // CSRF 방지
+        cookie.setPath("/"); // Cookie가 유효한 경로
+        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
+        response.addCookie(cookie);
+
+        // cookie 방식 사용 시 Token 노출 지우기 위함
+        jwtToken = null;
     }
 }
