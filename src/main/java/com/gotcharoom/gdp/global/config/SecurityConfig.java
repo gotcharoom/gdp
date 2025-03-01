@@ -19,6 +19,10 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.Collections;
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -57,7 +61,17 @@ public class SecurityConfig {
                 // JWT를 사용하기 때문에 세션을 사용하지 않음
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .cors(customizer -> {
+                    customizer.configurationSource(request -> {
+                        CorsConfiguration config = new CorsConfiguration();
+                        config.setAllowedOrigins(List.of("http://localhost:5173"));
+                        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
+                        config.setAllowCredentials(true);
+                        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
+
+                        return config;
+                    });
+                })
                 .authorizeHttpRequests(authRequest ->
                         authRequest
                                 .requestMatchers(
@@ -69,6 +83,7 @@ public class SecurityConfig {
 //                                .requestMatchers("/api/v1/user/**").hasRole()
                                 .anyRequest()
                                     .authenticated())
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(configurer -> {
                     configurer
                             .accessDeniedHandler(jwtAccessDeniedHandler)
