@@ -11,14 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginUserInfoResponse {
-    private Long uid;
     private String id;
     private String nickName;
     private String name;
 
     public static LoginUserInfoResponse fromEntity(GdpUser gdpUser) {
         return LoginUserInfoResponse.builder()
-                .uid(gdpUser.getUid())
                 .id(gdpUser.getId())
                 .nickName(gdpUser.getNickName())
                 .name(gdpUser.getName())

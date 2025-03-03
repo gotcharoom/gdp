@@ -3,7 +3,7 @@ package com.gotcharoom.gdp.global.util;
 import com.gotcharoom.gdp.auth.entity.BlacklistedToken;
 import com.gotcharoom.gdp.auth.entity.RefreshToken;
 import com.gotcharoom.gdp.auth.model.RefreshTokenRequest;
-import com.gotcharoom.gdp.auth.model.AccessTokenEnum;
+import com.gotcharoom.gdp.auth.model.TokenEnum;
 import com.gotcharoom.gdp.auth.model.TokenLocationEnum;
 import com.gotcharoom.gdp.auth.repository.BlacklistedTokenRepository;
 import com.gotcharoom.gdp.auth.repository.RefreshTokenRepository;
@@ -30,16 +30,16 @@ import java.util.Date;
 public class JwtUtil {
 
     @Value("${jwt.secret}")
-    private String secretKey;
+    private String SECRET_KEY;
 
     @Value("${jwt.token.access-expiration-time}")
-    private Long accessExpirationTime;
+    private Long ACCESS_EXPIRATION_TIME;
 
     @Value("${jwt.token.refresh-expiration-time}")
-    private Long refreshExpirationTime;
+    private Long REFRESH_EXPIRATION_TIME;
 
     @Value("${auth.token.location:COOKIE}")
-    private TokenLocationEnum tokenLocation;
+    private TokenLocationEnum TOKEN_LOCATION;
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final CustomUserDetailsService customUserDetailsService;
@@ -56,7 +56,7 @@ public class JwtUtil {
 
     @PostConstruct
     public void init() {
-        this.convertSecretKey(secretKey);
+        this.convertSecretKey(SECRET_KEY);
     }
 
     private Key convertSecretKey(String secretKey) {
@@ -71,9 +71,9 @@ public class JwtUtil {
     // AccessToken 생성
     public String createAccessToken(Authentication authentication){
         Date now = new Date();
-        Date expireDate = new Date(now.getTime() + accessExpirationTime);
+        Date expireDate = new Date(now.getTime() + ACCESS_EXPIRATION_TIME);
 
-        Key convertedSecretKey = convertSecretKey(secretKey);
+        Key convertedSecretKey = convertSecretKey(SECRET_KEY);
 
         return Jwts.builder()
                 .subject(authentication.getName())
@@ -86,9 +86,9 @@ public class JwtUtil {
     // Refresh Token 생성
     public String createRefreshToken(Authentication authentication){
         Date now = new Date();
-        Date expireDate = new Date(now.getTime() + refreshExpirationTime);
+        Date expireDate = new Date(now.getTime() + REFRESH_EXPIRATION_TIME);
 
-        Key convertedSecretKey = convertSecretKey(secretKey);
+        Key convertedSecretKey = convertSecretKey(SECRET_KEY);
 
         String refreshToken = Jwts.builder()
                 .subject(authentication.getName())
@@ -100,7 +100,7 @@ public class JwtUtil {
         RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder()
                 .authName(authentication.getName())
                 .refreshToken(refreshToken)
-                .ttl(refreshExpirationTime)
+                .ttl(REFRESH_EXPIRATION_TIME)
                 .build();
 
         // redis에 저장
@@ -111,7 +111,7 @@ public class JwtUtil {
 
     // Token > Claim > User > Authentication 객체 생성
     public Authentication getAuthentication(String token) {
-        SecretKey convertedSecretKey = (SecretKey) convertSecretKey(secretKey);
+        SecretKey convertedSecretKey = (SecretKey) convertSecretKey(SECRET_KEY);
 
         Claims userPrincipal = Jwts.parser()
                 .verifyWith(convertedSecretKey)
@@ -126,13 +126,46 @@ public class JwtUtil {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    public String resolveToken(HttpServletRequest req) {
+    public Authentication getAuthenticationFromExpiredToken(String token) {
+        SecretKey convertedSecretKey = (SecretKey) convertSecretKey(SECRET_KEY);
+        Claims userPrincipal;
 
-        return switch(tokenLocation) {
+        try {
+            userPrincipal = Jwts.parser()
+                    .verifyWith(convertedSecretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+        } catch(ExpiredJwtException e) {
+            log.info("Access Token이 만료되었습니다. Claims를 가져옵니다.");
+            userPrincipal = e.getClaims();
+        } catch (JwtException e) {
+            throw new RuntimeException("유효하지 않은 JWT 토큰입니다.");
+        }
+
+
+        String userName = userPrincipal.getSubject();
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(userName);
+
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
+    public String resolveAccessToken(HttpServletRequest req) {
+
+        return switch(TOKEN_LOCATION) {
             case HEADER -> resolveFromHeader(req);
-            case COOKIE -> resolveFromCookie(req);
+            case COOKIE -> resolveAccessTokenFromCookie(req);
         };
     }
+
+    public String resolveRefreshToken(HttpServletRequest req) {
+        return switch(TOKEN_LOCATION) {
+            case HEADER -> resolveFromHeader(req);
+            case COOKIE -> resolveRefreshTokenFromCookie(req);
+        };
+    }
+
 
     // Header에서 Token 추출
     public String resolveFromHeader(HttpServletRequest req) {
@@ -144,12 +177,26 @@ public class JwtUtil {
     }
 
     // Cookie에서 Token 추출
-    public String resolveFromCookie(HttpServletRequest req) {
+    public String resolveAccessTokenFromCookie(HttpServletRequest req) {
 
         if (req.getCookies() != null) {
             for (Cookie cookie : req.getCookies()) {
-                String accessTokenStr = AccessTokenEnum.AccessToken.getType();
+                String accessTokenStr = TokenEnum.AccessToken.getType();
                 if (accessTokenStr.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+
+    // Cookie에서 Token 추출
+    public String resolveRefreshTokenFromCookie(HttpServletRequest req) {
+        if (req.getCookies() != null) {
+            for (Cookie cookie : req.getCookies()) {
+                String refreshTokenStr = TokenEnum.RefreshToken.getType();
+                if (refreshTokenStr.equals(cookie.getName())) {
                     return cookie.getValue();
                 }
             }
@@ -161,7 +208,7 @@ public class JwtUtil {
     // Access Token 검증
     public boolean validateToken(String token){
         try{
-            SecretKey convertedSecretKey = (SecretKey) convertSecretKey(secretKey);
+            SecretKey convertedSecretKey = (SecretKey) convertSecretKey(SECRET_KEY);
 
             Jwts.parser()
                     .verifyWith(convertedSecretKey)
@@ -189,7 +236,7 @@ public class JwtUtil {
     public void addToBlacklist(String token) {
         if (token == null) { throw new RuntimeException(); }
 
-        Long expirationTime = System.currentTimeMillis() + accessExpirationTime;
+        Long expirationTime = System.currentTimeMillis() + ACCESS_EXPIRATION_TIME;
         BlacklistedToken blacklistedToken = new BlacklistedToken(token, expirationTime);
         blacklistedTokenRepository.save(blacklistedToken);
     }

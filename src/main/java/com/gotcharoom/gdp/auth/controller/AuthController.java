@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -39,6 +40,8 @@ public class AuthController {
 
             if(tokenLocation == TokenLocationEnum.COOKIE) {
                 authService.setAccessTokenCookie(jwtToken, response);
+                authService.setRefreshTokenCookie(jwtToken, response);
+                jwtToken = null;
             }
 
             return ApiResponse.success(jwtToken);
@@ -76,6 +79,7 @@ public class AuthController {
         try {
             authService.executeLogout(request);
             authService.removeAccessTokenCookie(response);
+            authService.removeRefreshTokenCookie(response);
 
             return ApiResponse.success();
         } catch (Exception e) {
@@ -89,7 +93,7 @@ public class AuthController {
             description = "JWT Access Token 갱신 API"
     )
     @PostMapping("/refresh")
-    public ApiResponse<JwtToken> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<JwtToken>> refreshToken(HttpServletRequest request, HttpServletResponse response) {
 
         try {
 
@@ -97,12 +101,31 @@ public class AuthController {
 
             if(tokenLocation == TokenLocationEnum.COOKIE) {
                 authService.setAccessTokenCookie(jwtToken, response);
+                jwtToken = null;
             }
 
-            return ApiResponse.success(jwtToken);
+            return ResponseEntity.ok(ApiResponse.success(jwtToken));
         } catch (Exception e) {
 
-            throw new RuntimeException("로그인 실패");
+           return ResponseEntity.status(499)
+                   .body(ApiResponse.error());
+        }
+    }
+
+    @Operation(
+            summary = "로그인 시 Access Token이 유효한지 확인",
+            description = "로그인 시 JWT의 Access Token이 유효한지 확인하는 API"
+    )
+    @PostMapping("/check")
+    public ApiResponse<Boolean> checkToken(HttpServletRequest request) {
+
+        try {
+            boolean isChecked = authService.checkAccessToken(request);
+
+            return ApiResponse.success(isChecked);
+        } catch (Exception e) {
+
+            return ApiResponse.error();
         }
     }
 }

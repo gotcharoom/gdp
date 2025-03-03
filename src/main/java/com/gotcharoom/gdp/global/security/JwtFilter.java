@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -22,10 +23,25 @@ public class JwtFilter extends OncePerRequestFilter {
         this.jwtUtil = jwtUtil;
     }
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+
+        List<String> excludedPaths = List.of(
+                "/api/v1/auth/login",
+                "/api/v1/auth/logout",
+                "/api/v1/auth/refresh",
+                "/api/v1/auth/check",
+                "/api/v1/user/sign-up"
+        );
+
+        return excludedPaths.stream().anyMatch(path::startsWith);
+    }
+
     // TODO. [TR-YOO] Exception 수정하기
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = jwtUtil.resolveToken(request);
+        String token = jwtUtil.resolveAccessToken(request);
         boolean isBlocked = jwtUtil.isBlacklisted(token);
 
         try {

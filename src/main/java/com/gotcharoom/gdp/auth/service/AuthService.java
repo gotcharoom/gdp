@@ -1,18 +1,17 @@
 package com.gotcharoom.gdp.auth.service;
 
 import com.gotcharoom.gdp.auth.entity.RefreshToken;
-import com.gotcharoom.gdp.auth.model.AccessTokenEnum;
+import com.gotcharoom.gdp.auth.model.*;
 import com.gotcharoom.gdp.auth.repository.RefreshTokenRepository;
 import com.gotcharoom.gdp.global.util.JwtUtil;
-import com.gotcharoom.gdp.auth.model.GdpLoginRequest;
-import com.gotcharoom.gdp.auth.model.JwtToken;
-import com.gotcharoom.gdp.auth.model.LoginUserInfoResponse;
 import com.gotcharoom.gdp.user.entity.GdpUser;
+import com.gotcharoom.gdp.user.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,16 +25,29 @@ import javax.transaction.Transactional;
 @Service
 public class AuthService {
 
+    @Value("${jwt.token.access-expiration-time}")
+    private Long ACCESS_EXPIRATION_TIME;
+
+    @Value("${jwt.token.refresh-expiration-time}")
+    private Long REFRESH_EXPIRATION_TIME;
+
     private final AuthenticationManager authenticationManager;
 
     private final JwtUtil jwtUtil;
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public AuthService(AuthenticationManager authenticationManager, JwtUtil jwtUtil, RefreshTokenRepository refreshTokenRepository) {
+    private final UserRepository userRepository;
+
+    public AuthService(AuthenticationManager authenticationManager,
+                       JwtUtil jwtUtil,
+                       RefreshTokenRepository refreshTokenRepository,
+                       UserRepository userRepository
+    ) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.userRepository = userRepository;
     }
 
     // TODO. [TR-YOO] Password 인코딩 처리하기
@@ -69,8 +81,14 @@ public class AuthService {
     public void executeLogout(HttpServletRequest request) {
 
         try {
-            String accessToken = jwtUtil.resolveToken(request);
-            Authentication auth = jwtUtil.getAuthentication(accessToken);
+            String accessToken = jwtUtil.resolveAccessToken(request);
+
+            if (accessToken == null || accessToken.isEmpty()) {
+                log.info("토큰이 없는 요청입니다. 이미 로그아웃된 상태일 수 있습니다");
+                return;
+            }
+
+            Authentication auth = jwtUtil.getAuthenticationFromExpiredToken(accessToken);
 
             // AccessToken Blacklist 처리
             jwtUtil.addToBlacklist(accessToken);
@@ -87,19 +105,21 @@ public class AuthService {
     public LoginUserInfoResponse getLoginUserDetail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !(authentication.getPrincipal() instanceof GdpUser gdpUser)) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("유저 정보를 가져올 수 없습니다");
         }
+
+        GdpUser gdpUser = userRepository.findById(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("해당계정을 찾을 수 없습니다"));
 
         return LoginUserInfoResponse.fromEntity(gdpUser);
     }
 
-    // TODO. [TR-YOO] Refresh Token 만료 시 로그아웃처리하는 로직 추가 필요
     @Transactional
     public JwtToken replaceJwtToken(HttpServletRequest request) {
 
-        String accessToken = jwtUtil.resolveToken(request);
-        Authentication auth = jwtUtil.getAuthentication(accessToken);
+        String refreshTokenFromCookie = jwtUtil.resolveRefreshToken(request);
+        Authentication auth = jwtUtil.getAuthenticationFromExpiredToken(refreshTokenFromCookie);
 
         // TODO. [TR-YOO] Exception 교체하기
         // Refresh Token 체크
@@ -116,7 +136,7 @@ public class AuthService {
         // TODO. [TR-YOO] Exception 교체하기
         // Access Token 체크
         try {
-            jwtUtil.validateToken(accessToken);
+            jwtUtil.validateToken(refreshTokenFromCookie);
         } catch (ExpiredJwtException e) {
             log.info("Access Token 유효기간 만료");
         } catch (Exception e) {
@@ -129,26 +149,67 @@ public class AuthService {
                 .build();
     }
 
+
     public void setAccessTokenCookie(JwtToken jwtToken, HttpServletResponse response) {
 
-        String accessTokenStr = AccessTokenEnum.AccessToken.getType();
+        int convertedTime = (int) (ACCESS_EXPIRATION_TIME / 1000);
+
+        String accessTokenStr = TokenEnum.AccessToken.getType();
         Cookie cookie = new Cookie(accessTokenStr, jwtToken.getAccessToken());
         cookie.setHttpOnly(true); // CSRF 방지
         cookie.setPath("/"); // Cookie가 유효한 경로
-        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
+//        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
+        cookie.setMaxAge(convertedTime);
         response.addCookie(cookie);
+    }
+    public void setRefreshTokenCookie(JwtToken jwtToken, HttpServletResponse response) {
 
-        // cookie 방식 사용 시 Token 노출 지우기 위함
-        jwtToken = null;
+        int convertedTime = (int) (REFRESH_EXPIRATION_TIME / 1000);
+
+        String refreshTokenStr = TokenEnum.RefreshToken.getType();
+        Cookie cookie = new Cookie(refreshTokenStr, jwtToken.getAccessToken());
+        cookie.setHttpOnly(true); // CSRF 방지
+        cookie.setPath("/"); // Cookie가 유효한 경로
+//        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
+        cookie.setMaxAge(convertedTime);
+        response.addCookie(cookie);
     }
 
     public void removeAccessTokenCookie(HttpServletResponse response) {
+        int convertedTime = (int) (ACCESS_EXPIRATION_TIME / 1000);
 
-        String accessTokenStr = AccessTokenEnum.AccessToken.getType();
+        String accessTokenStr = TokenEnum.AccessToken.getType();
         Cookie cookie = new Cookie(accessTokenStr, null);
         cookie.setHttpOnly(true); // CSRF 방지
         cookie.setPath("/"); // Cookie가 유효한 경로
         cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
+        cookie.setMaxAge(convertedTime);
         response.addCookie(cookie);
+    }
+
+    public void removeRefreshTokenCookie(HttpServletResponse response) {
+        int convertedTime = (int) (REFRESH_EXPIRATION_TIME / 1000);
+
+        String refreshTokenStr = TokenEnum.RefreshToken.getType();
+        Cookie cookie = new Cookie(refreshTokenStr, null);
+        cookie.setHttpOnly(true); // CSRF 방지
+        cookie.setPath("/"); // Cookie가 유효한 경로
+        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
+        cookie.setMaxAge(convertedTime);
+        response.addCookie(cookie);
+    }
+
+    @Transactional
+    public boolean checkAccessToken(HttpServletRequest request) {
+
+        try {
+            String token = jwtUtil.resolveAccessToken(request);
+            jwtUtil.validateToken(token);
+
+            return true;
+        } catch (Exception e) {
+
+            return false;
+        }
     }
 }

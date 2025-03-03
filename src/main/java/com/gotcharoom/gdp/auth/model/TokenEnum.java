@@ -5,8 +5,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum AccessTokenEnum {
-    AccessToken("access_token");
+public enum TokenEnum {
+    AccessToken("access_token"),
+    RefreshToken("refresh_token");
 
     private final String type;
 }
