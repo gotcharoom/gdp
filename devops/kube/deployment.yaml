@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gdp-backend-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gdp-backend-deploy
+  template:
+    metadata:
+      labels:
+        app: gdp-backend-deploy
+    spec:
+      containers:
+        - name: gdp-backend
+          image: gdp-backend:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: gdp-backend-secret
