@@ -21,7 +21,7 @@ spec:
         - name: gdp-backend
           image: harbor.stdtrinfra.com/gdp-backend/gdp-backend:latest
           ports:
-            - containerPort: 8443
+            - containerPort: 8080
           envFrom:
             - secretRef:
                 name: gdp-backend-secret
