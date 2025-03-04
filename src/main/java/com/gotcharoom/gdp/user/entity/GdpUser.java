@@ -1,5 +1,7 @@
 package com.gotcharoom.gdp.user.entity;
 
+import com.gotcharoom.gdp.global.security.Role;
+import com.gotcharoom.gdp.global.security.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,15 +16,32 @@ public class GdpUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name="social_type", nullable = false, unique = true)
+    private SocialType socialType;
+
     @Column(name="id", nullable = false, unique = true)
     private String id;
 
-    @Column(name="nick_name", nullable = false)
+    @Column(name="social_id")
+    private String socialId;
+
+    @Column(name="nick_name")
     private String nickName;
 
-    @Column(name="name", nullable = false)
+    @Column(name="name")
     private String name;
 
-    @Column(name="password", nullable = false)
+    @Column(name="password")
     private String password;
+
+    @Column(name="email", nullable = false)
+    private String email;
+
+    @Column(name="image_url")
+    private String imageUrl;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="role")
+    private Role role;
 }

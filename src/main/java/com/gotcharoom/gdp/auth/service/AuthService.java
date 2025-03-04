@@ -1,13 +1,14 @@
 package com.gotcharoom.gdp.auth.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gotcharoom.gdp.auth.entity.RefreshToken;
 import com.gotcharoom.gdp.auth.model.*;
 import com.gotcharoom.gdp.auth.repository.RefreshTokenRepository;
 import com.gotcharoom.gdp.global.util.JwtUtil;
+import com.gotcharoom.gdp.global.util.OAuth2Util;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import com.gotcharoom.gdp.user.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,9 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
 
-    private final JwtUtil jwtUtil;
+    public final JwtUtil jwtUtil;
+
+    public final OAuth2Util oAuth2Util;
 
     private final RefreshTokenRepository refreshTokenRepository;
 
@@ -41,24 +44,26 @@ public class AuthService {
 
     public AuthService(AuthenticationManager authenticationManager,
                        JwtUtil jwtUtil,
+                       OAuth2Util oAuth2Util,
                        RefreshTokenRepository refreshTokenRepository,
                        UserRepository userRepository
     ) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.oAuth2Util = oAuth2Util;
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
     }
 
     // TODO. [TR-YOO] Password 인코딩 처리하기
     @Transactional
-    public JwtToken generateJwtToken(GdpLoginRequest gdpLoginRequest) {
+    public JwtToken generateJwtToken(LoginRequest loginRequest) {
 
         try {
 
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                    gdpLoginRequest.getId(),
-                    gdpLoginRequest.getPassword()
+                    loginRequest.getId(),
+                    loginRequest.getPassword()
             );
 
             Authentication authentication = authenticationManager.authenticate(token);
@@ -71,6 +76,8 @@ public class AuthService {
         } catch(BadCredentialsException  e){
 
             log.error(e.getMessage());
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -116,7 +123,7 @@ public class AuthService {
     }
 
     @Transactional
-    public JwtToken replaceJwtToken(HttpServletRequest request) {
+    public JwtToken replaceJwtToken(HttpServletRequest request) throws JsonProcessingException {
 
         String refreshTokenFromCookie = jwtUtil.resolveRefreshToken(request);
         Authentication auth = jwtUtil.getAuthenticationFromExpiredToken(refreshTokenFromCookie);
@@ -150,66 +157,24 @@ public class AuthService {
     }
 
 
-    public void setAccessTokenCookie(JwtToken jwtToken, HttpServletResponse response) {
-
-        int convertedTime = (int) (ACCESS_EXPIRATION_TIME / 1000);
-
-        String accessTokenStr = TokenEnum.AccessToken.getType();
-        Cookie cookie = new Cookie(accessTokenStr, jwtToken.getAccessToken());
-        cookie.setHttpOnly(true); // CSRF 방지
-        cookie.setPath("/"); // Cookie가 유효한 경로
-//        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
-        cookie.setMaxAge(convertedTime);
-        response.addCookie(cookie);
-    }
-    public void setRefreshTokenCookie(JwtToken jwtToken, HttpServletResponse response) {
-
-        int convertedTime = (int) (REFRESH_EXPIRATION_TIME / 1000);
-
-        String refreshTokenStr = TokenEnum.RefreshToken.getType();
-        Cookie cookie = new Cookie(refreshTokenStr, jwtToken.getAccessToken());
-        cookie.setHttpOnly(true); // CSRF 방지
-        cookie.setPath("/"); // Cookie가 유효한 경로
-//        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
-        cookie.setMaxAge(convertedTime);
-        response.addCookie(cookie);
-    }
-
-    public void removeAccessTokenCookie(HttpServletResponse response) {
-        int convertedTime = (int) (ACCESS_EXPIRATION_TIME / 1000);
-
-        String accessTokenStr = TokenEnum.AccessToken.getType();
-        Cookie cookie = new Cookie(accessTokenStr, null);
-        cookie.setHttpOnly(true); // CSRF 방지
-        cookie.setPath("/"); // Cookie가 유효한 경로
-        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
-        cookie.setMaxAge(convertedTime);
-        response.addCookie(cookie);
-    }
-
-    public void removeRefreshTokenCookie(HttpServletResponse response) {
-        int convertedTime = (int) (REFRESH_EXPIRATION_TIME / 1000);
-
-        String refreshTokenStr = TokenEnum.RefreshToken.getType();
-        Cookie cookie = new Cookie(refreshTokenStr, null);
-        cookie.setHttpOnly(true); // CSRF 방지
-        cookie.setPath("/"); // Cookie가 유효한 경로
-        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
-        cookie.setMaxAge(convertedTime);
-        response.addCookie(cookie);
-    }
-
     @Transactional
     public boolean checkAccessToken(HttpServletRequest request) {
 
-        try {
-            String token = jwtUtil.resolveAccessToken(request);
-            jwtUtil.validateToken(token);
+        return jwtUtil.checkAccessToken(request);
+    }
 
-            return true;
-        } catch (Exception e) {
+    public void setAllToken(JwtToken jwtToken, HttpServletResponse response) {
+        jwtUtil.setAccessTokenCookie(jwtToken, response);
+        jwtUtil.setRefreshTokenCookie(jwtToken, response);
+    }
 
-            return false;
-        }
+    public void setAccessToken(JwtToken jwtToken, HttpServletResponse response) {
+        jwtUtil.setAccessTokenCookie(jwtToken, response);
+    }
+
+    public void removeAllToken(HttpServletResponse response) {
+
+        jwtUtil.removeAccessTokenCookie(response);
+        jwtUtil.removeRefreshTokenCookie(response);
     }
 }

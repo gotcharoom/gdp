@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class GdpLoginRequest {
+public class LoginRequest {
     @NotNull
     private String id;
     @NotNull

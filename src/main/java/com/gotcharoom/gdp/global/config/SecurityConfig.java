@@ -1,40 +1,57 @@
 package com.gotcharoom.gdp.global.config;
 
 
-import com.gotcharoom.gdp.global.security.JwtAccessDeniedHandler;
-import com.gotcharoom.gdp.global.security.JwtAuthenticationEntryPoint;
-//import com.gotcharoom.gdp.global.security.JwtFilter;
-import com.gotcharoom.gdp.global.security.JwtFilter;
+import com.gotcharoom.gdp.global.security.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
-import java.util.Collections;
 import java.util.List;
 
 @Configuration
 public class SecurityConfig {
 
+    @Value("${gdp.application.front-uri}")
+    private String GDP_FRONT_URI;
+
+    @Value("${gdp.custom.oauth2-auth-uri}")
+    private String OAUTH2_AUTH_URI;
+
+    @Value("${gdp.custom.oauth2-redirect-uri}")
+    private String OAUTH2_REDIRECT_URI;
+
     private final JwtFilter jwtFilter;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-//
-    public SecurityConfig(JwtFilter jwtFilter, JwtAccessDeniedHandler jwtAccessDeniedHandler, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
+
+    private final CustomOauth2UserService customOauth2UserService;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
+
+    public SecurityConfig(
+            JwtFilter jwtFilter,
+            JwtAccessDeniedHandler jwtAccessDeniedHandler,
+            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+            CustomOauth2UserService customOauth2UserService,
+            OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler,
+            OAuth2LoginFailureHandler oAuth2LoginFailureHandler
+    ) {
         this.jwtFilter = jwtFilter;
         this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.customOauth2UserService = customOauth2UserService;
+        this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
+        this.oAuth2LoginFailureHandler = oAuth2LoginFailureHandler;
     }
 
     @Bean
@@ -48,9 +65,8 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    // TODO. [TR-YOO] csrf 및 sessionManagement 끄는 이유 확인하기
     // TODO. [TR-YOO] Jwt Exception Handling 부분 수정하기
-    // TODO. [TR-YOO] SignUp / Oauth2 관련 url 추가하기
+    // TODO. [TR-YOO] OAUTH2 Success / Failure URL 수정하기
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -64,7 +80,7 @@ public class SecurityConfig {
                 .cors(customizer -> {
                     customizer.configurationSource(request -> {
                         CorsConfiguration config = new CorsConfiguration();
-                        config.setAllowedOrigins(List.of("http://localhost:5173"));
+                        config.setAllowedOrigins(List.of(GDP_FRONT_URI));
                         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
                         config.setAllowCredentials(true);
                         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
@@ -79,6 +95,8 @@ public class SecurityConfig {
                                         "/api/v1/auth/logout",
                                         "/api/v1/auth/refresh",
                                         "/api/v1/auth/check",
+                                        OAUTH2_AUTH_URI+"/**",
+                                        OAUTH2_REDIRECT_URI+"/**",
                                         "/api/v1/user/sign-up"
                                 )
                                     .permitAll()
@@ -91,6 +109,19 @@ public class SecurityConfig {
                             .accessDeniedHandler(jwtAccessDeniedHandler)
                             .authenticationEntryPoint(jwtAuthenticationEntryPoint);
                 })
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(endpoint ->
+                            endpoint.baseUri(OAUTH2_AUTH_URI)
+                        )
+                        .redirectionEndpoint(endpoint ->
+                            endpoint.baseUri(OAUTH2_REDIRECT_URI+"/*")
+                        )
+                        .userInfoEndpoint(config -> {
+                            config.userService(customOauth2UserService);
+                        })
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureHandler(oAuth2LoginFailureHandler)
+                )
                 .build();
     }
 }

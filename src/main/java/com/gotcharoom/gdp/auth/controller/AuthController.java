@@ -33,14 +33,13 @@ public class AuthController {
             description = "JWT 토큰 통한 자체 로그인 API"
     )
     @PostMapping("/login")
-    public ApiResponse<JwtToken> login(@RequestBody GdpLoginRequest gdpLoginRequest, HttpServletResponse response) {
+    public ApiResponse<JwtToken> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
 
         try {
-            JwtToken jwtToken = authService.generateJwtToken(gdpLoginRequest);
+            JwtToken jwtToken = authService.generateJwtToken(loginRequest);
 
             if(tokenLocation == TokenLocationEnum.COOKIE) {
-                authService.setAccessTokenCookie(jwtToken, response);
-                authService.setRefreshTokenCookie(jwtToken, response);
+                authService.setAllToken(jwtToken, response);
                 jwtToken = null;
             }
 
@@ -78,8 +77,7 @@ public class AuthController {
 
         try {
             authService.executeLogout(request);
-            authService.removeAccessTokenCookie(response);
-            authService.removeRefreshTokenCookie(response);
+            authService.removeAllToken(response);
 
             return ApiResponse.success();
         } catch (Exception e) {
@@ -100,7 +98,7 @@ public class AuthController {
             JwtToken jwtToken = authService.replaceJwtToken(request);
 
             if(tokenLocation == TokenLocationEnum.COOKIE) {
-                authService.setAccessTokenCookie(jwtToken, response);
+                authService.setAccessToken(jwtToken, response);
                 jwtToken = null;
             }
 

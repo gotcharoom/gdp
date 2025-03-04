@@ -3,6 +3,7 @@ package com.gotcharoom.gdp.global.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gotcharoom.gdp.global.api.ApiResponse;
 import com.gotcharoom.gdp.global.api.ErrorResponse;
+import com.gotcharoom.gdp.global.util.ObjectUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,11 +16,14 @@ import java.io.IOException;
 @Component
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
+    public JwtAccessDeniedHandler(ObjectUtil objectUtil) {
+        this.objectMapper = objectUtil.getObjectMapper();
+    }
 
     // 필요한 권한 없이 접근한 경우 : SC_FORBIDDEN(403) 응답
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

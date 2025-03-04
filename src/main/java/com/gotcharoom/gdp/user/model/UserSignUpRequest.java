@@ -1,5 +1,6 @@
 package com.gotcharoom.gdp.user.model;
 
+import com.gotcharoom.gdp.global.security.SocialType;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import lombok.*;
 
@@ -26,10 +27,13 @@ public class UserSignUpRequest {
     public GdpUser toEntity(String encodedPassword) {
 
         return GdpUser.builder()
+                .socialType(SocialType.GDP)
                 .id(id)
+                .socialId(null)
                 .nickName(nickName)
                 .name(name)
                 .password(encodedPassword)
+                .imageUrl(null)
                 .build();
     }
 }

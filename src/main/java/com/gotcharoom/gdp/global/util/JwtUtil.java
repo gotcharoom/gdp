@@ -1,19 +1,24 @@
 package com.gotcharoom.gdp.global.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gotcharoom.gdp.auth.entity.BlacklistedToken;
 import com.gotcharoom.gdp.auth.entity.RefreshToken;
+import com.gotcharoom.gdp.auth.model.JwtToken;
 import com.gotcharoom.gdp.auth.model.RefreshTokenRequest;
 import com.gotcharoom.gdp.auth.model.TokenEnum;
 import com.gotcharoom.gdp.auth.model.TokenLocationEnum;
 import com.gotcharoom.gdp.auth.repository.BlacklistedTokenRepository;
 import com.gotcharoom.gdp.auth.repository.RefreshTokenRepository;
 import com.gotcharoom.gdp.global.security.CustomUserDetailsService;
+import com.gotcharoom.gdp.user.repository.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,17 +46,28 @@ public class JwtUtil {
     @Value("${auth.token.location:COOKIE}")
     private TokenLocationEnum TOKEN_LOCATION;
 
+    private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final CustomUserDetailsService customUserDetailsService;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
+    private final OAuth2Util oAuth2Util;
+    private final ObjectMapper objectMapper;
 
-    public JwtUtil(RefreshTokenRepository refreshTokenRepository,
-                   CustomUserDetailsService customUserDetailsService,
-                   BlacklistedTokenRepository blacklistedTokenRepository
+
+    public JwtUtil(
+            UserRepository userRepository,
+            RefreshTokenRepository refreshTokenRepository,
+            CustomUserDetailsService customUserDetailsService,
+            BlacklistedTokenRepository blacklistedTokenRepository,
+            OAuth2Util oAuth2Util,
+            ObjectUtil objectUtil
     ) {
+        this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.customUserDetailsService = customUserDetailsService;
         this.blacklistedTokenRepository = blacklistedTokenRepository;
+        this.oAuth2Util = oAuth2Util;
+        this.objectMapper = objectUtil.getObjectMapper();
     }
 
     @PostConstruct
@@ -69,36 +85,18 @@ public class JwtUtil {
     }
 
     // AccessToken 생성
-    public String createAccessToken(Authentication authentication){
-        Date now = new Date();
-        Date expireDate = new Date(now.getTime() + ACCESS_EXPIRATION_TIME);
-
-        Key convertedSecretKey = convertSecretKey(SECRET_KEY);
-
-        return Jwts.builder()
-                .subject(authentication.getName())
-                .issuedAt(now)
-                .expiration(expireDate)
-                .signWith(convertedSecretKey)
-                .compact();
+    public String createAccessToken(Authentication authentication) throws JsonProcessingException {
+        String id = oAuth2Util.getSocialIdFromAuthentication(authentication);
+        return createToken(id, ACCESS_EXPIRATION_TIME);
     }
 
     // Refresh Token 생성
-    public String createRefreshToken(Authentication authentication){
-        Date now = new Date();
-        Date expireDate = new Date(now.getTime() + REFRESH_EXPIRATION_TIME);
-
-        Key convertedSecretKey = convertSecretKey(SECRET_KEY);
-
-        String refreshToken = Jwts.builder()
-                .subject(authentication.getName())
-                .issuedAt(now)
-                .expiration(expireDate)
-                .signWith(convertedSecretKey)
-                .compact();
+    public String createRefreshToken(Authentication authentication) throws JsonProcessingException {
+        String id = oAuth2Util.getSocialIdFromAuthentication(authentication);
+        String refreshToken = createToken(id, REFRESH_EXPIRATION_TIME);
 
         RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder()
-                .authName(authentication.getName())
+                .authName(id)
                 .refreshToken(refreshToken)
                 .ttl(REFRESH_EXPIRATION_TIME)
                 .build();
@@ -107,6 +105,20 @@ public class JwtUtil {
         refreshTokenRepository.save(refreshTokenRequest.toEntity());
 
         return refreshToken;
+    }
+
+    private String createToken(String id, Long expireTime) throws JsonProcessingException {
+        Date now = new Date();
+        Date expireDate = new Date(now.getTime() + expireTime);
+
+        Key convertedSecretKey = convertSecretKey(SECRET_KEY);
+
+        return Jwts.builder()
+                .subject(id)
+                .issuedAt(now)
+                .expiration(expireDate)
+                .signWith(convertedSecretKey)
+                .compact();
     }
 
     // Token > Claim > User > Authentication 객체 생성
@@ -119,9 +131,9 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        String userName = userPrincipal.getSubject();
+        String subject = userPrincipal.getSubject();
 
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(userName);
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(subject);
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
@@ -244,5 +256,67 @@ public class JwtUtil {
     public boolean isBlacklisted(String token) {
 
         return token != null && blacklistedTokenRepository.existsByToken(token);
+    }
+
+    public void setAccessTokenCookie(JwtToken jwtToken, HttpServletResponse response) {
+
+        int convertedTime = (int) (ACCESS_EXPIRATION_TIME / 1000);
+
+        String accessTokenStr = TokenEnum.AccessToken.getType();
+        Cookie cookie = new Cookie(accessTokenStr, jwtToken.getAccessToken());
+        cookie.setHttpOnly(true); // CSRF 방지
+        cookie.setPath("/"); // Cookie가 유효한 경로
+//        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
+        cookie.setMaxAge(convertedTime);
+        response.addCookie(cookie);
+    }
+
+    public void setRefreshTokenCookie(JwtToken jwtToken, HttpServletResponse response) {
+
+        int convertedTime = (int) (REFRESH_EXPIRATION_TIME / 1000);
+
+        String refreshTokenStr = TokenEnum.RefreshToken.getType();
+        Cookie cookie = new Cookie(refreshTokenStr, jwtToken.getAccessToken());
+        cookie.setHttpOnly(true); // CSRF 방지
+        cookie.setPath("/"); // Cookie가 유효한 경로
+//        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
+        cookie.setMaxAge(convertedTime);
+        response.addCookie(cookie);
+    }
+
+    public void removeAccessTokenCookie(HttpServletResponse response) {
+        int convertedTime = (int) (ACCESS_EXPIRATION_TIME / 1000);
+
+        String accessTokenStr = TokenEnum.AccessToken.getType();
+        Cookie cookie = new Cookie(accessTokenStr, null);
+        cookie.setHttpOnly(true); // CSRF 방지
+        cookie.setPath("/"); // Cookie가 유효한 경로
+        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
+        cookie.setMaxAge(convertedTime);
+        response.addCookie(cookie);
+    }
+
+    public void removeRefreshTokenCookie(HttpServletResponse response) {
+        int convertedTime = (int) (REFRESH_EXPIRATION_TIME / 1000);
+
+        String refreshTokenStr = TokenEnum.RefreshToken.getType();
+        Cookie cookie = new Cookie(refreshTokenStr, null);
+        cookie.setHttpOnly(true); // CSRF 방지
+        cookie.setPath("/"); // Cookie가 유효한 경로
+        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
+        cookie.setMaxAge(convertedTime);
+        response.addCookie(cookie);
+    }
+
+    public boolean checkAccessToken(HttpServletRequest request) {
+        try {
+            String token = resolveAccessToken(request);
+            validateToken(token);
+
+            return true;
+        } catch (Exception e) {
+
+            return false;
+        }
     }
 }
