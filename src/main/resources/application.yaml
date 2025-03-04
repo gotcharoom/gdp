@@ -1,4 +1,17 @@
-# 공통 설정
+# 공통 설정9
+
+gdp:
+  application:
+    front-uri: ${GDP_FRONT_URI:"http://localhost:5173"}
+    back-uri: ${GDP_BACK_URI:"http://localhost:8080"}
+  custom:
+    oauth2-auth-uri: ${OAUTH2_AUTH_URI}
+    oauth2-redirect-uri: ${OAUTH2_REDIRECT_URI}
+
+auth:
+  token:
+    location: COOKIE
+
 
 spring:
   config:
@@ -16,11 +29,60 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MariaDBDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true #To beautify or pretty print the SQL
         show_sql: true #show sql
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-name: Google
+            scope:
+              - profile
+              - email
+            authorization-grant-type: authorization_code
+            redirect-uri: ${GDP_BACK_URI:'http://localhost:8080'}${OAUTH2_REDIRECT_URI}/google
+
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            client-name: Kakao
+            scope:
+              - profile_nickname
+              - profile_image
+            authorization-grant-type: authorization_code
+            client-authentication-method: client_secret_post
+            redirect-uri: ${GDP_BACK_URI:'http://localhost:8080'}${OAUTH2_REDIRECT_URI}/kakao
+
+          naver:
+            client-id: ${NAVER_CLIENT_ID}
+            client-secret: ${NAVER_CLIENT_SECRET}
+            scope:
+              - name
+              - email
+              - profile_image
+            client-name: Naver
+            authorization-grant-type: authorization_code
+            redirect-uri: ${GDP_BACK_URI:'http://localhost:8080'}${OAUTH2_REDIRECT_URI}/naver
+
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+          naver:
+            authorization-uri: https://nid.naver.com/oauth2.0/authorize
+            token-uri: https://nid.naver.com/oauth2.0/token
+            user-info-uri: https://openapi.naver.com/v1/nid/me
+            user-name-attribute: response
 
 # swagger setting
 springdoc:
@@ -37,6 +99,7 @@ springdoc:
     display-query-params-without-oauth2: true # UI에서 OAuth2 없이 쿼리 매개변수를 표시한다.
     doc-expansion: none
   paths-to-match: # API 문서화에 포함할 경로 패턴을 설정
+    - /api/v1/**
     - /sample/**
 
 
@@ -44,3 +107,15 @@ sample:
   covid:
     url: ${COVID_API_URL}
     api-key: ${COVID_API_KEY}
+
+
+jwt:
+  secret: ${JWT_SECRET}
+  token:
+    access-expiration-time: ${ACCESS_TOKEN_EXPIRATION_TIME}
+    refresh-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME}
+
+data:
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}

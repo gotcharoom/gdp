@@ -34,9 +34,9 @@ public class SampleController {
 //            responseCode = "200",
 //            description = "회원가입에 성공하였습니다."
 //    )
-    @PostMapping("/test")
-    public void test() {
-        System.out.println("test");
+    @GetMapping("/test")
+    public ApiResponse<String> test() {
+        return ApiResponse.success();
     }
 
     @Operation(
@@ -53,7 +53,8 @@ public class SampleController {
             description = "테스트합니다"
     )
     @GetMapping("/response/success/data")
-    public ApiResponse<SampleModel> responseTestSuccessData() {
+    public ApiResponse<SampleModel> responseTestSuccessData() throws Exception {
+
         SampleModel sampleModel = sampleService.getSampleData();
 
         return ApiResponse.success(sampleModel);

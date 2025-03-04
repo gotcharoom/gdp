@@ -31,6 +31,6 @@ public class GlobalExceptionHandler {
     public ApiResponse<?> handleException(Exception e) {
         log.error("handleException() in GlobalExceptionHandler throw Exception : {}", e.getMessage());
         e.printStackTrace();
-        return ApiResponse.error(new CustomException(ErrorResponse.INTERNAL_SERVER_ERROR));
+        return ApiResponse.error(e);
     }
 }
