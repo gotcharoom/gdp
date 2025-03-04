@@ -24,4 +24,4 @@ spec:
             - containerPort: 8080
           envFrom:
             - secretRef:
-                name: gdp-backend-secret
+                name: gdp-backend-dev-secret
