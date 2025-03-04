@@ -14,7 +14,7 @@ spec:
         app: gdp-backend-dev-deploy
     spec:
       imagePullSecrets:
-        - name: harbor-image-pull-secrets
+        - name: harbor-image-pull-secret
       containers:
         - name: gdp-backend
           image: harbor.stdtrinfra.com/gdp-backend/gdp-backend:latest
