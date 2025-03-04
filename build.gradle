@@ -13,7 +13,7 @@ java {
 	}
 }
 
-jar {
+bootJar {
 	archiveFileName = "gdp-backend.jar"
 }
 
