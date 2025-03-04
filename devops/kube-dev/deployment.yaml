@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gdp-backend-dev-deploy
+  namespace: gdp
 spec:
   replicas: 1
   selector:
