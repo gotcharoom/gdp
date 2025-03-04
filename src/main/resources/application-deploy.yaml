@@ -1,4 +1,4 @@
 server:
   port: 8443
   ssl:
-    enabled: true
+    enabled: false
