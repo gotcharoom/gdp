@@ -1,5 +1,8 @@
 # 공통 설정9
 
+server:
+  port: 8080
+
 gdp:
   application:
     front-uri: ${GDP_FRONT_URI:"http://localhost:5173"}
