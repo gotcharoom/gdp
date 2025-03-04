@@ -5,7 +5,7 @@ metadata:
   namespace: gdp
 spec:
   selector:
-    app: gdp-backend-dev-deploy
+    pod: gdp-backend-dev-deploy
   ports:
     - name: https
       protocol: TCP
