@@ -3,15 +3,17 @@ kind: Deployment
 metadata:
   name: gdp-backend-dev-deploy
   namespace: gdp
+  labels:
+    app: gdp-backend-dev-deploy
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: gdp-backend-dev-deploy
+      pod: gdp-backend-dev-deploy
   template:
     metadata:
       labels:
-        app: gdp-backend-dev-deploy
+        pod: gdp-backend-dev-deploy
     spec:
       imagePullSecrets:
         - name: harbor-image-pull-secret
