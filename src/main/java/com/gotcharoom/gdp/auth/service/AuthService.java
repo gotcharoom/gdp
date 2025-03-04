@@ -132,6 +132,7 @@ public class AuthService {
         // Refresh Token 체크
         RefreshToken refreshToken = null;
         try {
+            System.out.println(auth.getName());
             refreshToken = refreshTokenRepository.findByAuthName(auth.getName())
                     .orElseThrow();
 

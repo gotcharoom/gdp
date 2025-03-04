@@ -47,13 +47,13 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
         // socialType에 따라 유저 정보를 통해 OAuthAttributes 객체 생성
-        OAuth2Attributes extractAttributes = OAuth2Attributes.of(socialType, attributes);
+        OAuth2Attributes  extractAttributes = OAuth2Attributes.of(socialType, attributes);
 
         // Social 정보로 User 객체 가져오기 (없다면 생성됨)
         GdpUser gdpUser = getUser(extractAttributes, socialType);
 
         if(gdpUser == null) {
-            registerUser(extractAttributes, socialType);
+            gdpUser = registerUser(extractAttributes, socialType);
         }
 
         return new CustomOAuth2User(
@@ -71,8 +71,10 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
                 attributes.getOauth2UserInfo().getId()).orElse(null);
     }
 
-    private void registerUser(OAuth2Attributes attributes, SocialType socialType) {
+    private GdpUser registerUser(OAuth2Attributes attributes, SocialType socialType) {
         GdpUser createdUser = attributes.toEntity(socialType, attributes.getOauth2UserInfo());
         userRepository.save(createdUser);
+
+        return createdUser;
     }
 }
