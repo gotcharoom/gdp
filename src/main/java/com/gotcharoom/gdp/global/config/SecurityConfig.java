@@ -109,7 +109,13 @@ public class SecurityConfig {
                                         "/api/v1/user/sign-up"
                                 )
                                     .permitAll()
-//                                .requestMatchers("/api/v1/user/**").hasRole()
+                                .requestMatchers(
+                                        "/notice",
+                                        "/notice/**"
+                                )
+                                    .permitAll()
+//                                .requestMatchers("/api/v1/user/**")
+//                                  .hasRole()
                                 .anyRequest()
                                     .authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
