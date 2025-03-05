@@ -1,0 +1,8 @@
+server:
+  port: 8080
+
+springdoc:
+  api-docs:
+    enabled: false  # API 문서 비활성화
+  swagger-ui:
+    enabled: false  # Swagger UI 비활성화

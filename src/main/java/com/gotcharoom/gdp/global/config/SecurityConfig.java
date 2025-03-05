@@ -91,6 +91,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authRequest ->
                         authRequest
                                 .requestMatchers(
+                                        "/swagger",
+                                        "/swagger-ui.html",
+                                        "/swagger-ui/**",
+                                        "/api-docs",
+                                        "/api-docs/**",
+                                        "/v3/api-docs/**"
+                                )
+                                   .permitAll()
+                                .requestMatchers(
                                         "/api/v1/auth/login",
                                         "/api/v1/auth/logout",
                                         "/api/v1/auth/refresh",
@@ -100,7 +109,13 @@ public class SecurityConfig {
                                         "/api/v1/user/sign-up"
                                 )
                                     .permitAll()
-//                                .requestMatchers("/api/v1/user/**").hasRole()
+                                .requestMatchers(
+                                        "/notice",
+                                        "/notice/**"
+                                )
+                                    .permitAll()
+//                                .requestMatchers("/api/v1/user/**")
+//                                  .hasRole()
                                 .anyRequest()
                                     .authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

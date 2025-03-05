@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gdp-backend-dev-deploy
+  namespace: gdp
+  labels:
+    app: gdp-backend-dev-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: gdp-backend-dev-deploy
+  template:
+    metadata:
+      labels:
+        pod: gdp-backend-dev-deploy
+    spec:
+      imagePullSecrets:
+        - name: harbor-image-pull-secret
+      containers:
+        - name: gdp-backend
+          image: harbor.stdtrinfra.com/gdp-backend/gdp-backend:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: gdp-backend-dev-secret
