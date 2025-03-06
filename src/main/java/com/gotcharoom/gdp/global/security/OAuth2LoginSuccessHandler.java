@@ -38,8 +38,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                     .refreshToken(refreshToken)
                     .build();
 
-            jwtUtil.setRefreshTokenCookie(jwtToken, response);
-            jwtUtil.setAccessTokenCookie(jwtToken, response);
+            boolean isRememberMe = jwtUtil.resolveRememberMe(request, response);
+            jwtUtil.setRefreshTokenCookie(jwtToken, response, isRememberMe);
+            jwtUtil.setAccessTokenCookie(jwtToken, response, isRememberMe);
 
             response.sendRedirect(GDP_FRONT_URI+"/");
         } catch (Exception e) {

@@ -33,13 +33,13 @@ public class AuthController {
             description = "JWT 토큰 통한 자체 로그인 API"
     )
     @PostMapping("/login")
-    public ApiResponse<JwtToken> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+    public ApiResponse<JwtToken> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
 
         try {
             JwtToken jwtToken = authService.generateJwtToken(loginRequest);
 
             if(tokenLocation == TokenLocationEnum.COOKIE) {
-                authService.setAllToken(jwtToken, response);
+                authService.setAllToken(jwtToken, request, response);
                 jwtToken = null;
             }
 
@@ -98,7 +98,7 @@ public class AuthController {
             JwtToken jwtToken = authService.replaceJwtToken(request);
 
             if(tokenLocation == TokenLocationEnum.COOKIE) {
-                authService.setAccessToken(jwtToken, response);
+                authService.setAccessToken(jwtToken, request, response);
                 jwtToken = null;
             }
 
@@ -121,6 +121,23 @@ public class AuthController {
             boolean isChecked = authService.checkAccessToken(request);
 
             return ApiResponse.success(isChecked);
+        } catch (Exception e) {
+
+            return ApiResponse.error();
+        }
+    }
+
+    @Operation(
+            summary = "Remember Me Cookie 설정",
+            description = "Token 기간 조절하는 Remember Me Cookie 설정용 API"
+    )
+    @PostMapping("/remember-me")
+    public ApiResponse<Void> rememberMe(@RequestBody RememberMeRequest request, HttpServletResponse response) {
+
+        try {
+            authService.setRememberMeCookie(request, response);
+
+            return ApiResponse.success();
         } catch (Exception e) {
 
             return ApiResponse.error();

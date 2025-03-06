@@ -104,6 +104,7 @@ public class SecurityConfig {
                                         "/api/v1/auth/logout",
                                         "/api/v1/auth/refresh",
                                         "/api/v1/auth/check",
+                                        "/api/v1/auth/remember-me",
                                         OAUTH2_AUTH_URI+"/**",
                                         OAUTH2_REDIRECT_URI+"/**",
                                         "/api/v1/user/sign-up"

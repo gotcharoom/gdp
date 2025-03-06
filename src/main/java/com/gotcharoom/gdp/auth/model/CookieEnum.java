@@ -5,9 +5,10 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum TokenEnum {
-    AccessToken("access_token"),
-    RefreshToken("refresh_token");
+public enum CookieEnum {
+    REMEMBER_ME("remember-me"),
+    ACCESS_TOKEN("access_token"),
+    REFRESH_TOKEN("refresh_token");
 
     private final String type;
 }
