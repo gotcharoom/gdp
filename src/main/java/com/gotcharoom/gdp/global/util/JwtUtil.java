@@ -6,7 +6,7 @@ import com.gotcharoom.gdp.auth.entity.BlacklistedToken;
 import com.gotcharoom.gdp.auth.entity.RefreshToken;
 import com.gotcharoom.gdp.auth.model.JwtToken;
 import com.gotcharoom.gdp.auth.model.RefreshTokenRequest;
-import com.gotcharoom.gdp.auth.model.TokenEnum;
+import com.gotcharoom.gdp.auth.model.CookieEnum;
 import com.gotcharoom.gdp.auth.model.TokenLocationEnum;
 import com.gotcharoom.gdp.auth.repository.BlacklistedTokenRepository;
 import com.gotcharoom.gdp.auth.repository.RefreshTokenRepository;
@@ -46,28 +46,22 @@ public class JwtUtil {
     @Value("${auth.token.location:COOKIE}")
     private TokenLocationEnum TOKEN_LOCATION;
 
-    private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final CustomUserDetailsService customUserDetailsService;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
     private final OAuth2Util oAuth2Util;
-    private final ObjectMapper objectMapper;
 
 
     public JwtUtil(
-            UserRepository userRepository,
             RefreshTokenRepository refreshTokenRepository,
             CustomUserDetailsService customUserDetailsService,
             BlacklistedTokenRepository blacklistedTokenRepository,
-            OAuth2Util oAuth2Util,
-            ObjectUtil objectUtil
+            OAuth2Util oAuth2Util
     ) {
-        this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.customUserDetailsService = customUserDetailsService;
         this.blacklistedTokenRepository = blacklistedTokenRepository;
         this.oAuth2Util = oAuth2Util;
-        this.objectMapper = objectUtil.getObjectMapper();
     }
 
     @PostConstruct
@@ -163,6 +157,21 @@ public class JwtUtil {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
+    public boolean resolveRememberMe(HttpServletRequest req, HttpServletResponse rep) {
+
+        if (req.getCookies() != null) {
+            for (Cookie cookie : req.getCookies()) {
+                String rememberMeStr = CookieEnum.REMEMBER_ME.getType();
+                if (rememberMeStr.equals(cookie.getName())) {
+                    String cookieValue = cookie.getValue();
+                    removeRememberMeToken(rep);
+                    return Boolean.parseBoolean(cookieValue);
+                }
+            }
+        }
+        return false;
+    }
+
     public String resolveAccessToken(HttpServletRequest req) {
 
         return switch(TOKEN_LOCATION) {
@@ -193,7 +202,7 @@ public class JwtUtil {
 
         if (req.getCookies() != null) {
             for (Cookie cookie : req.getCookies()) {
-                String accessTokenStr = TokenEnum.AccessToken.getType();
+                String accessTokenStr = CookieEnum.ACCESS_TOKEN.getType();
                 if (accessTokenStr.equals(cookie.getName())) {
                     return cookie.getValue();
                 }
@@ -207,7 +216,7 @@ public class JwtUtil {
     public String resolveRefreshTokenFromCookie(HttpServletRequest req) {
         if (req.getCookies() != null) {
             for (Cookie cookie : req.getCookies()) {
-                String refreshTokenStr = TokenEnum.RefreshToken.getType();
+                String refreshTokenStr = CookieEnum.REFRESH_TOKEN.getType();
                 if (refreshTokenStr.equals(cookie.getName())) {
                     return cookie.getValue();
                 }
@@ -258,36 +267,32 @@ public class JwtUtil {
         return token != null && blacklistedTokenRepository.existsByToken(token);
     }
 
-    public void setAccessTokenCookie(JwtToken jwtToken, HttpServletResponse response) {
+    public void setAccessTokenCookie(JwtToken jwtToken, HttpServletResponse response, boolean isRememberMe) {
+        int maxAge = isRememberMe ? (int) (ACCESS_EXPIRATION_TIME / 1000) : -1;
 
-        int convertedTime = (int) (ACCESS_EXPIRATION_TIME / 1000);
-
-        String accessTokenStr = TokenEnum.AccessToken.getType();
+        String accessTokenStr = CookieEnum.ACCESS_TOKEN.getType();
         Cookie cookie = new Cookie(accessTokenStr, jwtToken.getAccessToken());
         cookie.setHttpOnly(true); // CSRF 방지
         cookie.setPath("/"); // Cookie가 유효한 경로
-//        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
-        cookie.setMaxAge(convertedTime);
+        cookie.setMaxAge(maxAge); // -1 : 브라우저가 닫히면 Cookie 삭제
         response.addCookie(cookie);
     }
 
-    public void setRefreshTokenCookie(JwtToken jwtToken, HttpServletResponse response) {
+    public void setRefreshTokenCookie(JwtToken jwtToken, HttpServletResponse response, boolean isRememberMe) {
+        int maxAge = isRememberMe ? (int) (ACCESS_EXPIRATION_TIME / 1000) : -1;
 
-        int convertedTime = (int) (REFRESH_EXPIRATION_TIME / 1000);
-
-        String refreshTokenStr = TokenEnum.RefreshToken.getType();
+        String refreshTokenStr = CookieEnum.REFRESH_TOKEN.getType();
         Cookie cookie = new Cookie(refreshTokenStr, jwtToken.getAccessToken());
         cookie.setHttpOnly(true); // CSRF 방지
         cookie.setPath("/"); // Cookie가 유효한 경로
-//        cookie.setMaxAge(-1); // 브라우저가 닫히면 Cookie 삭제
-        cookie.setMaxAge(convertedTime);
+        cookie.setMaxAge(maxAge); // -1 : 브라우저가 닫히면 Cookie 삭제
         response.addCookie(cookie);
     }
 
     public void removeAccessTokenCookie(HttpServletResponse response) {
         int convertedTime = (int) (ACCESS_EXPIRATION_TIME / 1000);
 
-        String accessTokenStr = TokenEnum.AccessToken.getType();
+        String accessTokenStr = CookieEnum.ACCESS_TOKEN.getType();
         Cookie cookie = new Cookie(accessTokenStr, null);
         cookie.setHttpOnly(true); // CSRF 방지
         cookie.setPath("/"); // Cookie가 유효한 경로
@@ -299,7 +304,7 @@ public class JwtUtil {
     public void removeRefreshTokenCookie(HttpServletResponse response) {
         int convertedTime = (int) (REFRESH_EXPIRATION_TIME / 1000);
 
-        String refreshTokenStr = TokenEnum.RefreshToken.getType();
+        String refreshTokenStr = CookieEnum.REFRESH_TOKEN.getType();
         Cookie cookie = new Cookie(refreshTokenStr, null);
         cookie.setHttpOnly(true); // CSRF 방지
         cookie.setPath("/"); // Cookie가 유효한 경로
@@ -318,5 +323,23 @@ public class JwtUtil {
 
             return false;
         }
+    }
+
+    public void setRememberMeToken(HttpServletResponse response, boolean isRememberMe) {
+        String rememberMeStr = CookieEnum.REMEMBER_ME.getType();
+        Cookie cookie = new Cookie(rememberMeStr, String.valueOf(isRememberMe));
+        cookie.setHttpOnly(true); // CSRF 방지
+        cookie.setPath("/");
+        cookie.setMaxAge(-1);
+        response.addCookie(cookie);
+    }
+
+    public void removeRememberMeToken( HttpServletResponse response) {
+        String rememberMeStr = CookieEnum.REMEMBER_ME.getType();
+        Cookie cookie = new Cookie(rememberMeStr, null);
+        cookie.setHttpOnly(true); // CSRF 방지
+        cookie.setPath("/");
+        cookie.setMaxAge(-1);
+        response.addCookie(cookie);
     }
 }

@@ -164,18 +164,27 @@ public class AuthService {
         return jwtUtil.checkAccessToken(request);
     }
 
-    public void setAllToken(JwtToken jwtToken, HttpServletResponse response) {
-        jwtUtil.setAccessTokenCookie(jwtToken, response);
-        jwtUtil.setRefreshTokenCookie(jwtToken, response);
+    public void setAllToken(JwtToken jwtToken, HttpServletRequest request, HttpServletResponse response) {
+        boolean isRememberMe = jwtUtil.resolveRememberMe(request, response);
+
+        jwtUtil.setAccessTokenCookie(jwtToken, response, isRememberMe);
+        jwtUtil.setRefreshTokenCookie(jwtToken, response, isRememberMe);
     }
 
-    public void setAccessToken(JwtToken jwtToken, HttpServletResponse response) {
-        jwtUtil.setAccessTokenCookie(jwtToken, response);
+    public void setAccessToken(JwtToken jwtToken, HttpServletRequest request, HttpServletResponse response) {
+        boolean isRememberMe = jwtUtil.resolveRememberMe(request, response);
+
+        jwtUtil.setAccessTokenCookie(jwtToken, response, isRememberMe);
     }
 
     public void removeAllToken(HttpServletResponse response) {
 
         jwtUtil.removeAccessTokenCookie(response);
         jwtUtil.removeRefreshTokenCookie(response);
+    }
+
+    public void setRememberMeCookie(RememberMeRequest request, HttpServletResponse response) {
+        boolean isRememberMe = request.isRememberMe();
+        jwtUtil.setRememberMeToken(response, isRememberMe);
     }
 }

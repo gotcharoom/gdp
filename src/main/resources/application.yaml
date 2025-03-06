@@ -25,7 +25,7 @@ spring:
 
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://${DB_URL}:${DB_PORT:30306}/${DB_NAME}?characterEncoding=UTF-8&serverTimezone=UTC
+    url: jdbc:mariadb://${DB_URL}:${DB_PORT:30306}/${DB_NAME}?passwordCharacterEncoding=UTF-8
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
