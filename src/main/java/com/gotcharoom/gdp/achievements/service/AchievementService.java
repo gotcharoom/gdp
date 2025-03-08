@@ -1,6 +1,7 @@
 package com.gotcharoom.gdp.achievements.service;
 
 import com.gotcharoom.gdp.achievements.model.response.SteamAchievementResponse;
+import com.gotcharoom.gdp.achievements.model.response.SteamOwnGames;
 import com.gotcharoom.gdp.achievements.repository.SteamAchievmentRepository;
 import com.gotcharoom.gdp.global.util.WebClientUtil;
 import com.gotcharoom.gdp.user.repository.UserRepository;
@@ -30,15 +31,11 @@ public class AchievementService {
         this.webClientUtil = webClientUtil;
     }
 
-    public SteamAchievementResponse getSteamAchievement() {
-        // 사용자 steamId
-
-        String steamId = "76561198230645968";
-        // 게임 id
-        String appId = "429660";
-
+    // 해당 스팀 게임 도전과제 불러오기
+    public SteamAchievementResponse GetSteamPlayerAchievementsOne(String userName, String appId) {
         String target = "https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/";
-
+        // 사용자 steamId
+        String steamId = "76561198230645968";
 
         String url = UriComponentsBuilder.fromUriString(target)
                 .queryParam("key", STEAM_API_KEY)
@@ -49,6 +46,40 @@ public class AchievementService {
                 .trim();
 
         return webClientUtil.get(url, SteamAchievementResponse.class);
+
+    }
+
+//    public String GetSteamOwnedGames() {
+//        String target = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/";
+//
+//        // 사용자 steamId
+//        String steamId = "76561198230645968";
+//
+//        String url = UriComponentsBuilder.fromUriString(target)
+//                .queryParam("key", STEAM_API_KEY)
+//                .queryParam("steamid", steamId)
+//                .queryParam("format", "json")
+//                .toUriString()
+//                .trim();
+//
+//        return webClientUtil.get(url, String.class);
+//
+//    }
+
+    public SteamOwnGames GetSteamOwnedGames() {
+        String target = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/";
+
+        // 사용자 steamId
+        String steamId = "76561198230645968";
+
+        String url = UriComponentsBuilder.fromUriString(target)
+                .queryParam("key", STEAM_API_KEY)
+                .queryParam("steamid", steamId)
+                .queryParam("format", "json")
+                .toUriString()
+                .trim();
+
+        return webClientUtil.get(url, SteamOwnGames.class);
 
     }
 
