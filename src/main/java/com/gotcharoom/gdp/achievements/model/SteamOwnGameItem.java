@@ -1,4 +1,4 @@
-package com.gotcharoom.gdp.achievements.model.response;
+package com.gotcharoom.gdp.achievements.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

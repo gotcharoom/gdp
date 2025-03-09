@@ -1,4 +1,4 @@
-package com.gotcharoom.gdp.achievements.model.response;
+package com.gotcharoom.gdp.achievements.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlayerStat {
+public class SteamPlayerStat {
     private String steamID;
     private String gameName;
     private List<SteamAchievementItem> achievements;
