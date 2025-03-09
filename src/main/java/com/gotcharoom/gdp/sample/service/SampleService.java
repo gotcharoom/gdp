@@ -3,6 +3,7 @@ package com.gotcharoom.gdp.sample.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.gotcharoom.gdp.global.util.WebClientUtil;
 import com.gotcharoom.gdp.sample.entity.SampleUser;
+import com.gotcharoom.gdp.sample.model.SampleCovidData;
 import com.gotcharoom.gdp.sample.model.SampleModel;
 import com.gotcharoom.gdp.sample.model.SampleCovidModel;
 import com.gotcharoom.gdp.sample.repository.SampleUserRepository;
@@ -47,6 +48,19 @@ public class SampleService {
                 .toUriString();
 
         return webClientUtil.get(url, SampleCovidModel.class);
+    }
+
+    public SampleCovidData getSampleCovidTarget() {
+
+        String url = UriComponentsBuilder.fromUriString(COVID_API_URL)
+                .queryParam("serviceKey", COVID_API_KEY)
+                .queryParam("page", 1)
+                .queryParam("perPage", 10)
+                .queryParam("returnType", "JSON")
+                .build(true)
+                .toUriString();
+
+        return webClientUtil.get(url, SampleCovidData.class, "data[0]");
     }
 
     public List<SampleCovidModel> getSampleCovidList() {

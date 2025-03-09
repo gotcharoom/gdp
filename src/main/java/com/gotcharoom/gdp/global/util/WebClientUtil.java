@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gotcharoom.gdp.global.config.WebClientConfig;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -13,6 +12,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 @RequiredArgsConstructor
@@ -29,7 +30,6 @@ public class WebClientUtil {
                 .method(method)
                 .uri(url);
 
-        // GET 요청이면 bodyValue() 호출하지 않음, 다른 요청에서는 requestBody가 null일 경우 빈 BodyInserters 사용
         if (requestBody != null && method != HttpMethod.GET) {
             requestSpec.bodyValue(requestBody);
         } else if (method != HttpMethod.GET) {
@@ -41,8 +41,8 @@ public class WebClientUtil {
                 .bodyToMono(JsonNode.class);
 
         return responseMono
-                .map(json -> Optional.ofNullable(target).map(json::get).orElse(json)) // target이 있으면 특정 필드 추출
-                .map(resJson -> objectMapper.convertValue(resJson, new TypeReference<T>() {})); // TypeReference 적용
+                .map(json -> extractTargetField(json, target)) // target이 있으면 특정 필드 추출
+                .map(resJson -> objectMapper.convertValue(resJson, responseType)); // TypeReference 적용
     }
 
     /**
@@ -53,7 +53,6 @@ public class WebClientUtil {
                 .method(method)
                 .uri(url);
 
-        // GET 요청이면 bodyValue() 호출하지 않음, 다른 요청에서는 requestBody가 null일 경우 빈 BodyInserters 사용
         if (requestBody != null && method != HttpMethod.GET) {
             requestSpec.bodyValue(requestBody);
         } else if (method != HttpMethod.GET) {
@@ -65,7 +64,7 @@ public class WebClientUtil {
                 .bodyToMono(JsonNode.class);
 
         return responseMono
-                .map(json -> Optional.ofNullable(target).map(json::get).orElse(json)) // target이 있으면 특정 필드 추출
+                .map(json -> extractTargetField(json, target)) // target이 있으면 특정 필드 추출
                 .map(resJson -> objectMapper.convertValue(resJson, responseType));
     }
 
@@ -105,5 +104,43 @@ public class WebClientUtil {
 
     public <T, V> T post(String url, V requestDto, Class<T> responseType, String target) {
         return sendRequest(HttpMethod.POST, url, requestDto, responseType, target).block();
+    }
+
+    /**
+     * JSON에서 target 필드 추출 ('.' 및 '[index]' 지원)
+     */
+    private JsonNode extractTargetField(JsonNode json, String target) {
+        if (target == null || target.isEmpty()) {
+            return json;
+        }
+
+        String[] keys = target.split("\\.");
+        JsonNode currentNode = json;
+
+        for (String key : keys) {
+            if (currentNode == null) {
+                return null;
+            }
+
+            Matcher matcher = Pattern.compile("([a-zA-Z0-9_]+)\\[([0-9]+)]").matcher(key);
+
+            if (matcher.matches()) {
+                // 키에 배열 인덱스가 있는 경우 (예: test[0])
+                String fieldName = matcher.group(1); // "test"
+                int index = Integer.parseInt(matcher.group(2)); // "0"
+
+                currentNode = currentNode.get(fieldName);
+                if (currentNode != null && currentNode.isArray() && currentNode.size() > index) {
+                    currentNode = currentNode.get(index);
+                } else {
+                    return null;
+                }
+            } else {
+                // 일반 키 (예: response, data)
+                currentNode = currentNode.get(key);
+            }
+        }
+
+        return currentNode;
     }
 }
