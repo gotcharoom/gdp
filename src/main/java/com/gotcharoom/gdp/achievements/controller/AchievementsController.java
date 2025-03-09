@@ -1,7 +1,8 @@
 package com.gotcharoom.gdp.achievements.controller;
 
-import com.gotcharoom.gdp.achievements.model.response.SteamAchievementResponse;
-import com.gotcharoom.gdp.achievements.model.response.SteamOwnGames;
+import com.gotcharoom.gdp.achievements.model.SteamPlayerStat;
+import com.gotcharoom.gdp.achievements.model.request.SteamAchievementRequest;
+import com.gotcharoom.gdp.achievements.model.request.SteamOwnGamesRequest;
 import com.gotcharoom.gdp.achievements.service.AchievementService;
 import com.gotcharoom.gdp.global.api.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RequestMapping("/api/v1/achievements")
 @AllArgsConstructor
@@ -27,24 +30,31 @@ public class AchievementsController {
             description = "도전과제 목록 불러오기"
     )
     @GetMapping("/r1")
-    public ApiResponse<SteamAchievementResponse> requestMyAchievement(@AuthenticationPrincipal UserDetails userDetails) {
+    public ApiResponse<List<SteamPlayerStat>> requestMyAchievement() {
 
-        // 로그인 여부 체크
-        System.out.println(userDetails.getUsername());
-//        if(userDetails == null) throw new Exception("메롱 시티");
+        // @AuthenticationPrincipal UserDetails userDetails
+        // todo. 나중에 유저 이름으로 steamID 불러오는 코드 추가
 
-        SteamAchievementResponse result = achievementService.GetSteamPlayerAchievementsOne(userDetails.getUsername(), "429660");
+        List<SteamPlayerStat> result = achievementService.getSteamPlayerAchievement();
         return ApiResponse.success(result);
     }
 
     @Operation(
             summary = "테스트",
-            description = "appid 확인 테스트"
+            description = "테스트 중"
     )
     @GetMapping("/test")
-    public ApiResponse<SteamOwnGames> test() {
-        // todo. @AuthenticationPrincipal UserDetails userDetails 파라미터를 사용한 유저 데이터 추가 처리 필요
-
-        return ApiResponse.success(achievementService.GetSteamOwnedGames());
+    public ApiResponse<String> test() {
+        return ApiResponse.success(achievementService.hasAchievements(1778820));
     }
+
+//    @Operation(
+//            summary = "테스트2",
+//            description = "도전과제 없는 게임 테스트"
+//    )
+//    @GetMapping("/test2")
+//    public ApiResponse<String> test2() {
+//        return ApiResponse.success(achievementService.test(1778820));
+//    }
+
 }

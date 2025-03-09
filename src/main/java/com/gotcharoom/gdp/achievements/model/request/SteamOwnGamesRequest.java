@@ -1,6 +1,6 @@
 package com.gotcharoom.gdp.achievements.model.request;
 
-import com.gotcharoom.gdp.achievements.model.SteamPlayerStat;
+import com.gotcharoom.gdp.achievements.model.SteamOwnGames;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SteamAchievementRequest {
-    private SteamPlayerStat playerstats;
+public class SteamOwnGamesRequest {
+    private SteamOwnGames response;
 }
