@@ -9,8 +9,8 @@ import com.gotcharoom.gdp.global.util.WebClientUtil;
 import com.gotcharoom.gdp.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +24,6 @@ public class AchievementService {
     private static final String STEAM_API_KEY = "C9926F5CBA82A0101A90A59BE0665295";  // 발급받은 API 키
     private static final String STEAM_API_URL = "https://api.steampowered.com";
 
-//    private static final String appId = "429660";
-//    private static final String steamId = "76561198230645968";
-
     private final WebClientUtil webClientUtil;
 
     public AchievementService(WebClient.Builder webClientBuilder, SteamAchievmentRepository steamAchievmentRepository, UserRepository userRepository, WebClientUtil webClientUtil) {
@@ -36,8 +33,28 @@ public class AchievementService {
         this.webClientUtil = webClientUtil;
     }
 
-    // 해당 스팀 게임 도전과제 불러오기
-    public SteamAchievementRequest getSteamPlayerAchievementsOne(int appId) {
+    // 해당 스팀 게임 도전과제 목록 전부 불러오기
+    public List<SteamPlayerStat> getSteamPlayerAchievement() {
+        // 1. 소유한 게임 목록 불러오기
+        List<Integer>appids = getSteamOwnedGamesAppid();
+
+        List<SteamPlayerStat> result = new ArrayList<>();
+
+        // 2. 소유한 게임들의 도전과제 불러오기
+        for(int i : appids) {
+            try {
+                result.add(getSteamPlayerAchievementsOne(i).getPlayerstats());
+            } catch(WebClientResponseException.BadRequest e) {
+                System.out.println("오류 발생 번호는" + i);
+                continue;
+            }
+        }
+
+        return result;
+    }
+
+    // 특정 스팀 게임 도전과제 불러오기
+    private SteamAchievementRequest getSteamPlayerAchievementsOne(int appId) {
         String target = "https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/";
         // 사용자 steamId
         String steamId = "76561198230645968";
@@ -54,25 +71,8 @@ public class AchievementService {
 
     }
 
-    // 해당 스팀 게임 도전과제 목록 전부 불러오기
-    public List<SteamPlayerStat> getSteamPlayerAchievement() {
-        List<Integer>appids = getSteamOwnedGamesAppid();
-
-        System.out.println(appids);
-
-        List<SteamPlayerStat> result = new ArrayList<>();
-
-        for(int i : appids) {
-            System.out.println("지금 번호는" + i);
-            result.add(getSteamPlayerAchievementsOne(i).getPlayerstats());
-            System.out.println();
-        }
-
-        return result;
-    }
-
     // 보유한 스팀 게임 appid 목록 불러오기
-    public List<Integer> getSteamOwnedGamesAppid() {
+    private List<Integer> getSteamOwnedGamesAppid() {
         String target = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/";
         // 사용자 steamId
         String steamId = "76561198230645968";
@@ -94,20 +94,6 @@ public class AchievementService {
             appids.add(i.getAppid());
         }
         return appids;
-    }
-
-    // 해당 게임이 도전과제가 있는지 확인
-    public String hasAchievements(int appId) {
-        String target = "https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/";
-
-        String url = UriComponentsBuilder.fromUriString(target)
-                .queryParam("key", STEAM_API_KEY)
-                .queryParam("steamid", "76561198230645968")
-                .queryParam("appid", appId)
-                .toUriString()
-                .trim();
-
-        return webClientUtil.get(url, String.class);
     }
 
 }

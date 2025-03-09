@@ -1,15 +1,11 @@
 package com.gotcharoom.gdp.achievements.controller;
 
 import com.gotcharoom.gdp.achievements.model.SteamPlayerStat;
-import com.gotcharoom.gdp.achievements.model.request.SteamAchievementRequest;
-import com.gotcharoom.gdp.achievements.model.request.SteamOwnGamesRequest;
 import com.gotcharoom.gdp.achievements.service.AchievementService;
 import com.gotcharoom.gdp.global.api.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,17 +41,7 @@ public class AchievementsController {
     )
     @GetMapping("/test")
     public ApiResponse<String> test() {
-        return ApiResponse.success(achievementService.hasAchievements(1778820));
+        return ApiResponse.success("string");
     }
-
-//    @Operation(
-//            summary = "테스트2",
-//            description = "도전과제 없는 게임 테스트"
-//    )
-//    @GetMapping("/test2")
-//    public ApiResponse<String> test2() {
-//        return ApiResponse.success(achievementService.test(1778820));
-//    }
-    // 테스트
 
 }
