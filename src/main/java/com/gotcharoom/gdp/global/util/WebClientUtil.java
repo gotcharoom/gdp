@@ -33,7 +33,7 @@ public class WebClientUtil {
         Mono<JsonNode> responseMono = webClientConfig.webClient()
                 .method(method)
                 .uri(url)
-                .bodyValue(Optional.ofNullable(requestBody).orElse(""))
+                .bodyValue(Optional.ofNullable(requestBody).orElseGet(() -> (V) new Object()))
                 .retrieve()
                 .bodyToMono(JsonNode.class);
 
