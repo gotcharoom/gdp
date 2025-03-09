@@ -1,12 +1,12 @@
 package com.gotcharoom.gdp.sample.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.gotcharoom.gdp.global.util.WebClientUtil;
 import com.gotcharoom.gdp.sample.entity.SampleUser;
 import com.gotcharoom.gdp.sample.model.SampleModel;
 import com.gotcharoom.gdp.sample.model.SampleCovidModel;
 import com.gotcharoom.gdp.sample.repository.SampleUserRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -59,6 +59,6 @@ public class SampleService {
                 .build(true)
                 .toUriString();
 
-        return webClientUtil.get(url, new ParameterizedTypeReference<List<SampleCovidModel>>() {});
+        return webClientUtil.get(url, new TypeReference<List<SampleCovidModel>>() {});
     }
 }
