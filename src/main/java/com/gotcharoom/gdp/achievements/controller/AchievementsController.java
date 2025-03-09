@@ -6,6 +6,8 @@ import com.gotcharoom.gdp.global.api.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,12 +28,13 @@ public class AchievementsController {
             description = "도전과제 목록 불러오기"
     )
     @GetMapping("/r1")
-    public ApiResponse<List<SteamPlayerStat>> requestMyAchievement() {
+    public ApiResponse<List<SteamPlayerStat>> requestMyAchievement(@AuthenticationPrincipal UserDetails userDetails) {
 
-        // @AuthenticationPrincipal UserDetails userDetails
         // todo. 나중에 유저 이름으로 steamID 불러오는 코드 추가
+        // @AuthenticationPrincipal UserDetails userDetails
+        // userDetails.getUsername();
 
-        List<SteamPlayerStat> result = achievementService.getSteamPlayerAchievement();
+        List<SteamPlayerStat> result = achievementService.getSteamPlayerAchievement("ss");
         return ApiResponse.success(result);
     }
 
