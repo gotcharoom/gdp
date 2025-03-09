@@ -57,7 +57,7 @@ public class AchievementService {
     }
 
     // 특정 스팀 게임 도전과제 불러오기
-    private SteamPlayerStat getSteamPlayerAchievementsOne(int appId, String steamId) {
+    public SteamPlayerStat getSteamPlayerAchievementsOne(int appId, String steamId) {
         String target = "https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/";
 
         String url = UriComponentsBuilder.fromUriString(target)
@@ -68,7 +68,16 @@ public class AchievementService {
                 .toUriString()
                 .trim();
 
-        return webClientUtil.get(url, SteamPlayerStat.class, "playerstats");
+        SteamPlayerStat result = webClientUtil.get(url, SteamPlayerStat.class, "playerstats");
+
+        // 결과물에서 달성한 도전 과제만 추려내기
+        for(int i=0; i<result.getAchievements().size(); i++) {
+            if (result.getAchievements().get(i).getAchieved() == 0) {
+                result.getAchievements().remove(result.getAchievements().get(i));
+            }
+        }
+
+        return result;
 
     }
 
