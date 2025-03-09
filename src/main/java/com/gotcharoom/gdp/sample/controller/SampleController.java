@@ -2,6 +2,7 @@ package com.gotcharoom.gdp.sample.controller;
 
 import com.gotcharoom.gdp.global.api.ApiResponse;
 import com.gotcharoom.gdp.global.api.ErrorResponse;
+import com.gotcharoom.gdp.sample.model.SampleCovidData;
 import com.gotcharoom.gdp.sample.model.SampleModel;
 import com.gotcharoom.gdp.sample.model.SampleCovidModel;
 import com.gotcharoom.gdp.sample.service.SampleService;
@@ -65,8 +66,19 @@ public class SampleController {
             description = "테스트합니다"
     )
     @GetMapping("/response/success/covid")
-    public ApiResponse<SampleCovidModel> responseTestSuccessWeather() {
+    public ApiResponse<SampleCovidModel> responseTestSuccessCovid() {
         SampleCovidModel sampleCovidModel = sampleService.getSampleCovid();
+
+        return ApiResponse.success(sampleCovidModel);
+    }
+
+    @Operation(
+            summary = "Response 테스트 - 성공 (코로나 접종 장소 조회 API)",
+            description = "Target 테스트합니다"
+    )
+    @GetMapping("/response/success/covid/target")
+    public ApiResponse<SampleCovidData> responseTestSuccessCovidTarget() {
+        SampleCovidData sampleCovidModel = sampleService.getSampleCovidTarget();
 
         return ApiResponse.success(sampleCovidModel);
     }
