@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
@@ -20,36 +22,45 @@ public class WebClientUtil {
     private final ObjectMapper objectMapper;
 
     /**
-     * TypeReference를 ParameterizedTypeReference로 변환
-     */
-    private <T> ParameterizedTypeReference<T> toParameterizedTypeReference(TypeReference<T> typeRef) {
-        return new ParameterizedTypeReference<T>() {};
-    }
-
-    /**
      * WebClient 요청 - 공통 처리 (TypeReference 사용)
      */
     private <T, V> Mono<T> sendRequest(HttpMethod method, String url, V requestBody, TypeReference<T> responseType, String target) {
-        Mono<JsonNode> responseMono = webClientConfig.webClient()
+        WebClient.RequestBodySpec requestSpec = webClientConfig.webClient()
                 .method(method)
-                .uri(url)
-                .bodyValue(Optional.ofNullable(requestBody).orElseGet(() -> (V) new Object()))
+                .uri(url);
+
+        // GET 요청이면 bodyValue() 호출하지 않음, 다른 요청에서는 requestBody가 null일 경우 빈 BodyInserters 사용
+        if (requestBody != null && method != HttpMethod.GET) {
+            requestSpec.bodyValue(requestBody);
+        } else if (method != HttpMethod.GET) {
+            requestSpec.body(BodyInserters.empty());
+        }
+
+        Mono<JsonNode> responseMono = requestSpec
                 .retrieve()
                 .bodyToMono(JsonNode.class);
 
         return responseMono
                 .map(json -> Optional.ofNullable(target).map(json::get).orElse(json)) // target이 있으면 특정 필드 추출
-                .map(resJson -> objectMapper.convertValue(resJson, responseType));
+                .map(resJson -> objectMapper.convertValue(resJson, new TypeReference<T>() {})); // TypeReference 적용
     }
 
     /**
      * WebClient 요청 - 공통 처리 (Class<T> 사용)
      */
     private <T, V> Mono<T> sendRequest(HttpMethod method, String url, V requestBody, Class<T> responseType, String target) {
-        Mono<JsonNode> responseMono = webClientConfig.webClient()
+        WebClient.RequestBodySpec requestSpec = webClientConfig.webClient()
                 .method(method)
-                .uri(url)
-                .bodyValue(Optional.ofNullable(requestBody).orElseGet(() -> (V) new Object()))
+                .uri(url);
+
+        // GET 요청이면 bodyValue() 호출하지 않음, 다른 요청에서는 requestBody가 null일 경우 빈 BodyInserters 사용
+        if (requestBody != null && method != HttpMethod.GET) {
+            requestSpec.bodyValue(requestBody);
+        } else if (method != HttpMethod.GET) {
+            requestSpec.body(BodyInserters.empty());
+        }
+
+        Mono<JsonNode> responseMono = requestSpec
                 .retrieve()
                 .bodyToMono(JsonNode.class);
 
