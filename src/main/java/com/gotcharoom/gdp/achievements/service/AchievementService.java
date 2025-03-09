@@ -95,21 +95,35 @@ public class AchievementService {
         return appids;
     }
 
-    // 외부 api 사용 테스트
-        public Object test() {
-
-        // 주소
+    // 외부 api 사용 테스트 (GetSchemaForGame)
+    public Object test() {
         String target = "https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/";
 
-        // 1. 사용자 게임 목록 요청
         String url = UriComponentsBuilder.fromUriString(target)
                 .queryParam("key", STEAM_API_KEY)
-                .queryParam("appid", "1778820")
+                .queryParam("appid", "429660")
                 .queryParam("l", "koreana")
                 .toUriString()
                 .trim();
 
         return webClientUtil.get(url, Object.class);
+
+    }
+
+    // 외부 api 사용 테스트 (GetOwnedGames)
+    public Object test2() {
+        String target = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/";
+
+        String url = UriComponentsBuilder.fromUriString(target)
+                .queryParam("key", STEAM_API_KEY)
+                .queryParam("steamid", "76561198230645968")
+                .queryParam("format", "json")
+                .toUriString()
+                .trim();
+
+        return webClientUtil.get(url, Object.class, "response");
+
+
 
     }
 

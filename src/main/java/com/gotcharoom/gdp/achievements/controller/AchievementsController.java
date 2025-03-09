@@ -39,12 +39,21 @@ public class AchievementsController {
     }
 
     @Operation(
-            summary = "외부 api 테스트",
+            summary = "외부 api 테스트 (GetSchemaForGame)",
             description = "테스트 중"
     )
     @GetMapping("/test")
     public ApiResponse<Object> test() {
         return ApiResponse.success(achievementService.test());
+    }
+
+    @Operation(
+            summary = "외부 api 테스트 (GetOwnedGames)",
+            description = "테스트 중"
+    )
+    @GetMapping("/test2")
+    public ApiResponse<Object> test2() {
+        return ApiResponse.success(achievementService.test2());
     }
 
 }
