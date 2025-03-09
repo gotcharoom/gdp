@@ -39,12 +39,12 @@ public class AchievementsController {
     }
 
     @Operation(
-            summary = "테스트",
+            summary = "외부 api 테스트",
             description = "테스트 중"
     )
     @GetMapping("/test")
-    public ApiResponse<String> test() {
-        return ApiResponse.success("string");
+    public ApiResponse<Object> test() {
+        return ApiResponse.success(achievementService.test());
     }
 
 }

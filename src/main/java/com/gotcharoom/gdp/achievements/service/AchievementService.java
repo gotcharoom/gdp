@@ -1,9 +1,8 @@
 package com.gotcharoom.gdp.achievements.service;
 
 import com.gotcharoom.gdp.achievements.model.SteamOwnGameItem;
+import com.gotcharoom.gdp.achievements.model.SteamOwnGames;
 import com.gotcharoom.gdp.achievements.model.SteamPlayerStat;
-import com.gotcharoom.gdp.achievements.model.request.SteamAchievementRequest;
-import com.gotcharoom.gdp.achievements.model.request.SteamOwnGamesRequest;
 import com.gotcharoom.gdp.achievements.repository.SteamAchievmentRepository;
 import com.gotcharoom.gdp.global.util.WebClientUtil;
 import com.gotcharoom.gdp.user.repository.UserRepository;
@@ -43,10 +42,11 @@ public class AchievementService {
 
         List<SteamPlayerStat> result = new ArrayList<>();
 
+
         // 3. 소유한 게임들의 도전과제 불러오기
         for(int i : appids) {
             try {
-                result.add(getSteamPlayerAchievementsOne(i, steamId).getPlayerstats());
+                result.add(getSteamPlayerAchievementsOne(i, steamId));
             } catch(WebClientResponseException.BadRequest e) {
                 System.out.println("오류 발생 번호는" + i);
                 continue;
@@ -57,7 +57,7 @@ public class AchievementService {
     }
 
     // 특정 스팀 게임 도전과제 불러오기
-    private SteamAchievementRequest getSteamPlayerAchievementsOne(int appId, String steamId) {
+    private SteamPlayerStat getSteamPlayerAchievementsOne(int appId, String steamId) {
         String target = "https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/";
 
         String url = UriComponentsBuilder.fromUriString(target)
@@ -68,7 +68,7 @@ public class AchievementService {
                 .toUriString()
                 .trim();
 
-        return webClientUtil.get(url, SteamAchievementRequest.class);
+        return webClientUtil.get(url, SteamPlayerStat.class, "playerstats");
 
     }
 
@@ -84,15 +84,34 @@ public class AchievementService {
                 .toUriString()
                 .trim();
 
-        SteamOwnGamesRequest result =  webClientUtil.get(url, SteamOwnGamesRequest.class);
+        SteamOwnGames result =  webClientUtil.get(url, SteamOwnGames.class, "response");
 
         // 2. appid만 추출
-        List<SteamOwnGameItem> games = result.getResponse().getGames();
+        List<SteamOwnGameItem> games = result.getGames();
         List<Integer> appids = new ArrayList<>();
         for(SteamOwnGameItem i : games) {
             appids.add(i.getAppid());
         }
         return appids;
     }
+
+    // 외부 api 사용 테스트
+        public Object test() {
+
+        // 주소
+        String target = "https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/";
+
+        // 1. 사용자 게임 목록 요청
+        String url = UriComponentsBuilder.fromUriString(target)
+                .queryParam("key", STEAM_API_KEY)
+                .queryParam("appid", "1778820")
+                .queryParam("l", "koreana")
+                .toUriString()
+                .trim();
+
+        return webClientUtil.get(url, Object.class);
+
+    }
+
 
 }

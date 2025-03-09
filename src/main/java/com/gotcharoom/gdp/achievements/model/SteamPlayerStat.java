@@ -16,5 +16,4 @@ public class SteamPlayerStat {
     private String gameName;
     private List<SteamAchievementItem> achievements;
     private boolean success;
-
 }
