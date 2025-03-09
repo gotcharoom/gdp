@@ -11,7 +11,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,8 +40,7 @@ public class WebClientUtil {
                 .bodyToMono(JsonNode.class);
 
         return responseMono
-                .map(json -> extractTargetField(json, target)) // target이 있으면 특정 필드 추출
-                .map(resJson -> objectMapper.convertValue(resJson, responseType)); // TypeReference 적용
+                .map(json -> extractAndConvert(json, target, responseType));
     }
 
     /**
@@ -64,8 +62,7 @@ public class WebClientUtil {
                 .bodyToMono(JsonNode.class);
 
         return responseMono
-                .map(json -> extractTargetField(json, target)) // target이 있으면 특정 필드 추출
-                .map(resJson -> objectMapper.convertValue(resJson, responseType));
+                .map(json -> extractAndConvert(json, target, responseType));
     }
 
     /**
@@ -142,5 +139,40 @@ public class WebClientUtil {
         }
 
         return currentNode;
+    }
+
+    /**
+     * JSON에서 target 필드 추출 후 변환 (String.class 처리 추가)
+     */
+    private <T> T extractAndConvert(JsonNode json, String target, Class<T> responseType) {
+        if (target != null && !target.isEmpty()) {
+            json = extractTargetField(json, target);
+        }
+
+        if (json == null || json.isNull()) {
+            return null;
+        }
+
+        if (responseType == String.class) {
+            try {
+                return responseType.cast(objectMapper.writeValueAsString(json));
+            } catch (Exception e) {
+                return responseType.cast(json.asText());
+            }
+        }
+
+        return objectMapper.convertValue(json, responseType);
+    }
+
+    private <T> T extractAndConvert(JsonNode json, String target, TypeReference<T> responseType) {
+        if (target != null && !target.isEmpty()) {
+            json = extractTargetField(json, target);
+        }
+
+        if (json == null || json.isNull()) {
+            return null;
+        }
+
+        return objectMapper.convertValue(json, responseType);
     }
 }
