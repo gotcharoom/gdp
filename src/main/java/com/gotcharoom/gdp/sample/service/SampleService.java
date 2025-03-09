@@ -63,6 +63,19 @@ public class SampleService {
         return webClientUtil.get(url, SampleCovidData.class, "data[0]");
     }
 
+    public String getSampleCovidString() {
+
+        String url = UriComponentsBuilder.fromUriString(COVID_API_URL)
+                .queryParam("serviceKey", COVID_API_KEY)
+                .queryParam("page", 1)
+                .queryParam("perPage", 10)
+                .queryParam("returnType", "JSON")
+                .build(true)
+                .toUriString();
+
+        return webClientUtil.get(url, String.class);
+    }
+
     public List<SampleCovidModel> getSampleCovidList() {
 
         String url = UriComponentsBuilder.fromUriString(COVID_API_URL)

@@ -84,6 +84,17 @@ public class SampleController {
     }
 
     @Operation(
+            summary = "Response 테스트 - 성공 (코로나 접종 장소 조회 API)",
+            description = "Target 테스트합니다"
+    )
+    @GetMapping("/response/success/covid/string")
+    public ApiResponse<String > responseTestSuccessCovidString() {
+        String  sampleCovidModel = sampleService.getSampleCovidString();
+
+        return ApiResponse.success(sampleCovidModel);
+    }
+
+    @Operation(
             summary = "테스트",
             description = "테스트합니다"
     )
