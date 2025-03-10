@@ -16,4 +16,14 @@ public class SteamPlayerStat {
     private String gameName;
     private List<SteamAchievementItem> achievements;
     private boolean success;
+
+    // 새 객체 생성 (builder 패턴 방식)
+    public SteamPlayerStat toBuilder(List<SteamAchievementItem> newAchievements) {
+        return SteamPlayerStat.builder()
+                .steamID(steamID)
+                .gameName(gameName)
+                .achievements(newAchievements)
+                .success(success)
+                .build();
+    }
 }

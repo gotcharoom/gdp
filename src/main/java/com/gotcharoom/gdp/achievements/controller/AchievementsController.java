@@ -62,7 +62,7 @@ public class AchievementsController {
     )
     @GetMapping("/test3")
     public ApiResponse<Object> test3() {
-        return ApiResponse.success(achievementService.getSteamPlayerAchievementsOne(429660, "76561198230645968"));
+        return ApiResponse.success(achievementService.getSteamPlayerAchievementsOne(1623730, "76561198230645968"));
     }
 
 }

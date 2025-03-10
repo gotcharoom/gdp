@@ -24,7 +24,7 @@ public class SteamAchievement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 스팀 유저 id(코드)
+    // 스팀 유저 id(코드) (비정규화로 처리)
     @Column(name="steam_id", nullable = false)
     private String steamID;
 

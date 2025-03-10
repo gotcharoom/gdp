@@ -1,5 +1,6 @@
 package com.gotcharoom.gdp.achievements.service;
 
+import com.gotcharoom.gdp.achievements.model.SteamAchievementItem;
 import com.gotcharoom.gdp.achievements.model.SteamOwnGameItem;
 import com.gotcharoom.gdp.achievements.model.SteamOwnGames;
 import com.gotcharoom.gdp.achievements.model.SteamPlayerStat;
@@ -11,7 +12,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AchievementService {
@@ -41,15 +44,16 @@ public class AchievementService {
         List<Integer>appids = getSteamOwnedGamesAppid(steamId);
 
         List<SteamPlayerStat> result = new ArrayList<>();
-
-
+        
         // 3. 소유한 게임들의 도전과제 불러오기
         for(int i : appids) {
+            // 4. 도전과제 미보유 게임에 대한 요청은 400 BadRequest가 발생하거나 도전 과제 데이터가 넘어오지 않음 -> 예외 처리 후 다음 게임 정보 요청
             try {
                 result.add(getSteamPlayerAchievementsOne(i, steamId));
             } catch(WebClientResponseException.BadRequest e) {
                 System.out.println("오류 발생 번호는" + i);
-                continue;
+            } catch(IllegalArgumentException e) {
+
             }
         }
 
@@ -57,7 +61,7 @@ public class AchievementService {
     }
 
     // 특정 스팀 게임 도전과제 불러오기
-    public SteamPlayerStat getSteamPlayerAchievementsOne(int appId, String steamId) {
+    public SteamPlayerStat getSteamPlayerAchievementsOne(int appId, String steamId) throws IllegalArgumentException {
         String target = "https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/";
 
         String url = UriComponentsBuilder.fromUriString(target)
@@ -70,14 +74,27 @@ public class AchievementService {
 
         SteamPlayerStat result = webClientUtil.get(url, SteamPlayerStat.class, "playerstats");
 
-        // 결과물에서 달성한 도전 과제만 추려내기
-        for(int i=0; i<result.getAchievements().size(); i++) {
-            if (result.getAchievements().get(i).getAchieved() == 0) {
-                result.getAchievements().remove(result.getAchievements().get(i));
-            }
+        // 유효성 검사 1. 도전과제가 있는 게임인지 확인
+        if(result.getAchievements() == null) {
+            System.out.println("유효성 오류 검사 1 발생 번호는 " + appId);
+            throw new IllegalArgumentException("도전과제가 없는 게임입니다. appid = " + appId);
+        }
+        
+        // 달성한 도전과제만 추출
+        List<SteamAchievementItem> filteredList = result.getAchievements().stream()
+                .filter(item -> item.getAchieved() == 1)
+                .collect(Collectors.toList());
+        
+        // 유효성 검사 2. 달성한 도전과제가 하나도 없는지 확인
+        if (filteredList.isEmpty()) {
+            System.out.println("유효성 오류 검사 2 발생 번호는 " + appId);
+            throw new IllegalArgumentException(" 달성한 도전과제가 하나도 없는 게임입니다. appid = " + appId);
         }
 
-        return result;
+        // 추출된 목록을 새 객체에 담아 return
+        SteamPlayerStat newResult = result.toBuilder(filteredList);
+
+        return newResult;
 
     }
 
@@ -131,8 +148,6 @@ public class AchievementService {
                 .trim();
 
         return webClientUtil.get(url, Object.class, "response");
-
-
 
     }
 
