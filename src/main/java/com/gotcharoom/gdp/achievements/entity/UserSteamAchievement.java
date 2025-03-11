@@ -2,6 +2,10 @@ package com.gotcharoom.gdp.achievements.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnTransformer;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.util.Date;
 
 @Getter
 @Builder
@@ -47,5 +51,12 @@ public class UserSteamAchievement {
     // 도전과제 상세 설명
     @Column(nullable = false)
     private String description;
+
+    // unix 시간으로 포맷
+//    @CreationTimestamp
+//    @Temporal(TemporalType.TIMESTAMP)
+//    @Column(name = "upload_date")
+//    @ColumnTransformer(read = "UNIX_TIMESTAMP(created_at)", write = "FROM_UNIXTIME(?)")
+//    private Date uploadDate;
 
 }

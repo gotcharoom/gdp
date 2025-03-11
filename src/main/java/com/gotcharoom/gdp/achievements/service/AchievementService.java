@@ -1,5 +1,6 @@
 package com.gotcharoom.gdp.achievements.service;
 
+import com.gotcharoom.gdp.achievements.entity.UserSteamAchievement;
 import com.gotcharoom.gdp.achievements.model.SteamAchievementItem;
 import com.gotcharoom.gdp.achievements.model.SteamOwnGameItem;
 import com.gotcharoom.gdp.achievements.model.SteamOwnGames;
@@ -114,6 +115,25 @@ public class AchievementService {
             appids.add(i.getAppid());
         }
         return appids;
+    }
+
+    public String saveSteamAchievements() {
+        List<SteamPlayerStat> result = getSteamPlayerAchievement("ss");
+
+        for(SteamPlayerStat i : result) {
+            for(SteamAchievementItem j : i.getAchievements()) {
+                steamAchievmentRepository.save(UserSteamAchievement.builder()
+                        .steamID(i.getSteamID())
+                        .gameName(i.getGameName())
+                        .apiname(j.getApiname())
+                        .unlocktime(j.getUnlocktime())
+                        .name(j.getName())
+                        .description(j.getDescription())
+                        .build());
+            }
+        }
+
+        return "ok";
     }
 
 

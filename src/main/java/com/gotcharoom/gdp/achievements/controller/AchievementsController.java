@@ -65,4 +65,13 @@ public class AchievementsController {
         return ApiResponse.success(achievementService.getSteamPlayerAchievementsOne(1623730, "76561198230645968"));
     }
 
+    @Operation(
+            summary = "세이브 기능 테스트 중",
+            description = "테스트 중"
+    )
+    @GetMapping("/test4")
+    public ApiResponse<Object> test4() {
+        return ApiResponse.success(achievementService.saveSteamAchievements());
+    }
+
 }
