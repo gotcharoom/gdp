@@ -8,18 +8,15 @@ import com.gotcharoom.gdp.achievements.repository.SteamAchievmentRepository;
 import com.gotcharoom.gdp.global.util.WebClientUtil;
 import com.gotcharoom.gdp.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class AchievementService {
 
-    private final WebClient webClient;
     private final SteamAchievmentRepository steamAchievmentRepository;
     private final UserRepository userRepository;
 
@@ -28,8 +25,7 @@ public class AchievementService {
 
     private final WebClientUtil webClientUtil;
 
-    public AchievementService(WebClient.Builder webClientBuilder, SteamAchievmentRepository steamAchievmentRepository, UserRepository userRepository, WebClientUtil webClientUtil) {
-        this.webClient = webClientBuilder.baseUrl(STEAM_API_URL).build();
+    public AchievementService(SteamAchievmentRepository steamAchievmentRepository, UserRepository userRepository, WebClientUtil webClientUtil) {
         this.steamAchievmentRepository = steamAchievmentRepository;
         this.userRepository = userRepository;
         this.webClientUtil = webClientUtil;
@@ -51,9 +47,8 @@ public class AchievementService {
             try {
                 result.add(getSteamPlayerAchievementsOne(i, steamId));
             } catch(WebClientResponseException.BadRequest e) {
-                System.out.println("오류 발생 번호는" + i);
+                System.out.println("400 오류 발생 번호는" + i);
             } catch(IllegalArgumentException e) {
-
             }
         }
 
@@ -62,7 +57,7 @@ public class AchievementService {
 
     // 특정 스팀 게임 도전과제 불러오기
     public SteamPlayerStat getSteamPlayerAchievementsOne(int appId, String steamId) throws IllegalArgumentException {
-        String target = "https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/";
+        String target = STEAM_API_URL + "/ISteamUserStats/GetPlayerAchievements/v0001/";
 
         String url = UriComponentsBuilder.fromUriString(target)
                 .queryParam("key", STEAM_API_KEY)
@@ -100,7 +95,7 @@ public class AchievementService {
 
     // 보유한 스팀 게임 appid 목록 불러오기
     private List<Integer> getSteamOwnedGamesAppid(String steamId) {
-        String target = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/";
+        String target = STEAM_API_URL + "/IPlayerService/GetOwnedGames/v0001/";
 
         // 1. 사용자 게임 목록 요청
         String url = UriComponentsBuilder.fromUriString(target)
@@ -121,9 +116,12 @@ public class AchievementService {
         return appids;
     }
 
+
+
+
     // 외부 api 사용 테스트 (GetSchemaForGame)
     public Object test() {
-        String target = "https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/";
+        String target = STEAM_API_URL + "/ISteamUserStats/GetSchemaForGame/v2/";
 
         String url = UriComponentsBuilder.fromUriString(target)
                 .queryParam("key", STEAM_API_KEY)
@@ -138,7 +136,7 @@ public class AchievementService {
 
     // 외부 api 사용 테스트 (GetOwnedGames)
     public Object test2() {
-        String target = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/";
+        String target = STEAM_API_URL + "/IPlayerService/GetOwnedGames/v0001/";
 
         String url = UriComponentsBuilder.fromUriString(target)
                 .queryParam("key", STEAM_API_KEY)

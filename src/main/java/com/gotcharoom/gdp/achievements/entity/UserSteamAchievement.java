@@ -9,16 +9,16 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @Table(
-        name = "user_achievement",
+        name = "user_steam_achievement",
         uniqueConstraints = {
-                @UniqueConstraint(name = "unique_user_achievement", columnNames = {
+                @UniqueConstraint(name = "unique_user_steam_achievement", columnNames = {
                         "steamId",
                         "game_name",
                         "apiname"
                 })
         }
 )
-public class SteamAchievement {
+public class UserSteamAchievement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,10 +35,6 @@ public class SteamAchievement {
     // 도전과제 id
     @Column(name="apiname", nullable = false)
     private String apiname;
-
-    // 도전과제 달성 여부 (0=미달성, 1=달성)
-    @Column(nullable = false)
-    private byte achieved;
 
     // 해금 시간 (unix 시간)
     @Column(nullable = false)
