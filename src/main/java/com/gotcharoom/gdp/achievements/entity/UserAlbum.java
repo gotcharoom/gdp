@@ -2,10 +2,11 @@ package com.gotcharoom.gdp.achievements.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnTransformer;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.util.Date;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -28,14 +29,20 @@ public class UserAlbum {
 
     private String userId;
 
+    // 앨범과 연동한 도전과제 목록
     @OneToMany(mappedBy = "userAlbum", cascade = CascadeType.ALL)
-    private List<UserAlbumAchievementList> achievements;
+    @Builder.Default // 빈 리스트 작성을 위한 필수 설정
+    private List<UserAlbumAchievementList> achievements = new ArrayList<>();
 
-    // unix 시간으로 포맷
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "upload_date", updatable = false)
-    @ColumnTransformer(read = "UNIX_TIMESTAMP(created_at)", write = "FROM_UNIXTIME(?)")
-    private Date uploadDate;
+    // 업로드 날짜
+    @UpdateTimestamp
+    @Column(name = "upload_date")
+    private LocalDateTime uploadDate;
+
+    // 연관관계 편의 메서드
+    public void addAchievement(UserAlbumAchievementList achievementList) {
+        achievements.add(achievementList);
+        achievementList.toBuilder(this);
+    }
 
 }

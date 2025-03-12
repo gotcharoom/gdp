@@ -5,14 +5,17 @@ import com.gotcharoom.gdp.achievements.model.SteamAchievementItem;
 import com.gotcharoom.gdp.achievements.model.SteamOwnGameItem;
 import com.gotcharoom.gdp.achievements.model.SteamOwnGames;
 import com.gotcharoom.gdp.achievements.model.SteamPlayerStat;
+import com.gotcharoom.gdp.achievements.model.request.AlbumSaveRequest;
 import com.gotcharoom.gdp.achievements.repository.SteamAchievmentRepository;
 import com.gotcharoom.gdp.global.util.WebClientUtil;
 import com.gotcharoom.gdp.user.repository.UserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -117,26 +120,36 @@ public class AchievementService {
         return appids;
     }
 
-    public String saveSteamAchievements() {
-        List<SteamPlayerStat> result = getSteamPlayerAchievement("ss");
+    // 스팀 도전과제 저장
+    public int saveSteamAchievements(List<SteamPlayerStat> achievementList) {
+        int count = 0;
 
-        for(SteamPlayerStat i : result) {
+        // 저장을 위해 포맷
+        for(SteamPlayerStat i : achievementList) {
             for(SteamAchievementItem j : i.getAchievements()) {
-                steamAchievmentRepository.save(UserSteamAchievement.builder()
-                        .steamID(i.getSteamID())
-                        .gameName(i.getGameName())
-                        .apiname(j.getApiname())
-                        .unlocktime(j.getUnlocktime())
-                        .name(j.getName())
-                        .description(j.getDescription())
-                        .build());
+                try {
+                    steamAchievmentRepository.save(UserSteamAchievement.builder()
+                            .steamID(i.getSteamID())
+                            .gameName(i.getGameName())
+                            .apiname(j.getApiname())
+                            .unlocktime(j.getUnlocktime())
+                            .name(j.getName())
+                            .description(j.getDescription())
+                            .build());
+
+                    // 저장에 성공한 항목 수 집계
+                    count++;
+
+                } catch (DataIntegrityViolationException e) {
+                    System.out.println("이미 존재하는 데이터입니다." + i);
+                }
             }
         }
 
-        return "ok";
+        return count;
     }
 
-
+    // --------------------------------------- TEST Methods ---------------------------------------
 
 
     // 외부 api 사용 테스트 (GetSchemaForGame)
@@ -168,6 +181,8 @@ public class AchievementService {
         return webClientUtil.get(url, Object.class, "response");
 
     }
+
+
 
 
 }
