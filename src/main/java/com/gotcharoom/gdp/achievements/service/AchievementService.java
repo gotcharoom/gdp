@@ -5,7 +5,6 @@ import com.gotcharoom.gdp.achievements.model.SteamAchievementItem;
 import com.gotcharoom.gdp.achievements.model.SteamOwnGameItem;
 import com.gotcharoom.gdp.achievements.model.SteamOwnGames;
 import com.gotcharoom.gdp.achievements.model.SteamPlayerStat;
-import com.gotcharoom.gdp.achievements.model.request.AlbumSaveRequest;
 import com.gotcharoom.gdp.achievements.repository.SteamAchievmentRepository;
 import com.gotcharoom.gdp.global.util.WebClientUtil;
 import com.gotcharoom.gdp.user.repository.UserRepository;
@@ -15,7 +14,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.util.UriComponentsBuilder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +33,7 @@ public class AchievementService {
         this.webClientUtil = webClientUtil;
     }
 
-    // 해당 스팀 게임 도전과제 목록 전부 불러오기
+    // 연동한 스팀 계정의 게임 도전과제 목록 전부 불러오기
     public List<SteamPlayerStat> getSteamPlayerAchievement(String userName) {
 
         // 1. 현재 접속한 유저의 스팀id 확인 (현재는 생략)
@@ -91,9 +89,7 @@ public class AchievementService {
         }
 
         // 추출된 목록을 새 객체에 담아 return
-        SteamPlayerStat newResult = result.toBuilder(filteredList);
-
-        return newResult;
+        return result.toBuilder(filteredList);
 
     }
 

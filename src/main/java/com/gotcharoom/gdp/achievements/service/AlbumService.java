@@ -6,7 +6,9 @@ import com.gotcharoom.gdp.achievements.entity.UserSteamAchievement;
 import com.gotcharoom.gdp.achievements.model.request.AlbumSaveRequest;
 import com.gotcharoom.gdp.achievements.repository.SteamAchievmentRepository;
 import com.gotcharoom.gdp.achievements.repository.UserAlbumRepository;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ public class AlbumService {
         return userAlbumRepository.findById(1L);
     }
 
-    public int saveAlbum(AlbumSaveRequest requestData) {
+    public int saveUserAlbum(AlbumSaveRequest requestData) {
         UserAlbum newAlbumData = UserAlbum.builder()
                 .title(requestData.getTitle())
                 .contentText(requestData.getContentText())
@@ -48,6 +50,17 @@ public class AlbumService {
 
     }
 
+    @Transactional
+    public void deleteUserAlbum(int index) {
+        System.out.println("index 값은 : " + index);
+        try {
+            userAlbumRepository.deleteById((long) index);
+        } catch (Exception e) {
+            System.out.println("오류가 발생했나? ");
+            throw new IllegalArgumentException("해당 앨범을 찾을 수 없습니다.");
+        }
+    }
+
     // --------------------------------------- TEST Methods ---------------------------------------
 
     // 테스트용 request 데이터 제작 메소드
@@ -63,15 +76,12 @@ public class AlbumService {
             n1.add(a2.get());
             n1.add(a3.get());
 
-
-            AlbumSaveRequest newData = AlbumSaveRequest.builder()
+            return AlbumSaveRequest.builder()
                     .title("타이틀입니다.")
                     .contentText("내용물입니다 내용물입니다. 내용물입니다...")
                     .image("asdfasdfasdad")
                     .achievements(n1)
                     .build();
-
-            return newData;
         }
 
         return null;

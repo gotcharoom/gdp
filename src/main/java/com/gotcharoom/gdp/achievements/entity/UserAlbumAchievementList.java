@@ -1,21 +1,25 @@
 package com.gotcharoom.gdp.achievements.entity;
 
-import com.gotcharoom.gdp.achievements.model.SteamAchievementItem;
-import com.gotcharoom.gdp.achievements.model.SteamPlayerStat;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
-@Table(name = "user_album_achievment_list")
+@Table(
+        name = "user_album_achievment_list",
+        uniqueConstraints = {
+            @UniqueConstraint(name = "unique_user_steam_achievement", columnNames = {
+                    "USER_ALBUM_ID",
+                    "USER_ACHIEVEMENT_ID",
+                })
+        }
+)
+// 앨범에 저장된 도전과제 목록 (중간 매핑 테이블)
 public class UserAlbumAchievementList {
-    // 앨범에 저장된 도전과제 목록 (중간 매핑 테이블)
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

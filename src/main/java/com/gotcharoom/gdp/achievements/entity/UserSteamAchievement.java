@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 @Table(
         name = "user_steam_achievement",
         uniqueConstraints = {
-                @UniqueConstraint(name = "unique_user_steam_achievement", columnNames = {
-                        "steamId",
-                        "game_name",
-                        "apiname"
-                })
+            @UniqueConstraint(name = "unique_user_steam_achievement", columnNames = {
+                    "steamId",
+                    "game_name",
+                    "apiname"
+            })
         }
 )
 public class UserSteamAchievement {

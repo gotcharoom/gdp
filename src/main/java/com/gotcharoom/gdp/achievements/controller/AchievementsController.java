@@ -51,19 +51,29 @@ public class AchievementsController {
     }
 
     @Operation(
-            summary = "앨범에 도전과제 저장하기",
-            description = "내 앨범에 선택한 도전과제를 저장 / return 타입 : 저장한 수(count)"
+            summary = "앨범 저장하기",
+            description = "작성한 앨범 내용과 앨범에 등록한 도전과제를 저장 / return 타입 : 저장한 수(count)"
     )
     @PostMapping("/r3")
     public ApiResponse<Integer> saveAlbum(@RequestBody AlbumSaveRequest requestData) {
-
+        
+        // 리퀘스트 데이터 용 목데이터 추가
         AlbumSaveRequest mockData = albumService.albumRequestDataTest();
-        return ApiResponse.success(albumService.saveAlbum(mockData));
+        return ApiResponse.success(albumService.saveUserAlbum(mockData));
+    }
+
+    @Operation(
+            summary = "앨범 삭제",
+            description = "선택한 앨범을 지우기 / return 타입 : String"
+    )
+    @PostMapping("/r4")
+    public ApiResponse<String> saveAlbum(@RequestBody Integer index) {
+        albumService.deleteUserAlbum(index);
+        return ApiResponse.success("ok");
     }
 
 
-
-
+    
     // --------------------------------------- TEST API ---------------------------------------
 
     @Operation(
