@@ -51,7 +51,7 @@ public class AchievementsController {
     }
 
     @Operation(
-            summary = "앨범 저장하기",
+            summary = "앨범 저장하기(신규)",
             description = "작성한 앨범 내용과 앨범에 등록한 도전과제를 저장 / return 타입 : 저장한 수(count)"
     )
     @PostMapping("/r3")
@@ -67,7 +67,7 @@ public class AchievementsController {
             description = "선택한 앨범을 지우기 / return 타입 : String"
     )
     @PostMapping("/r4")
-    public ApiResponse<String> saveAlbum(@RequestBody Integer index) {
+    public ApiResponse<String> saveAlbum(@RequestBody long index) {
         albumService.deleteUserAlbum(index);
         return ApiResponse.success("ok");
     }

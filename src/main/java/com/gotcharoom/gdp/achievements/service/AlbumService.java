@@ -6,6 +6,8 @@ import com.gotcharoom.gdp.achievements.entity.UserSteamAchievement;
 import com.gotcharoom.gdp.achievements.model.request.AlbumSaveRequest;
 import com.gotcharoom.gdp.achievements.repository.SteamAchievmentRepository;
 import com.gotcharoom.gdp.achievements.repository.UserAlbumRepository;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,10 +26,12 @@ public class AlbumService {
         this.userAlbumRepository = userAlbumRepository;
     }
 
-    public Optional<UserAlbum> getUserAlbum() {
-        return userAlbumRepository.findById(1L);
+    public UserAlbum getUserAlbum() {
+        return userAlbumRepository.findById(1L)
+                .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 앨범이 존재하지 않습니다.", 1));
     }
 
+    // 앨범 저장 기능
     public int saveUserAlbum(AlbumSaveRequest requestData) {
         UserAlbum newAlbumData = UserAlbum.builder()
                 .title(requestData.getTitle())
@@ -50,16 +54,28 @@ public class AlbumService {
 
     }
 
+    // 앨범 삭제 기능
     @Transactional
-    public void deleteUserAlbum(int index) {
+    public void deleteUserAlbum(Long index) {
         System.out.println("index 값은 : " + index);
         try {
-            userAlbumRepository.deleteById((long) index);
+            // deleteById 메소드를 쓰면 Exception이 발생 안함 -> 오류 캐치를 위해 findById와 delete 메소드 사용
+            UserAlbum album = userAlbumRepository.findById(index)
+                    .orElseThrow(() -> new EmptyResultDataAccessException(1));
+            userAlbumRepository.delete(album);
+
+        } catch (EmptyResultDataAccessException e) {
+            System.out.println("오류가 발생했나? " + e);
+            throw new EmptyResultDataAccessException("해당 앨범이 존재하지 않습니다: 22 " + index, 1);
+
+        } catch (DataIntegrityViolationException | ConstraintViolationException e) {
+            throw new DataIntegrityViolationException("제약 조건 위반 오류 발생");
+
         } catch (Exception e) {
-            System.out.println("오류가 발생했나? ");
-            throw new IllegalArgumentException("해당 앨범을 찾을 수 없습니다.");
+            throw new IllegalArgumentException("기타 예외 발생");
         }
     }
+
 
     // --------------------------------------- TEST Methods ---------------------------------------
 
