@@ -97,6 +97,10 @@ spring:
           auth: true
           starttls:
             enable: true
+          ssl:
+            trust: ${MAIL_HOST}
+            checkserveridentity: false
+
 
 
 # swagger setting
