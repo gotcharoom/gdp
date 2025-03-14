@@ -4,6 +4,7 @@ import com.gotcharoom.gdp.achievements.entity.UserAlbum;
 import com.gotcharoom.gdp.achievements.entity.UserAlbumAchievementList;
 import com.gotcharoom.gdp.achievements.entity.UserSteamAchievement;
 import com.gotcharoom.gdp.achievements.model.request.AlbumSaveRequest;
+import com.gotcharoom.gdp.achievements.model.response.GetAlbumResponse;
 import com.gotcharoom.gdp.achievements.repository.SteamAchievmentRepository;
 import com.gotcharoom.gdp.achievements.repository.UserAlbumRepository;
 import jakarta.validation.ConstraintViolationException;
@@ -18,22 +19,29 @@ import java.util.Optional;
 
 @Service
 public class AlbumService {
-
-    private final SteamAchievmentRepository steamAchievmentRepository;
     private final UserAlbumRepository userAlbumRepository;
-    public AlbumService(SteamAchievmentRepository steamAchievmentRepository, UserAlbumRepository userAlbumRepository) {
-        this.steamAchievmentRepository = steamAchievmentRepository;
+    private final SteamAchievmentRepository steamAchievmentRepository;
+    public AlbumService(UserAlbumRepository userAlbumRepository, SteamAchievmentRepository steamAchievmentRepository) {
         this.userAlbumRepository = userAlbumRepository;
+        this.steamAchievmentRepository = steamAchievmentRepository;
     }
 
-    public UserAlbum getUserAlbum() {
-        return userAlbumRepository.findById(1L)
+    public GetAlbumResponse getUserAlbum(Long index) {
+        UserAlbum album = userAlbumRepository.findById(index)
                 .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 앨범이 존재하지 않습니다.", 1));
+
+        List<UserSteamAchievement> achievements = steamAchievmentRepository.findAllById(index);
+
+
+        return album;
     }
 
-    // 앨범 저장 기능
+    // 앨범 저장 & 수정 기능
     public int saveUserAlbum(AlbumSaveRequest requestData) {
+        // id가 null일시 => 새 앨범 생성
+        // id가 null이 아닐 시 => 수정 (중간 테이블(UserAlbumAchievementList도 자동으로 갱신됨)
         UserAlbum newAlbumData = UserAlbum.builder()
+                .id(requestData.getId())
                 .title(requestData.getTitle())
                 .contentText(requestData.getContentText())
                 .image(requestData.getImage())
@@ -41,14 +49,23 @@ public class AlbumService {
                 .build();
 
         requestData.getAchievements().forEach(item -> {
+            UserSteamAchievement sample = UserSteamAchievement.builder()
+                    .id(item)
+                    .build();
+
             UserAlbumAchievementList newAchievement = UserAlbumAchievementList.builder()
-                    .achievement(item)
+                    .achievement(sample)
                     .build();
 
             newAlbumData.addAchievement(newAchievement);
         });
 
-        userAlbumRepository.save(newAlbumData);
+        try {
+            userAlbumRepository.save(newAlbumData);
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalArgumentException("잘못된 앨범 번호 또는 도전과제 번호 입니다");
+        }
+
 
         return 1;
 
@@ -66,10 +83,10 @@ public class AlbumService {
 
         } catch (EmptyResultDataAccessException e) {
             System.out.println("오류가 발생했나? " + e);
-            throw new EmptyResultDataAccessException("해당 앨범이 존재하지 않습니다: 22 " + index, 1);
+            throw new IllegalArgumentException("해당 앨범이 존재하지 않습니다: 22 " + index);
 
         } catch (DataIntegrityViolationException | ConstraintViolationException e) {
-            throw new DataIntegrityViolationException("제약 조건 위반 오류 발생");
+            throw new IllegalArgumentException("제약 조건 위반 오류 발생");
 
         } catch (Exception e) {
             throw new IllegalArgumentException("기타 예외 발생");
@@ -80,26 +97,14 @@ public class AlbumService {
     // --------------------------------------- TEST Methods ---------------------------------------
 
     // 테스트용 request 데이터 제작 메소드
-    public AlbumSaveRequest albumRequestDataTest() {
-        Optional<UserSteamAchievement> a1 = steamAchievmentRepository.findById(1L);
-        Optional<UserSteamAchievement> a2 = steamAchievmentRepository.findById(2L);
-        Optional<UserSteamAchievement> a3 = steamAchievmentRepository.findById(3L);
+    public AlbumSaveRequest albumRequestDataTest(List<Long> ids) {
 
-        List<UserSteamAchievement> n1 = new ArrayList<>();
 
-        if(a1.isPresent() && a2.isPresent() && a3.isPresent()) {
-            n1.add(a1.get());
-            n1.add(a2.get());
-            n1.add(a3.get());
-
-            return AlbumSaveRequest.builder()
-                    .title("타이틀입니다.")
-                    .contentText("내용물입니다 내용물입니다. 내용물입니다...")
-                    .image("asdfasdfasdad")
-                    .achievements(n1)
-                    .build();
-        }
-
-        return null;
+        return AlbumSaveRequest.builder()
+                .title("타이틀입니다.")
+                .contentText("내용물입니다 내용물입니다. 내용물입니다...")
+                .image("asdfasdfasdad")
+                .achievements(ids)
+                .build();
     }
 }

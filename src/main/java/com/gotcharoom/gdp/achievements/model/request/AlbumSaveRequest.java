@@ -23,5 +23,6 @@ public class AlbumSaveRequest {
 
 //    private String userId;
 
-    private List<UserSteamAchievement> achievements;
+    // 연동한 도전과제 id값
+    private List<Long> achievements;
 }

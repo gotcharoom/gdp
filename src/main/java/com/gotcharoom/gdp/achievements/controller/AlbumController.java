@@ -1,15 +1,13 @@
 package com.gotcharoom.gdp.achievements.controller;
 
+import com.gotcharoom.gdp.achievements.entity.UserAlbum;
 import com.gotcharoom.gdp.achievements.model.request.AlbumSaveRequest;
 import com.gotcharoom.gdp.achievements.service.AlbumService;
 import com.gotcharoom.gdp.global.api.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/v1/album")
 @AllArgsConstructor
@@ -19,15 +17,15 @@ public class AlbumController {
     private final AlbumService albumService;
 
     @Operation(
-            summary = "앨범 저장하기(신규)",
+            summary = "앨범 저장/수정하기",
             description = "작성한 앨범 내용과 앨범에 등록한 도전과제를 저장 / return 타입 : 저장한 수(count)"
     )
     @PostMapping("/r1")
     public ApiResponse<Integer> saveAlbum(@RequestBody AlbumSaveRequest requestData) {
 
         // 리퀘스트 데이터 용 목데이터 추가
-        AlbumSaveRequest mockData = albumService.albumRequestDataTest();
-        return ApiResponse.success(albumService.saveUserAlbum(mockData));
+//        AlbumSaveRequest mockData = albumService.albumRequestDataTest(requestData.getAchievements());
+        return ApiResponse.success(albumService.saveUserAlbum(requestData));
     }
 
     @Operation(
@@ -41,15 +39,13 @@ public class AlbumController {
     }
 
     @Operation(
-            summary = "앨범 수정",
-            description = "앨범 내용을 수정 / return 타입 : String"
+            summary = "앨범 가져오기(1건)",
+            description = "선택한 앨범 정보 가져오기 / return 타입 : UserAlbum"
     )
-    @PostMapping("/r3")
-    public ApiResponse<AlbumSaveRequest> editAlbum(@RequestBody AlbumSaveRequest requestData) {
-        // 리퀘스트 데이터 용 목데이터 추가
-//        AlbumSaveRequest mockData = albumService.albumRequestDataTest();
-//        albumService.saveUserAlbum(mockData);
-        return ApiResponse.success(requestData);
+    @GetMapping("/r3")
+    public ApiResponse<Object> getAlbumDetail(@RequestParam("index") long index) {
+        return ApiResponse.success(albumService.getUserAlbum(index));
     }
+
 
 }
