@@ -1,4 +1,4 @@
-package com.gotcharoom.gdp.achievements.model;
+package com.gotcharoom.gdp.achievements.model.steamAPI;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

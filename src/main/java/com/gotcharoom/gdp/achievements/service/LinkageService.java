@@ -2,9 +2,9 @@ package com.gotcharoom.gdp.achievements.service;
 
 import com.gotcharoom.gdp.achievements.entity.UserSteamAchievement;
 import com.gotcharoom.gdp.achievements.model.SteamAchievementItem;
-import com.gotcharoom.gdp.achievements.model.SteamOwnGameItem;
-import com.gotcharoom.gdp.achievements.model.SteamOwnGames;
-import com.gotcharoom.gdp.achievements.model.SteamPlayerStat;
+import com.gotcharoom.gdp.achievements.model.steamAPI.SteamOwnGameItem;
+import com.gotcharoom.gdp.achievements.model.steamAPI.SteamOwnGames;
+import com.gotcharoom.gdp.achievements.model.steamAPI.SteamPlayerStat;
 import com.gotcharoom.gdp.achievements.repository.SteamAchievmentRepository;
 import com.gotcharoom.gdp.global.util.WebClientUtil;
 import com.gotcharoom.gdp.user.repository.UserRepository;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class AchievementService {
+public class LinkageService {
 
     private final SteamAchievmentRepository steamAchievmentRepository;
     private final UserRepository userRepository;
@@ -27,7 +27,7 @@ public class AchievementService {
 
     private final WebClientUtil webClientUtil;
 
-    public AchievementService(SteamAchievmentRepository steamAchievmentRepository, UserRepository userRepository, WebClientUtil webClientUtil) {
+    public LinkageService(SteamAchievmentRepository steamAchievmentRepository, UserRepository userRepository, WebClientUtil webClientUtil) {
         this.steamAchievmentRepository = steamAchievmentRepository;
         this.userRepository = userRepository;
         this.webClientUtil = webClientUtil;
@@ -116,7 +116,7 @@ public class AchievementService {
         return appids;
     }
 
-    // 스팀 도전과제 저장
+    // 연동한 스팀 도전과제를 DB에 저장
     public int saveSteamAchievements(List<SteamPlayerStat> achievementList) {
         int count = 0;
 
@@ -136,7 +136,7 @@ public class AchievementService {
                     // 저장에 성공한 항목 수 집계
                     count++;
 
-                } catch (DataIntegrityViolationException e) {
+                } catch (DataIntegrityViolationException e) { // 이미 연동한 도전과제인지 유효성 검사
                     System.out.println("이미 존재하는 데이터입니다." + i);
                 }
             }
