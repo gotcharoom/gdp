@@ -44,4 +44,18 @@ public class GdpUser {
     @Enumerated(EnumType.STRING)
     @Column(name="role")
     private Role role;
+
+    public GdpUser changePassword(String changedPassword) {
+        return GdpUser.builder()
+                .socialType(socialType)
+                .id(id)
+                .socialId(socialId)
+                .nickName(nickName)
+                .name(name)
+                .password(changedPassword)
+                .email(email)
+                .imageUrl(imageUrl)
+                .role(role)
+                .build();
+    }
 }

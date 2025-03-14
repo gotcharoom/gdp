@@ -1,7 +1,6 @@
 package com.gotcharoom.gdp.mail.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,7 +16,6 @@ public class MailRequest {
     private String htmlContents;
 
     public static class MailRequestBuilder {
-        private final String mailFrom = "postmaster@stdtrinfra.com";  // ✅ mailFrom을 고정
         private String mailTo;
         private String subject;
         private String htmlContents;
@@ -38,6 +36,8 @@ public class MailRequest {
         }
 
         public MailRequest build() {
+            // ✅ mailFrom을 고정
+            String mailFrom = "postmaster@stdtrinfra.com";
             return new MailRequest(mailFrom, mailTo, subject, htmlContents);
         }
     }
