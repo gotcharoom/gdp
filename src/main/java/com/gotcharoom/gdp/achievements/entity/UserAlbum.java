@@ -20,6 +20,7 @@ public class UserAlbum {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
     @Column(columnDefinition = "TEXT")
@@ -27,6 +28,7 @@ public class UserAlbum {
 
     private String image;
 
+    @Column(nullable = false)
     private String userId;
 
     // 앨범과 연동한 도전과제 목록
