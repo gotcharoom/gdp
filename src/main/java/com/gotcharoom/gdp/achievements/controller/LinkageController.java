@@ -14,7 +14,7 @@ import java.util.List;
 
 @RequestMapping("/api/v1/linkage")
 @AllArgsConstructor
-@Tag(name = "linkage", description = "연동 관련 API")
+@Tag(name = "도전과제 연동", description = "연동 관련 API")
 @RestController
 public class LinkageController {
     private final LinkageService linkageService;

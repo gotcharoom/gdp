@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/v1/album")
 @AllArgsConstructor
-@Tag(name = "album", description = "앨범 관련 API")
+@Tag(name = "앨범 기능", description = "앨범 관련 API")
 @RestController
 public class AlbumController {
     private final AlbumService albumService;
@@ -38,6 +38,18 @@ public class AlbumController {
     public ApiResponse<String> deleteAlbum(@RequestBody long index) {
         albumService.deleteUserAlbum(index);
         return ApiResponse.success("ok");
+    }
+
+    @Operation(
+            summary = "앨범 수정",
+            description = "앨범 내용을 수정 / return 타입 : String"
+    )
+    @PostMapping("/r3")
+    public ApiResponse<AlbumSaveRequest> editAlbum(@RequestBody AlbumSaveRequest requestData) {
+        // 리퀘스트 데이터 용 목데이터 추가
+//        AlbumSaveRequest mockData = albumService.albumRequestDataTest();
+//        albumService.saveUserAlbum(mockData);
+        return ApiResponse.success(requestData);
     }
 
 }

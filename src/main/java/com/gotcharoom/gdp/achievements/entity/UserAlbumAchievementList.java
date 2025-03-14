@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -32,12 +31,9 @@ public class UserAlbumAchievementList {
     @JoinColumn(name = "USER_ACHIEVEMENT_ID")
     private UserSteamAchievement achievement;
 
-    // 새 객체 생성 (builder 패턴 방식)
-    public UserAlbumAchievementList toBuilder(UserAlbum newAlbum) {
-        return UserAlbumAchievementList.builder()
-                .userAlbum(newAlbum)
-                .achievement(achievement)
-                .build();
+    // album 연관 관계용 setter 메소드
+    public void updateAlbum(UserAlbum newAlbum) {
+        this.userAlbum = newAlbum;
     }
 
 }

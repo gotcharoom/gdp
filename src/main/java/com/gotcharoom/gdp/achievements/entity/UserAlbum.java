@@ -42,7 +42,7 @@ public class UserAlbum {
     // 연관관계 편의 메서드
     public void addAchievement(UserAlbumAchievementList achievementList) {
         achievements.add(achievementList);
-        achievementList.setUserAlbum(this);
+        achievementList.updateAlbum(this);
     }
 
 }

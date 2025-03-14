@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AlbumSaveRequest {
+    private Long id;
+
     private String title;
 
     private String contentText;
