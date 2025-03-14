@@ -35,7 +35,7 @@ public class MailService {
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
         helper.setFrom(request.getMailFrom());
-        helper.setTo(request.getMailFrom());
+        helper.setTo(request.getMailTo());
         helper.setSubject(request.getSubject());
         helper.setText(request.getHtmlContents(), true);
 
