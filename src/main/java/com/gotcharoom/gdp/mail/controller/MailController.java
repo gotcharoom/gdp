@@ -5,6 +5,7 @@ import com.gotcharoom.gdp.auth.model.LoginRequest;
 import com.gotcharoom.gdp.auth.model.TokenLocationEnum;
 import com.gotcharoom.gdp.global.api.ApiResponse;
 import com.gotcharoom.gdp.mail.model.FindIdRequest;
+import com.gotcharoom.gdp.mail.model.FindPasswordRequest;
 import com.gotcharoom.gdp.mail.model.FindResponse;
 import com.gotcharoom.gdp.mail.service.MailService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,13 +32,24 @@ public class MailController {
     }
 
     @Operation(
-            summary = "로그인 - JWT 토큰 발급",
-            description = "JWT 토큰 통한 자체 로그인 API"
+            summary = "ID 찾기",
+            description = "Email 통한 GDP ID 찾기 API"
     )
     @PostMapping("/find/id")
-    public ApiResponse<FindResponse> login(@RequestBody FindIdRequest findIdRequest) throws MessagingException {
+    public ApiResponse<FindResponse> findId(@RequestBody FindIdRequest request) throws MessagingException {
 
-        FindResponse response = mailService.sendFindIdEmail(findIdRequest);
+        FindResponse response = mailService.sendFindIdEmail(request);
+        return ApiResponse.success(response);
+    }
+
+    @Operation(
+            summary = "임시 비밀번호 발급",
+            description = "GDP ID / Email 통한 임시 비밀번호 발급 API"
+    )
+    @PostMapping("/generate/temp-password")
+    public ApiResponse<FindResponse> generateTemporaryPassword(@RequestBody FindPasswordRequest request) throws MessagingException {
+
+        FindResponse response = mailService.sendGenerateTempPasswordEmail(request);
         return ApiResponse.success(response);
     }
 }

@@ -2,6 +2,7 @@ package com.gotcharoom.gdp.mail.service;
 
 import com.gotcharoom.gdp.global.security.SocialType;
 import com.gotcharoom.gdp.mail.model.FindIdRequest;
+import com.gotcharoom.gdp.mail.model.FindPasswordRequest;
 import com.gotcharoom.gdp.mail.model.FindResponse;
 import com.gotcharoom.gdp.mail.model.MailRequest;
 import com.gotcharoom.gdp.user.entity.GdpUser;
@@ -10,9 +11,12 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+
+import java.util.UUID;
 
 @Service
 public class MailService {
@@ -24,10 +28,67 @@ public class MailService {
     private final TemplateEngine templateEngine;
     private final JavaMailSender mailSender;
 
-    public MailService(UserRepository userRepository, TemplateEngine templateEngine, JavaMailSender mailSender) {
+    private final PasswordEncoder passwordEncoder;
+
+    public MailService(
+            UserRepository userRepository,
+            TemplateEngine templateEngine,
+            JavaMailSender mailSender,
+            PasswordEncoder passwordEncoder
+    ) {
         this.userRepository = userRepository;
         this.templateEngine = templateEngine;
         this.mailSender = mailSender;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public FindResponse sendFindIdEmail(FindIdRequest request) throws MessagingException {
+        boolean isFound = false;
+
+        GdpUser gdpUser = userRepository.findBySocialTypeAndEmail(SocialType.GDP, request.getEmail())
+                .orElse(null);
+
+        if (gdpUser != null) {
+            isFound = true;
+            String templated = applyTemplateToFindIdMail(gdpUser);
+
+            MailRequest mailRequest = MailRequest.builder()
+                    .mailTo(gdpUser.getEmail())
+                    .subject(FIND_ID_MAIL_SUBJECT)
+                    .htmlContents(templated)
+                    .build();
+            MimeMessage message = createMail(mailRequest);
+            mailSender.send(message);
+        }
+
+        return FindResponse.builder()
+                .isFound(isFound)
+                .build();
+    }
+
+    public FindResponse sendGenerateTempPasswordEmail(FindPasswordRequest request) throws MessagingException {
+        boolean isFound = false;
+
+        GdpUser gdpUser = userRepository.findBySocialTypeAndIdAndEmail(SocialType.GDP, request.getId(), request.getEmail())
+                .orElse(null);
+
+        if (gdpUser != null) {
+            isFound = true;
+            String tempPassword = createTempPassword(gdpUser);
+            String templated = applyTemplateToFindPasswordMail(gdpUser, tempPassword);
+
+            MailRequest mailRequest = MailRequest.builder()
+                    .mailTo(gdpUser.getEmail())
+                    .subject(FIND_ID_MAIL_SUBJECT)
+                    .htmlContents(templated)
+                    .build();
+            MimeMessage message = createMail(mailRequest);
+            mailSender.send(message);
+        }
+
+        return FindResponse.builder()
+                .isFound(isFound)
+                .build();
     }
 
     private MimeMessage createMail(MailRequest request) throws MessagingException {
@@ -50,34 +111,22 @@ public class MailService {
         return templateEngine.process("find-id-template", context);
     }
 
-//    private String applyTemplateToFindPasswordMail(FindIdRequest findIdRequest) {
-//        Context context = new Context();
-//        context.setVariable("username", username);
-//
-//        return templateEngine.process("find-id-template", context);
-//    }
+    private String applyTemplateToFindPasswordMail(GdpUser gdpUser, String tempPassword) {
+        Context context = new Context();
+        context.setVariable("username", gdpUser.getName());
 
-    public FindResponse sendFindIdEmail(FindIdRequest findIdRequest) throws MessagingException {
-        boolean isFound = false;
+        context.setVariable("tempPassword", tempPassword);
 
-        GdpUser gdpUser = userRepository.findBySocialTypeAndEmail(SocialType.GDP, findIdRequest.getEmail())
-                .orElse(null);
+        return templateEngine.process("find-password-template", context);
+    }
 
-        if (gdpUser != null) {
-            isFound = true;
-            String templated = applyTemplateToFindIdMail(gdpUser);
+    private String createTempPassword(GdpUser gdpUser) {
+        String tempPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 10);;
 
-            MailRequest request = MailRequest.builder()
-                    .mailTo(gdpUser.getEmail())
-                    .subject(FIND_ID_MAIL_SUBJECT)
-                    .htmlContents(templated)
-                    .build();
-            MimeMessage message = createMail(request);
-            mailSender.send(message);
-        }
+        String encoded = passwordEncoder.encode(tempPassword);
+        gdpUser.changePassword(encoded);
+        userRepository.save(gdpUser);
 
-        return FindResponse.builder()
-                .isFound(isFound)
-                .build();
+        return tempPassword;
     }
 }
