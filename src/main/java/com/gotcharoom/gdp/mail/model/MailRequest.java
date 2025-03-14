@@ -17,7 +17,7 @@ public class MailRequest {
     private String htmlContents;
 
     public static class MailRequestBuilder {
-        private final String mailFrom = "root@stdtrinfra.com";  // ✅ mailFrom을 고정
+        private final String mailFrom = "postmaster@stdtrinfra.com";  // ✅ mailFrom을 고정
         private String mailTo;
         private String subject;
         private String htmlContents;
