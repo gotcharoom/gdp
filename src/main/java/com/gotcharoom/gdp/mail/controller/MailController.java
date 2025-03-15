@@ -1,8 +1,5 @@
 package com.gotcharoom.gdp.mail.controller;
 
-import com.gotcharoom.gdp.auth.model.JwtToken;
-import com.gotcharoom.gdp.auth.model.LoginRequest;
-import com.gotcharoom.gdp.auth.model.TokenLocationEnum;
 import com.gotcharoom.gdp.global.api.ApiResponse;
 import com.gotcharoom.gdp.mail.model.FindIdRequest;
 import com.gotcharoom.gdp.mail.model.FindPasswordRequest;
@@ -11,8 +8,6 @@ import com.gotcharoom.gdp.mail.service.MailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

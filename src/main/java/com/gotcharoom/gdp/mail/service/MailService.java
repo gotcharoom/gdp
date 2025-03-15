@@ -23,6 +23,8 @@ public class MailService {
 
     private static final String FIND_ID_MAIL_SUBJECT = "GDP ID 찾기 메일입니다";
 
+    private static final String GENERATE_TEMP_PASSWORD_MAIL_SUBJECT = "GDP 임시 비밀번호 발급 메일입니다";
+
     private final UserRepository userRepository;
 
     private final TemplateEngine templateEngine;
@@ -79,7 +81,7 @@ public class MailService {
 
             MailRequest mailRequest = MailRequest.builder()
                     .mailTo(gdpUser.getEmail())
-                    .subject(FIND_ID_MAIL_SUBJECT)
+                    .subject(GENERATE_TEMP_PASSWORD_MAIL_SUBJECT)
                     .htmlContents(templated)
                     .build();
             MimeMessage message = createMail(mailRequest);
