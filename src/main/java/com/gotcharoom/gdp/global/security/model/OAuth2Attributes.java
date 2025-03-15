@@ -69,8 +69,10 @@ public class OAuth2Attributes {
                 .id(oauth2UserInfo.getId())
                 .socialId(oauth2UserInfo.getId())
                 .nickName(oauth2UserInfo.getNickname())
+                .name(oauth2UserInfo.getName())
+                .email(oauth2UserInfo.getEmail())
                 .imageUrl(oauth2UserInfo.getImageUrl())
-                .role(Role.GUEST)
+                .role(Role.USER)
                 .build();
     }
 }

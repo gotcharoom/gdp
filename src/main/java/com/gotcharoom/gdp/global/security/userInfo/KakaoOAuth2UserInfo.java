@@ -20,37 +20,38 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
         return String.valueOf(attributes.get(usernameAttributeName));
     }
 
+    // 공통 메서드: kakao_account 가져오기
+    private Map<String, Object> getKakaoAccount() {
+        return (Map<String, Object>) attributes.get("kakao_account");
+    }
+
+    // 공통 메서드: profile 가져오기
+    private Map<String, Object> getProfile() {
+        Map<String, Object> account = getKakaoAccount();
+        return account != null ? (Map<String, Object>) account.get("profile") : null;
+    }
+
     @Override
     public String getNickname() {
-        Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
+        Map<String, Object> profile = getProfile();
+        return profile != null ? (String) profile.get("nickname") : null;
+    }
 
-        if (account == null) {
-            return null;
-        }
+    @Override
+    public String getName() {
+        Map<String, Object> profile = getProfile();
+        return profile != null ? (String) profile.get("nickname") : null;
+    }
 
-        Map<String, Object> profile = (Map<String, Object>) account.get("profile");
-
-        if (profile == null) {
-            return null;
-        }
-
-        return (String) profile.get("nickname");
+    @Override
+    public String getEmail() {
+        Map<String, Object> account = getKakaoAccount();
+        return account != null ? (String) account.get("email") : null;
     }
 
     @Override
     public String getImageUrl() {
-        Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
-
-        if (account == null) {
-            return null;
-        }
-
-        Map<String, Object> profile = (Map<String, Object>) account.get("profile");
-
-        if (profile == null) {
-            return null;
-        }
-
-        return (String) profile.get("thumbnail_image_url");
+        Map<String, Object> profile = getProfile();
+        return profile != null ? (String) profile.get("thumbnail_image_url") : null;
     }
 }

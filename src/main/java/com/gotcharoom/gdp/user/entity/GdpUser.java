@@ -10,26 +10,31 @@ import lombok.*;
 @NoArgsConstructor( access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
-@Table(name = "gdp_user")
+@Table(
+        name = "gdp_user",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "unique_social_type_id", columnNames = {"social_type", "id"})
+        }
+)
 public class GdpUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long uid;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="social_type", nullable = false, unique = true)
+    @Column(name="social_type", nullable = false)
     private SocialType socialType;
 
-    @Column(name="id", nullable = false, unique = true)
+    @Column(name="id", nullable = false)
     private String id;
 
     @Column(name="social_id")
     private String socialId;
 
-    @Column(name="nick_name")
+    @Column(name="nick_name", nullable = false)
     private String nickName;
 
-    @Column(name="name")
+    @Column(name="name", nullable = false)
     private String name;
 
     @Column(name="password")
@@ -42,7 +47,7 @@ public class GdpUser {
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="role")
+    @Column(name="role", nullable = false)
     private Role role;
 
     public GdpUser changePassword(String changedPassword) {
