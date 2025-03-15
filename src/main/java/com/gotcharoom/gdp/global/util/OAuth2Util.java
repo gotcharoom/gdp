@@ -1,10 +1,8 @@
 package com.gotcharoom.gdp.global.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gotcharoom.gdp.global.security.OAuth2Attributes;
-import com.gotcharoom.gdp.global.security.SocialType;
+import com.gotcharoom.gdp.global.security.model.OAuth2Attributes;
+import com.gotcharoom.gdp.global.security.model.SocialType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;

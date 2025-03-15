@@ -1,4 +1,4 @@
-package com.gotcharoom.gdp.global.security;
+package com.gotcharoom.gdp.global.security.userInfo;
 
 import java.util.Map;
 

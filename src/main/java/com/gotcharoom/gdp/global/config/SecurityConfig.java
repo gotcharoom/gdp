@@ -2,6 +2,11 @@ package com.gotcharoom.gdp.global.config;
 
 
 import com.gotcharoom.gdp.global.security.*;
+import com.gotcharoom.gdp.global.security.handler.JwtAccessDeniedHandler;
+import com.gotcharoom.gdp.global.security.handler.JwtAuthenticationEntryPoint;
+import com.gotcharoom.gdp.global.security.handler.OAuth2LoginFailureHandler;
+import com.gotcharoom.gdp.global.security.handler.OAuth2LoginSuccessHandler;
+import com.gotcharoom.gdp.global.security.service.CustomOauth2UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

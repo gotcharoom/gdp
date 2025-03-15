@@ -1,7 +1,6 @@
-    package com.gotcharoom.gdp.global.security;
+    package com.gotcharoom.gdp.global.security.service;
 
-    import com.fasterxml.jackson.databind.ObjectMapper;
-    import com.gotcharoom.gdp.global.util.ObjectUtil;
+    import com.gotcharoom.gdp.global.security.model.SocialType;
     import com.gotcharoom.gdp.user.entity.GdpUser;
     import com.gotcharoom.gdp.user.repository.UserRepository;
     import org.springframework.security.core.GrantedAuthority;

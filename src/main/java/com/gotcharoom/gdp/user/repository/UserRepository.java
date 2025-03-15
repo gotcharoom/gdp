@@ -1,6 +1,6 @@
 package com.gotcharoom.gdp.user.repository;
 
-import com.gotcharoom.gdp.global.security.SocialType;
+import com.gotcharoom.gdp.global.security.model.SocialType;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

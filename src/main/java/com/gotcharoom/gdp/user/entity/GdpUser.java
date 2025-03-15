@@ -1,7 +1,7 @@
 package com.gotcharoom.gdp.user.entity;
 
-import com.gotcharoom.gdp.global.security.Role;
-import com.gotcharoom.gdp.global.security.SocialType;
+import com.gotcharoom.gdp.global.security.model.Role;
+import com.gotcharoom.gdp.global.security.model.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
 

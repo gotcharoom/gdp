@@ -1,7 +1,7 @@
 package com.gotcharoom.gdp.user.model;
 
-import com.gotcharoom.gdp.global.security.Role;
-import com.gotcharoom.gdp.global.security.SocialType;
+import com.gotcharoom.gdp.global.security.model.Role;
+import com.gotcharoom.gdp.global.security.model.SocialType;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

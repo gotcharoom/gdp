@@ -1,5 +1,6 @@
-package com.gotcharoom.gdp.global.security;
+package com.gotcharoom.gdp.global.security.model;
 
+import com.gotcharoom.gdp.global.security.userInfo.*;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +19,7 @@ public class OAuth2Attributes {
         this.oauth2UserInfo = oauth2UserInfo;
     }
 
-    public static OAuth2Attributes of(SocialType socialType,Map<String, Object> attributes) {
+    public static OAuth2Attributes of(SocialType socialType, Map<String, Object> attributes) {
 
         if(socialType == SocialType.GDP) {
             return ofGdp(attributes);
