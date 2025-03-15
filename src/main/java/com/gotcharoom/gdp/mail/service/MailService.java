@@ -1,6 +1,6 @@
 package com.gotcharoom.gdp.mail.service;
 
-import com.gotcharoom.gdp.global.security.SocialType;
+import com.gotcharoom.gdp.global.security.model.SocialType;
 import com.gotcharoom.gdp.mail.model.FindIdRequest;
 import com.gotcharoom.gdp.mail.model.FindPasswordRequest;
 import com.gotcharoom.gdp.mail.model.FindResponse;

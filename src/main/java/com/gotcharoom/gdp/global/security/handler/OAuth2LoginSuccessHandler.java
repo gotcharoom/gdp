@@ -1,4 +1,4 @@
-package com.gotcharoom.gdp.global.security;
+package com.gotcharoom.gdp.global.security.handler;
 
 import com.gotcharoom.gdp.auth.model.JwtToken;
 import com.gotcharoom.gdp.global.util.JwtUtil;

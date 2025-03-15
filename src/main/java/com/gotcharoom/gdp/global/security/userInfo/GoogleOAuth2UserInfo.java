@@ -1,4 +1,4 @@
-package com.gotcharoom.gdp.global.security;
+package com.gotcharoom.gdp.global.security.userInfo;
 
 import java.util.Map;
 
@@ -23,6 +23,16 @@ public class GoogleOAuth2UserInfo extends OAuth2UserInfo {
     @Override
     public String getNickname() {
         return (String) attributes.get("name");
+    }
+
+    @Override
+    public String getName() {
+        return (String) attributes.get("name");
+    }
+
+    @Override
+    public String getEmail() {
+        return (String) attributes.get("email");
     }
 
     @Override
