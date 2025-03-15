@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/user")
-@Tag(name = "GDP 로그인", description = "GDP 회원 로그인 API")
+@Tag(name = "GDP 유저", description = "GDP 회원 API")
 public class UserController {
 
     private final UserService userService;
