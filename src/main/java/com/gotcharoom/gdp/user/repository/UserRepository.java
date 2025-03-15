@@ -16,4 +16,6 @@ public interface UserRepository extends JpaRepository<GdpUser, Long> {
     Optional<GdpUser> findBySocialTypeAndEmail(SocialType socialType, String email);
 
     Optional<GdpUser> findBySocialTypeAndIdAndEmail(SocialType socialType, String id, String email);
+
+    Optional<GdpUser> findByNickName(String nickName);
 }

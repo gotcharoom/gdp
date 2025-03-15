@@ -1,5 +1,6 @@
 package com.gotcharoom.gdp.global.security.model;
 
+import com.gotcharoom.gdp.global.security.service.NicknameGenerator;
 import com.gotcharoom.gdp.global.security.userInfo.*;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import lombok.Builder;
@@ -63,12 +64,12 @@ public class OAuth2Attributes {
     }
 
     // TODO. [TR-YOO] Role 추가하기
-    public GdpUser toEntity(SocialType socialType, OAuth2UserInfo oauth2UserInfo) {
+    public GdpUser toEntity(SocialType socialType, OAuth2UserInfo oauth2UserInfo, NicknameGenerator nicknameGenerator) {
         return GdpUser.builder()
                 .socialType(socialType)
                 .id(oauth2UserInfo.getId())
                 .socialId(oauth2UserInfo.getId())
-                .nickName(oauth2UserInfo.getNickname())
+                .nickName(nicknameGenerator.generateUniqueNickname())
                 .name(oauth2UserInfo.getName())
                 .email(oauth2UserInfo.getEmail())
                 .imageUrl(oauth2UserInfo.getImageUrl())

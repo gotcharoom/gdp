@@ -27,12 +27,6 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
-    public String getNickname() {
-        Map<String, Object> response = getResponse();
-        return response != null ? (String) response.get("nickname") : null;
-    }
-
-    @Override
     public String getName() {
         Map<String, Object> response = getResponse();
         return response != null ? (String) response.get("name") : null;
