@@ -10,12 +10,7 @@ import lombok.*;
 @NoArgsConstructor( access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
-@Table(
-        name = "gdp_user",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "unique_social_type_id", columnNames = {"social_type", "id"})
-        }
-)
+@Table(name = "gdp_user")
 public class GdpUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +20,7 @@ public class GdpUser {
     @Column(name="social_type", nullable = false)
     private SocialType socialType;
 
-    @Column(name="id", nullable = false)
+    @Column(name="id", nullable = false, unique = true)
     private String id;
 
     @Column(name="social_id")

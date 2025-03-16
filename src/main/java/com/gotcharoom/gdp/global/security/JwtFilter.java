@@ -33,7 +33,10 @@ public class JwtFilter extends OncePerRequestFilter {
                 "/api/v1/auth/refresh",
                 "/api/v1/auth/check",
                 "/api/v1/auth/remember-me",
-                "/api/v1/user/sign-up"
+                "/api/v1/user/sign-up",
+                "/api/v1/user/check/duplicate/id",
+                "/api/v1/user/check/duplicate/nickname",
+                "/api/v1/user/check/duplicate/email"
         );
 
         return excludedPaths.stream().anyMatch(path::startsWith);

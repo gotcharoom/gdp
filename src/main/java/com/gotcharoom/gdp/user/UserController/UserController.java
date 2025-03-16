@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @RestController
 @RequestMapping("/api/v1/user")
 @Tag(name = "GDP 유저", description = "GDP 회원 API")
@@ -24,12 +26,16 @@ public class UserController {
             description = "회원 가입 API"
     )
     @PostMapping("/sign-up")
-    public ApiResponse<JwtToken> signUpUser(@RequestBody UserSignUpRequest userSignUpRequest) {
+    public ApiResponse<Boolean> signUpUser(@RequestBody UserSignUpRequest userSignUpRequest) {
 
         try {
-            userService.registerUser(userSignUpRequest);
+            boolean isRegistered = userService.registerUser(userSignUpRequest);
 
-            return ApiResponse.success();
+            if(!isRegistered) {
+                throw new RuntimeException();
+            }
+
+            return ApiResponse.success(true);
         } catch (Exception e) {
 
             throw new RuntimeException("유저 생성 실패");
@@ -51,5 +57,41 @@ public class UserController {
 
             throw new RuntimeException("유저 생성 실패");
         }
+    }
+
+    @Operation(
+            summary = "중복 체크 - ID (중복 시 true / 사용 가능시 false)",
+            description = "ID 중복체크 API (중복 시 true / 사용 가능시 false)"
+    )
+    @GetMapping("/check/duplicate/id")
+    public ApiResponse<Boolean> checkDuplicateId(@RequestParam String id) {
+
+        boolean isDuplicated = userService.checkDuplicateId(id);
+
+        return ApiResponse.success(isDuplicated);
+    }
+
+    @Operation(
+            summary = "중복 체크 - Nickname (중복 시 true / 사용 가능시 false)",
+            description = "닉네임 중복체크 API (중복 시 true / 사용 가능시 false)"
+    )
+    @GetMapping("/check/duplicate/nickname")
+    public ApiResponse<Boolean> checkDuplicateNickname(@RequestParam String nickname) {
+
+        boolean isDuplicated = userService.checkDuplicateNickname(nickname);
+
+        return ApiResponse.success(isDuplicated);
+    }
+
+    @Operation(
+            summary = "중복 체크 - Email (중복 시 true / 사용 가능시 false)",
+            description = "Email 중복체크 API (중복 시 true / 사용 가능시 false)"
+    )
+    @GetMapping("/check/duplicate/email")
+    public ApiResponse<Boolean> checkDuplicateEmail(@RequestParam String email) {
+
+        boolean isDuplicated = userService.checkDuplicateEmail(email);
+
+        return ApiResponse.success(isDuplicated);
     }
 }
