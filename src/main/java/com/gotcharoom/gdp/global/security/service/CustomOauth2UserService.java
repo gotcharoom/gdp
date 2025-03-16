@@ -25,16 +25,16 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
     private final OAuth2Util oAuth2Util;
     private final UserRepository userRepository;
 
-    private final NicknameGenerator nicknameGenerator;
+    private final UniqueGenerator uniqueGenerator;
 
     public CustomOauth2UserService(
             OAuth2Util oAuth2Util,
             UserRepository userRepository,
-            NicknameGenerator nicknameGenerator
+            UniqueGenerator uniqueGenerator
     ) {
         this.oAuth2Util = oAuth2Util;
         this.userRepository = userRepository;
-        this.nicknameGenerator = nicknameGenerator;
+        this.uniqueGenerator = uniqueGenerator;
     }
 
     @Override
@@ -82,7 +82,7 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private GdpUser registerUser(OAuth2Attributes attributes, SocialType socialType) {
-        GdpUser createdUser = attributes.toEntity(socialType, attributes.getOauth2UserInfo(), nicknameGenerator);
+        GdpUser createdUser = attributes.toEntity(socialType, attributes.getOauth2UserInfo(), uniqueGenerator);
         userRepository.save(createdUser);
 
         return createdUser;
