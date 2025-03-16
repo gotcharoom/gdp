@@ -37,7 +37,7 @@ public class MailRequest {
 
         public MailRequest build() {
             // ✅ mailFrom을 고정
-            String mailFrom = "postmaster@stdtrinfra.com";
+            String mailFrom = "gotcharoom@gmail.com";
             return new MailRequest(mailFrom, mailTo, subject, htmlContents);
         }
     }

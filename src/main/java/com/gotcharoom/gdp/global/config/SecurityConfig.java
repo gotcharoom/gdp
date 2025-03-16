@@ -112,6 +112,8 @@ public class SecurityConfig {
 //                                        "/api/v1/auth/remember-me",
 //                                        OAUTH2_AUTH_URI+"/**",
 //                                        OAUTH2_REDIRECT_URI+"/**",
+//                                        "/api/v1/mail/find/id",
+//                                        "/api/v1/mail/generate/temp-password",
 //                                        "/api/v1/user/sign-up",
 //                                        "/api/v1/user/check/duplicate/id",
 //                                        "/api/v1/user/check/duplicate/nickname",
