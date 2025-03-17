@@ -14,7 +14,7 @@ public class UserSignUpRequest {
     @NotNull
     private String id;
     @NotNull
-    private String nickName;
+    private String nickname;
     @NotNull
     private String name;
     @NotNull
@@ -28,7 +28,7 @@ public class UserSignUpRequest {
                 .socialType(SocialType.GDP)
                 .id(id)
                 .socialId(null)
-                .nickName(nickName)
+                .nickname(nickname)
                 .name(name)
                 .password(password)
                 .email(email)
@@ -43,7 +43,7 @@ public class UserSignUpRequest {
                 .socialType(SocialType.GDP)
                 .id(id)
                 .socialId(null)
-                .nickName(nickName)
+                .nickname(nickname)
                 .name(name)
                 .password(encodedPassword)
                 .email(email)

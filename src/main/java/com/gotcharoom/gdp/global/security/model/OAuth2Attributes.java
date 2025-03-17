@@ -69,7 +69,7 @@ public class OAuth2Attributes {
                 .socialType(socialType)
                 .id(uniqueGenerator.generateUniqueId(socialType))
                 .socialId(oauth2UserInfo.getId())
-                .nickName(uniqueGenerator.generateUniqueNickname())
+                .nickname(uniqueGenerator.generateUniqueNickname())
                 .name(oauth2UserInfo.getName())
                 .email(oauth2UserInfo.getEmail())
                 .imageUrl(oauth2UserInfo.getImageUrl())

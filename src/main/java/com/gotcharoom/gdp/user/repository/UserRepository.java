@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<GdpUser, Long> {
 
     Optional<GdpUser> findById(String id);
-    Optional<GdpUser> findByNickName(String nickName);
+    Optional<GdpUser> findByNickname(String nickname);
     Optional<GdpUser> findBySocialTypeAndId(SocialType socialType, String id);
 
     Optional<GdpUser> findBySocialTypeAndEmail(SocialType socialType, String email);
