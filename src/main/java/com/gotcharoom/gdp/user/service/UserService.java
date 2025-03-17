@@ -3,6 +3,7 @@ package com.gotcharoom.gdp.user.service;
 import com.gotcharoom.gdp.global.security.model.SocialType;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import com.gotcharoom.gdp.user.model.UserDetailsResponse;
+import com.gotcharoom.gdp.user.model.UserDetailsUpdateRequest;
 import com.gotcharoom.gdp.user.model.UserSignUpRequest;
 import com.gotcharoom.gdp.user.repository.UserRepository;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -102,5 +103,16 @@ public class UserService {
                 .email(user.getEmail())
                 .nickname(user.getNickname())
                 .build();
+    }
+
+    public void putUserDetails(UserDetailsUpdateRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+            throw new RuntimeException();
+        }
+        GdpUser user = userRepository.findById(authentication.getName()).orElseThrow();
+
+
     }
 }
