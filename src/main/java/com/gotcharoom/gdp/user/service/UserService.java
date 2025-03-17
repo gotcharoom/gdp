@@ -58,7 +58,7 @@ public class UserService {
     }
 
     public boolean checkDuplicateNickname(String nickname) {
-        boolean isExist =userRepository.findByNickName(nickname).isPresent();
+        boolean isExist =userRepository.findByNickname(nickname).isPresent();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
