@@ -26,8 +26,8 @@ public class GdpUser {
     @Column(name="social_id")
     private String socialId;
 
-    @Column(name="nick_name", nullable = false)
-    private String nickName;
+    @Column(name="nickname", nullable = false)
+    private String nickname;
 
     @Column(name="name", nullable = false)
     private String name;
@@ -51,7 +51,7 @@ public class GdpUser {
                 .socialType(socialType)
                 .id(id)
                 .socialId(socialId)
-                .nickName(nickName)
+                .nickname(nickname)
                 .name(name)
                 .password(changedPassword)
                 .email(email)
