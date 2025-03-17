@@ -103,5 +103,4 @@ public class UserService {
                 .nickname(user.getNickname())
                 .build();
     }
-
 }
