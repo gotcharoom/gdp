@@ -126,8 +126,8 @@ public class MailService {
         String tempPassword = UUID.randomUUID().toString().replace("-", "").substring(0, 10);;
 
         String encoded = passwordEncoder.encode(tempPassword);
-        gdpUser.changePassword(encoded);
-        userRepository.save(gdpUser);
+        GdpUser changed = gdpUser.changePassword(encoded);
+        userRepository.save(changed);
 
         return tempPassword;
     }

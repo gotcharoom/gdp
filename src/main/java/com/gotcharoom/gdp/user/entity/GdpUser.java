@@ -47,6 +47,7 @@ public class GdpUser {
 
     public GdpUser changePassword(String changedPassword) {
         return GdpUser.builder()
+                .uid(uid)
                 .socialType(socialType)
                 .id(id)
                 .socialId(socialId)
