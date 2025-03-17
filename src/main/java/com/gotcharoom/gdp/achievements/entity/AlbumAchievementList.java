@@ -18,7 +18,7 @@ import lombok.*;
         }
 )
 // 앨범에 저장된 도전과제 목록 (중간 매핑 테이블)
-public class UserAlbumAchievementList {
+public class AlbumAchievementList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

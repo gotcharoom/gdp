@@ -34,7 +34,7 @@ public class UserAlbum {
     // 앨범과 연동한 도전과제 목록
     @OneToMany(mappedBy = "userAlbum", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default // 빈 리스트 작성을 위한 필수 설정
-    private List<UserAlbumAchievementList> achievements = new ArrayList<>();
+    private List<AlbumAchievementList> achievements = new ArrayList<>();
 
     // 업로드 날짜
     @UpdateTimestamp
@@ -42,7 +42,7 @@ public class UserAlbum {
     private LocalDateTime uploadDate;
 
     // 연관관계 편의 메서드
-    public void addAchievement(UserAlbumAchievementList achievementList) {
+    public void addAchievement(AlbumAchievementList achievementList) {
         achievements.add(achievementList);
         achievementList.updateAlbum(this);
     }

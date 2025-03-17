@@ -1,11 +1,12 @@
 package com.gotcharoom.gdp.achievements.service;
 
 import com.gotcharoom.gdp.achievements.entity.UserAlbum;
-import com.gotcharoom.gdp.achievements.entity.UserAlbumAchievementList;
+import com.gotcharoom.gdp.achievements.entity.AlbumAchievementList;
 import com.gotcharoom.gdp.achievements.entity.UserSteamAchievement;
 import com.gotcharoom.gdp.achievements.model.request.AlbumSaveRequest;
 import com.gotcharoom.gdp.achievements.model.response.GetAlbumResponse;
 import com.gotcharoom.gdp.achievements.repository.SteamAchievmentRepository;
+import com.gotcharoom.gdp.achievements.repository.AlbumAchievementListRepository;
 import com.gotcharoom.gdp.achievements.repository.UserAlbumRepository;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,27 +14,33 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AlbumService {
     private final UserAlbumRepository userAlbumRepository;
     private final SteamAchievmentRepository steamAchievmentRepository;
-    public AlbumService(UserAlbumRepository userAlbumRepository, SteamAchievmentRepository steamAchievmentRepository) {
+    private final AlbumAchievementListRepository albumAchievementListRepository;
+
+    public AlbumService(UserAlbumRepository userAlbumRepository, SteamAchievmentRepository steamAchievmentRepository, AlbumAchievementListRepository albumAchievementListRepository) {
         this.userAlbumRepository = userAlbumRepository;
         this.steamAchievmentRepository = steamAchievmentRepository;
+        this.albumAchievementListRepository = albumAchievementListRepository;
     }
 
     public GetAlbumResponse getUserAlbum(Long index) {
         UserAlbum album = userAlbumRepository.findById(index)
                 .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 앨범이 존재하지 않습니다.", 1));
 
-        List<UserSteamAchievement> achievements = steamAchievmentRepository.findAllById(index);
+        List<UserSteamAchievement> achievementList = albumAchievementListRepository.findAlbumAchievementList(index);
 
-
-        return album;
+        return GetAlbumResponse.builder()
+                .id(album.getId())
+                .title(album.getTitle())
+                .contentText(album.getContentText())
+                .image(album.getImage())
+                .achievements(achievementList)
+                .build();
     }
 
     // 앨범 저장 & 수정 기능
@@ -53,7 +60,7 @@ public class AlbumService {
                     .id(item)
                     .build();
 
-            UserAlbumAchievementList newAchievement = UserAlbumAchievementList.builder()
+            AlbumAchievementList newAchievement = AlbumAchievementList.builder()
                     .achievement(sample)
                     .build();
 
@@ -98,7 +105,6 @@ public class AlbumService {
 
     // 테스트용 request 데이터 제작 메소드
     public AlbumSaveRequest albumRequestDataTest(List<Long> ids) {
-
 
         return AlbumSaveRequest.builder()
                 .title("타이틀입니다.")

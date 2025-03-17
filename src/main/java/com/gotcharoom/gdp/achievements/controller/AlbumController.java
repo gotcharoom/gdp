@@ -1,7 +1,7 @@
 package com.gotcharoom.gdp.achievements.controller;
 
-import com.gotcharoom.gdp.achievements.entity.UserAlbum;
 import com.gotcharoom.gdp.achievements.model.request.AlbumSaveRequest;
+import com.gotcharoom.gdp.achievements.model.response.GetAlbumResponse;
 import com.gotcharoom.gdp.achievements.service.AlbumService;
 import com.gotcharoom.gdp.global.api.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,7 +43,7 @@ public class AlbumController {
             description = "선택한 앨범 정보 가져오기 / return 타입 : UserAlbum"
     )
     @GetMapping("/r3")
-    public ApiResponse<Object> getAlbumDetail(@RequestParam("index") long index) {
+    public ApiResponse<GetAlbumResponse> getAlbumDetail(@RequestParam("index") long index) {
         return ApiResponse.success(albumService.getUserAlbum(index));
     }
 

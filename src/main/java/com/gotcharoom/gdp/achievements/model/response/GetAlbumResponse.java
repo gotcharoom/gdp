@@ -1,8 +1,6 @@
 package com.gotcharoom.gdp.achievements.model.response;
 
-import com.gotcharoom.gdp.achievements.entity.UserAlbumAchievementList;
-import com.gotcharoom.gdp.achievements.model.SteamAchievementItem;
-import jakarta.persistence.Column;
+import com.gotcharoom.gdp.achievements.entity.UserSteamAchievement;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,5 +17,5 @@ public class GetAlbumResponse {
     private String title;
     private String contentText;
     private String image;
-    List<SteamAchievementItem> achievements;
+    List<UserSteamAchievement> achievements;
 }
