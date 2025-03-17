@@ -27,7 +27,7 @@ public class UniqueGenerator {
         String nickname;
         do {
             nickname = "User" + RandomStringUtils.randomAlphanumeric(6); // 예: UserA1B2C3
-        } while (userRepository.findByNickName(nickname).isPresent()); // 중복이면 다시 생성
+        } while (userRepository.findByNickname(nickname).isPresent()); // 중복이면 다시 생성
 
         return nickname;
     }
