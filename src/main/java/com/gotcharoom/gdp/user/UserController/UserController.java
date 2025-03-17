@@ -2,6 +2,7 @@ package com.gotcharoom.gdp.user.UserController;
 
 import com.gotcharoom.gdp.global.api.ApiResponse;
 import com.gotcharoom.gdp.auth.model.JwtToken;
+import com.gotcharoom.gdp.user.model.UserDetailsResponse;
 import com.gotcharoom.gdp.user.model.UserSignUpRequest;
 import com.gotcharoom.gdp.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -93,5 +94,17 @@ public class UserController {
         boolean isDuplicated = userService.checkDuplicateEmail(email);
 
         return ApiResponse.success(isDuplicated);
+    }
+
+    @Operation(
+            summary = "내 정보",
+            description = "유저 - 내 정보 API"
+    )
+    @GetMapping("/details")
+    public ApiResponse<UserDetailsResponse> getUserDetails() {
+
+        UserDetailsResponse userDetails = userService.getUserDetails();
+
+        return ApiResponse.success(userDetails);
     }
 }

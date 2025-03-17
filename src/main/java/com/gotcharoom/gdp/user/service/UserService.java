@@ -2,6 +2,7 @@ package com.gotcharoom.gdp.user.service;
 
 import com.gotcharoom.gdp.global.security.model.SocialType;
 import com.gotcharoom.gdp.user.entity.GdpUser;
+import com.gotcharoom.gdp.user.model.UserDetailsResponse;
 import com.gotcharoom.gdp.user.model.UserSignUpRequest;
 import com.gotcharoom.gdp.user.repository.UserRepository;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -66,7 +67,7 @@ public class UserService {
         }
 
         GdpUser gdpUser = userRepository.findById(authentication.getName()).orElseThrow();
-        String loginUserNickname = gdpUser.getNickName();
+        String loginUserNickname = gdpUser.getNickname();
         boolean isCurrentNickname = nickname.equals(loginUserNickname);
 
         return !isCurrentNickname && isExist;
@@ -86,6 +87,21 @@ public class UserService {
         boolean isCurrentEmail = email.equals(loginUserEmail);
 
         return !isCurrentEmail && isExist;
+    }
+
+    public UserDetailsResponse getUserDetails() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+            throw new RuntimeException();
+        }
+        GdpUser user = userRepository.findById(authentication.getName()).orElseThrow();
+
+        return UserDetailsResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .build();
     }
 
 }
