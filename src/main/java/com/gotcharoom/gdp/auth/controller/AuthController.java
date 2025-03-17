@@ -40,6 +40,7 @@ public class AuthController {
 
             if(tokenLocation == TokenLocationEnum.COOKIE) {
                 authService.setAllToken(jwtToken, request, response);
+
                 jwtToken = null;
             }
 

@@ -23,6 +23,11 @@ public class JwtFilter extends OncePerRequestFilter {
         this.jwtUtil = jwtUtil;
     }
 
+    /*
+     * SecurityContextHolder는 기본적으로 ThreadLocal을 사용하여 저장됨.
+     * 때문에 Exclude API 설정 시 반드시 로그인 시 사용하는 API / 로그인이 불필요한 API를 분리해야 함
+     * ex) 중복체크 API
+     */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
