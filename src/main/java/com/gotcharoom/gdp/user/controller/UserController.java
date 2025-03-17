@@ -1,4 +1,4 @@
-package com.gotcharoom.gdp.user.UserController;
+package com.gotcharoom.gdp.user.controller;
 
 import com.gotcharoom.gdp.global.api.ApiResponse;
 import com.gotcharoom.gdp.auth.model.JwtToken;
@@ -9,8 +9,6 @@ import com.gotcharoom.gdp.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
-
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -44,22 +42,9 @@ public class UserController {
         }
     }
 
-    @Operation(
-            summary = "회원 탈퇴",
-            description = "회원 탈퇴 API"
-    )
-    @DeleteMapping("/cancel-user")
-    public ApiResponse<JwtToken> cancelUser() {
 
-        try {
-            userService.deleteUser();
 
-            return ApiResponse.success();
-        } catch (Exception e) {
-
-            throw new RuntimeException("유저 생성 실패");
-        }
-    }
+    /* 중복체크 - Login 하지 않았을 때 사용 */
 
     @Operation(
             summary = "중복 체크 - ID (중복 시 true / 사용 가능시 false)",
@@ -96,6 +81,9 @@ public class UserController {
 
         return ApiResponse.success(isDuplicated);
     }
+
+
+    /* 유저 정보 */
 
     @Operation(
             summary = "내 정보",
