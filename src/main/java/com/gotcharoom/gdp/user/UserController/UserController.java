@@ -3,6 +3,7 @@ package com.gotcharoom.gdp.user.UserController;
 import com.gotcharoom.gdp.global.api.ApiResponse;
 import com.gotcharoom.gdp.auth.model.JwtToken;
 import com.gotcharoom.gdp.user.model.UserDetailsResponse;
+import com.gotcharoom.gdp.user.model.UserDetailsUpdateRequest;
 import com.gotcharoom.gdp.user.model.UserSignUpRequest;
 import com.gotcharoom.gdp.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -106,5 +107,18 @@ public class UserController {
         UserDetailsResponse userDetails = userService.getUserDetails();
 
         return ApiResponse.success(userDetails);
+    }
+
+    @Operation(
+            summary = "내 정보 수정",
+            description = "유저 - 내 정보 수정 API"
+    )
+    @PutMapping("/details")
+    public ApiResponse<Void> putUserDetails(UserDetailsUpdateRequest request) {
+
+
+        userService.putUserDetails(request);
+
+        return ApiResponse.success();
     }
 }
