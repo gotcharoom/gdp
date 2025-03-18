@@ -1,21 +1,19 @@
 package com.gotcharoom.gdp.achievements.model.response;
 
-import com.gotcharoom.gdp.achievements.entity.UserSteamAchievement;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetAlbumResponse {
+public class AlbumGetListResponse {
     private Long id;
     private String title;
-    private String contentText;
     private String image;
-    List<UserSteamAchievement> achievements;
+    private LocalDateTime uploadDate;
 }

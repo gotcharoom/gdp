@@ -23,10 +23,12 @@ public class AlbumAchievementList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // album 테이블 id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ALBUM_ID")
     private UserAlbum userAlbum;
 
+    // 도전과제 id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ACHIEVEMENT_ID")
     private UserSteamAchievement achievement;

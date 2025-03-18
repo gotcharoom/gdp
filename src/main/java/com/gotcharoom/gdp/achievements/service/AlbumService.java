@@ -4,13 +4,17 @@ import com.gotcharoom.gdp.achievements.entity.UserAlbum;
 import com.gotcharoom.gdp.achievements.entity.AlbumAchievementList;
 import com.gotcharoom.gdp.achievements.entity.UserSteamAchievement;
 import com.gotcharoom.gdp.achievements.model.request.AlbumSaveRequest;
-import com.gotcharoom.gdp.achievements.model.response.GetAlbumResponse;
+import com.gotcharoom.gdp.achievements.model.response.AlbumGetListResponse;
+import com.gotcharoom.gdp.achievements.model.response.AlbumGetResponse;
 import com.gotcharoom.gdp.achievements.repository.SteamAchievmentRepository;
 import com.gotcharoom.gdp.achievements.repository.AlbumAchievementListRepository;
 import com.gotcharoom.gdp.achievements.repository.UserAlbumRepository;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,13 +32,22 @@ public class AlbumService {
         this.albumAchievementListRepository = albumAchievementListRepository;
     }
 
-    public GetAlbumResponse getUserAlbum(Long index) {
+    // 앨범 전체 목록 가져오기
+    public Page<UserAlbum> getUserAlbums(int pageNo, int pageSize) {
+
+        Page<UserAlbum> newData = userAlbumRepository.findPageBy(PageRequest.of(0, 6, Sort.by("id").descending()));
+
+        return newData;
+    }
+
+    // 앨범 내용 가져오기 (details)
+    public AlbumGetResponse getUserAlbumOne(Long index) {
         UserAlbum album = userAlbumRepository.findById(index)
                 .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 앨범이 존재하지 않습니다.", 1));
 
         List<UserSteamAchievement> achievementList = albumAchievementListRepository.findAlbumAchievementList(index);
 
-        return GetAlbumResponse.builder()
+        return AlbumGetResponse.builder()
                 .id(album.getId())
                 .title(album.getTitle())
                 .contentText(album.getContentText())

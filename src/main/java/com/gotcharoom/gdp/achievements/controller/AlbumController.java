@@ -1,12 +1,14 @@
 package com.gotcharoom.gdp.achievements.controller;
 
+import com.gotcharoom.gdp.achievements.entity.UserAlbum;
 import com.gotcharoom.gdp.achievements.model.request.AlbumSaveRequest;
-import com.gotcharoom.gdp.achievements.model.response.GetAlbumResponse;
+import com.gotcharoom.gdp.achievements.model.response.AlbumGetResponse;
 import com.gotcharoom.gdp.achievements.service.AlbumService;
 import com.gotcharoom.gdp.global.api.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/v1/album")
@@ -43,8 +45,17 @@ public class AlbumController {
             description = "선택한 앨범 정보 가져오기 / return 타입 : UserAlbum"
     )
     @GetMapping("/r3")
-    public ApiResponse<GetAlbumResponse> getAlbumDetail(@RequestParam("index") long index) {
-        return ApiResponse.success(albumService.getUserAlbum(index));
+    public ApiResponse<AlbumGetResponse> getAlbumDetail(@RequestParam("index") long index) {
+        return ApiResponse.success(albumService.getUserAlbumOne(index));
+    }
+
+    @Operation(
+            summary = "앨범 목록 가져오기",
+            description = "앨범 정보 가져오기 / return 타입 : "
+    )
+    @GetMapping("/r4")
+    public ApiResponse<Page<UserAlbum>> getAlbumList() {
+        return ApiResponse.success(albumService.getUserAlbums(1, 2));
     }
 
 
