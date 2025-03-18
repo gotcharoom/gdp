@@ -2,6 +2,7 @@ package com.gotcharoom.gdp.achievements.controller;
 
 import com.gotcharoom.gdp.achievements.entity.UserAlbum;
 import com.gotcharoom.gdp.achievements.model.request.AlbumSaveRequest;
+import com.gotcharoom.gdp.achievements.model.response.AlbumGetListResponse;
 import com.gotcharoom.gdp.achievements.model.response.AlbumGetResponse;
 import com.gotcharoom.gdp.achievements.service.AlbumService;
 import com.gotcharoom.gdp.global.api.ApiResponse;
@@ -54,7 +55,7 @@ public class AlbumController {
             description = "앨범 정보 가져오기 / return 타입 : "
     )
     @GetMapping("/r4")
-    public ApiResponse<Page<UserAlbum>> getAlbumList() {
+    public ApiResponse<Page<AlbumGetListResponse>> getAlbumList() {
         return ApiResponse.success(albumService.getUserAlbums(1, 2));
     }
 

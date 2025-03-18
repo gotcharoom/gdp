@@ -33,11 +33,10 @@ public class AlbumService {
     }
 
     // 앨범 전체 목록 가져오기
-    public Page<UserAlbum> getUserAlbums(int pageNo, int pageSize) {
+    public Page<AlbumGetListResponse> getUserAlbums(int pageNo, int pageSize) {
 
-        Page<UserAlbum> newData = userAlbumRepository.findPageBy(PageRequest.of(0, 6, Sort.by("id").descending()));
+        return userAlbumRepository.findPageBy(PageRequest.of(0, 6, Sort.by("id").descending()));
 
-        return newData;
     }
 
     // 앨범 내용 가져오기 (details)
