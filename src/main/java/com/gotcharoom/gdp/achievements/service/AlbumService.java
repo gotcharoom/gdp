@@ -35,7 +35,7 @@ public class AlbumService {
     // 앨범 전체 목록 가져오기
     public Page<AlbumGetListResponse> getUserAlbums(int pageNo, int pageSize) {
 
-        return userAlbumRepository.findPageBy(PageRequest.of(0, 6, Sort.by("id").descending()));
+        return userAlbumRepository.findPageBy(PageRequest.of(pageNo, pageSize, Sort.by("id").descending()));
 
     }
 

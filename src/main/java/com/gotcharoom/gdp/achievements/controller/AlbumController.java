@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedModel;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/v1/album")
@@ -55,8 +56,8 @@ public class AlbumController {
             description = "앨범 정보 가져오기 / return 타입 : "
     )
     @GetMapping("/r4")
-    public ApiResponse<Page<AlbumGetListResponse>> getAlbumList() {
-        return ApiResponse.success(albumService.getUserAlbums(1, 2));
+    public ApiResponse<PagedModel<AlbumGetListResponse>> getAlbumList(@RequestParam int pageNo) {
+        return ApiResponse.success(new PagedModel<>(albumService.getUserAlbums(pageNo, 5)));
     }
 
 
