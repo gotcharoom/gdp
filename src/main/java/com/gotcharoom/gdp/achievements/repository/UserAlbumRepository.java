@@ -10,8 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserAlbumRepository extends JpaRepository<UserAlbum, Long> {
-
-//    @Query("SELECT DISTINCT s.id, s.title, s.contentText, s.image, s.userId, s.uploadDate FROM UserAlbum s JOIN s.achievements ")
+    // 새 객체에 매핑해서 SELECT
     @Query("SELECT DISTINCT new com.gotcharoom.gdp.achievements.model.response.AlbumGetListResponse" +
             "(s.id, s.title, s.image, s.uploadDate) " +
             "FROM UserAlbum s JOIN s.achievements ")

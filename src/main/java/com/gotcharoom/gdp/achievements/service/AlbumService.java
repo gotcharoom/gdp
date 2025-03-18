@@ -6,7 +6,6 @@ import com.gotcharoom.gdp.achievements.entity.UserSteamAchievement;
 import com.gotcharoom.gdp.achievements.model.request.AlbumSaveRequest;
 import com.gotcharoom.gdp.achievements.model.response.AlbumGetListResponse;
 import com.gotcharoom.gdp.achievements.model.response.AlbumGetResponse;
-import com.gotcharoom.gdp.achievements.repository.SteamAchievmentRepository;
 import com.gotcharoom.gdp.achievements.repository.AlbumAchievementListRepository;
 import com.gotcharoom.gdp.achievements.repository.UserAlbumRepository;
 import jakarta.validation.ConstraintViolationException;
@@ -23,12 +22,10 @@ import java.util.List;
 @Service
 public class AlbumService {
     private final UserAlbumRepository userAlbumRepository;
-    private final SteamAchievmentRepository steamAchievmentRepository;
     private final AlbumAchievementListRepository albumAchievementListRepository;
 
-    public AlbumService(UserAlbumRepository userAlbumRepository, SteamAchievmentRepository steamAchievmentRepository, AlbumAchievementListRepository albumAchievementListRepository) {
+    public AlbumService(UserAlbumRepository userAlbumRepository, AlbumAchievementListRepository albumAchievementListRepository) {
         this.userAlbumRepository = userAlbumRepository;
-        this.steamAchievmentRepository = steamAchievmentRepository;
         this.albumAchievementListRepository = albumAchievementListRepository;
     }
 
@@ -44,7 +41,7 @@ public class AlbumService {
         UserAlbum album = userAlbumRepository.findById(index)
                 .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 앨범이 존재하지 않습니다.", 1));
 
-        List<UserSteamAchievement> achievementList = albumAchievementListRepository.findAlbumAchievementList(index);
+        List<UserSteamAchievement> achievementList = albumAchievementListRepository.findAchievementList(index);
 
         return AlbumGetResponse.builder()
                 .id(album.getId())
@@ -56,9 +53,9 @@ public class AlbumService {
     }
 
     // 앨범 저장 & 수정 기능
-    public int saveUserAlbum(AlbumSaveRequest requestData) {
+    public void saveUserAlbum(AlbumSaveRequest requestData) {
         // id가 null일시 => 새 앨범 생성
-        // id가 null이 아닐 시 => 수정 (중간 테이블(UserAlbumAchievementList도 자동으로 갱신됨)
+        // id가 null이 아닐 시 => 수정 (중간 테이블(AlbumAchievementList)도 자동으로 갱신됨)
         UserAlbum newAlbumData = UserAlbum.builder()
                 .id(requestData.getId())
                 .title(requestData.getTitle())
@@ -84,10 +81,6 @@ public class AlbumService {
         } catch (DataIntegrityViolationException e) {
             throw new IllegalArgumentException("잘못된 앨범 번호 또는 도전과제 번호 입니다");
         }
-
-
-        return 1;
-
     }
 
     // 앨범 삭제 기능
@@ -101,8 +94,7 @@ public class AlbumService {
             userAlbumRepository.delete(album);
 
         } catch (EmptyResultDataAccessException e) {
-            System.out.println("오류가 발생했나? " + e);
-            throw new IllegalArgumentException("해당 앨범이 존재하지 않습니다: 22 " + index);
+            throw new IllegalArgumentException("해당 앨범이 존재하지 않습니다:" + index);
 
         } catch (DataIntegrityViolationException | ConstraintViolationException e) {
             throw new IllegalArgumentException("제약 조건 위반 오류 발생");
@@ -115,14 +107,4 @@ public class AlbumService {
 
     // --------------------------------------- TEST Methods ---------------------------------------
 
-    // 테스트용 request 데이터 제작 메소드
-    public AlbumSaveRequest albumRequestDataTest(List<Long> ids) {
-
-        return AlbumSaveRequest.builder()
-                .title("타이틀입니다.")
-                .contentText("내용물입니다 내용물입니다. 내용물입니다...")
-                .image("asdfasdfasdad")
-                .achievements(ids)
-                .build();
-    }
 }
