@@ -23,12 +23,12 @@ public class UserAlbum {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name="content_text", columnDefinition = "TEXT")
     private String contentText;
 
     private String image;
 
-    @Column(nullable = false)
+    @Column(name="user_id", nullable = false)
     private String userId;
 
     // 앨범과 연동한 도전과제 목록

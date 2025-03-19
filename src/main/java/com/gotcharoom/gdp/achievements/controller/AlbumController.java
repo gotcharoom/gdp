@@ -70,7 +70,7 @@ public class AlbumController {
     // --------------------------------------- TEST API ---------------------------------------
 
     @Operation(
-            summary = "외부 api 테스트 (GetSchemaForGame)",
+            summary = "테스트",
             description = "테스트 중"
     )
     @GetMapping("/test")

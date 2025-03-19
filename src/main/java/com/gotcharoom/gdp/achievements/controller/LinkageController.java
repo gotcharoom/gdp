@@ -39,7 +39,7 @@ public class LinkageController {
             description = "연동에 성공한 도전과제를 저장(추후 변경) / return 타입 : 저장한 수(count)"
     )
     @PostMapping("/r2")
-    public ApiResponse<Object> saveAchievements() {
+    public ApiResponse<Integer> saveAchievements() {
         // todo. 리스트 불러오기 -> 프론트 개발 후 프론트측에서 파라미터로 받아오는걸로 추후 변경
         List<SteamPlayerStat> achievementList = linkageService.getSteamPlayerAchievement("ss");
 

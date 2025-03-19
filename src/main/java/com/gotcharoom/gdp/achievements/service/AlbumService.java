@@ -142,6 +142,6 @@ public class AlbumService {
     // --------------------------------------- TEST Methods ---------------------------------------
 
     public List<UserAlbum> test() {
-        return userAlbumRepository.findAll();
+        return userAlbumRepository.findAllByTitleContains("수정된 앨범");
     }
 }
