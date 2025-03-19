@@ -10,7 +10,6 @@ import org.hibernate.annotations.Immutable;
 @Builder
 @NoArgsConstructor( access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Immutable
 @Entity
 @Table(name = "gdp_user")
 public class GdpUser {
