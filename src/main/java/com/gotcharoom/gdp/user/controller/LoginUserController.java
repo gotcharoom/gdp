@@ -2,6 +2,8 @@ package com.gotcharoom.gdp.user.controller;
 
 import com.gotcharoom.gdp.auth.model.JwtToken;
 import com.gotcharoom.gdp.global.api.ApiResponse;
+import com.gotcharoom.gdp.user.model.UserDetailsResponse;
+import com.gotcharoom.gdp.user.model.UserDetailsUpdateRequest;
 import com.gotcharoom.gdp.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -71,4 +73,30 @@ public class LoginUserController {
         return ApiResponse.success(isDuplicated);
     }
 
+    /* 유저 정보 */
+
+    @Operation(
+            summary = "내 정보",
+            description = "유저 - 내 정보 API"
+    )
+    @GetMapping("/details")
+    public ApiResponse<UserDetailsResponse> getUserDetails() {
+
+        UserDetailsResponse userDetails = userService.getUserDetails();
+
+        return ApiResponse.success(userDetails);
+    }
+
+    @Operation(
+            summary = "내 정보 수정",
+            description = "유저 - 내 정보 수정 API"
+    )
+    @PutMapping("/details")
+    public ApiResponse<Void> putUserDetails(@ModelAttribute UserDetailsUpdateRequest request) {
+
+
+        userService.putUserDetails(request);
+
+        return ApiResponse.success();
+    }
 }

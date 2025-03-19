@@ -1,18 +1,19 @@
 package com.gotcharoom.gdp.user.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.Serializable;
 
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDetailsUpdateRequest {
+public class UserDetailsUpdateRequest implements Serializable {
+    private String nickname;
+    private String name;
     private String email;
-    private String prevPassword;
-    private String newPassword;
-    private String newPasswordConfirm;
-
+    private MultipartFile imageFile;
+    private CropArea imageCropArea;
 }

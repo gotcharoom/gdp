@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UserService {
@@ -101,18 +102,26 @@ public class UserService {
         return UserDetailsResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
+                .name(user.getName())
                 .nickname(user.getNickname())
                 .build();
     }
 
     public void putUserDetails(UserDetailsUpdateRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
-            throw new RuntimeException();
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+//            throw new RuntimeException();
+//        }
+//        GdpUser user = userRepository.findById(authentication.getName()).orElseThrow();
+        MultipartFile imageFile = request.getImageFile();
+        if (imageFile != null && !imageFile.isEmpty()) {
+            System.out.println("Received Image File: " + imageFile.getOriginalFilename());
+            System.out.println("File Size: " + imageFile.getSize());
+            System.out.println("File Type: " + imageFile.getContentType());
+        } else {
+            System.out.println("No image file received.");
         }
-        GdpUser user = userRepository.findById(authentication.getName()).orElseThrow();
-
 
     }
 }
