@@ -1,11 +1,13 @@
 package com.gotcharoom.gdp.user.service;
 
 import com.gotcharoom.gdp.global.security.model.SocialType;
+import com.gotcharoom.gdp.global.util.FileUploadUtil;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import com.gotcharoom.gdp.user.model.UserDetailsResponse;
 import com.gotcharoom.gdp.user.model.UserDetailsUpdateRequest;
 import com.gotcharoom.gdp.user.model.UserSignUpRequest;
 import com.gotcharoom.gdp.user.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,16 +15,27 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Service
 public class UserService {
+
+    @Value("${gdp.file-server.url}")
+    private String SERVER_URL;
+
+    @Value("${gdp.file-server.dir.profile}")
+    private String PROFILE_DIR;
 
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    private final FileUploadUtil fileUploadUtil;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, FileUploadUtil fileUploadUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.fileUploadUtil = fileUploadUtil;
     }
 
     public boolean registerUser(UserSignUpRequest userSignUpRequest) {
@@ -107,21 +120,20 @@ public class UserService {
                 .build();
     }
 
-    public void putUserDetails(UserDetailsUpdateRequest request) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
-//            throw new RuntimeException();
-//        }
-//        GdpUser user = userRepository.findById(authentication.getName()).orElseThrow();
-        MultipartFile imageFile = request.getImageFile();
-        if (imageFile != null && !imageFile.isEmpty()) {
-            System.out.println("Received Image File: " + imageFile.getOriginalFilename());
-            System.out.println("File Size: " + imageFile.getSize());
-            System.out.println("File Type: " + imageFile.getContentType());
-        } else {
-            System.out.println("No image file received.");
+    public void putUserDetails(UserDetailsUpdateRequest request) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+            throw new RuntimeException();
         }
 
+        GdpUser user = userRepository.findById(authentication.getName()).orElseThrow();
+
+        fileUploadUtil.deleteOldImage(user.getImageUrl());
+        String fileUrl = SERVER_URL + PROFILE_DIR;
+        String imageUrl = fileUploadUtil.serverUploadFile(request.getImageFile(), fileUrl);
+
+        GdpUser updatedUser = user.updateProfile(request.getNickname(), request.getName(), request.getEmail(), imageUrl);
+        userRepository.save(updatedUser);
     }
 }

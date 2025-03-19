@@ -1,15 +1,16 @@
 package com.gotcharoom.gdp.user.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.io.Serializable;
 
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CropArea {
+@ToString
+public class CropArea implements Serializable {
     private int x;
     private int y;
     private int width;

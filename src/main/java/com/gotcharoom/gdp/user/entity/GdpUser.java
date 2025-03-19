@@ -2,6 +2,7 @@ package com.gotcharoom.gdp.user.entity;
 
 import com.gotcharoom.gdp.global.security.model.Role;
 import com.gotcharoom.gdp.global.security.model.SocialType;
+import com.gotcharoom.gdp.user.model.UserDetailsUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Immutable;
@@ -58,6 +59,21 @@ public class GdpUser {
                 .email(email)
                 .imageUrl(imageUrl)
                 .role(role)
+                .build();
+    }
+
+    public GdpUser updateProfile(String nickname, String name, String email, String imageUrl) {
+        return GdpUser.builder()
+                .uid(this.uid)
+                .socialType(this.socialType)
+                .id(this.id)
+                .socialId(this.getSocialId())
+                .nickname(nickname)
+                .name(name)
+                .password(this.password)
+                .email(email)
+                .imageUrl(imageUrl)
+                .role(this.role)
                 .build();
     }
 }

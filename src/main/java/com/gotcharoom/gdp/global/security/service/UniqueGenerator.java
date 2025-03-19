@@ -32,4 +32,13 @@ public class UniqueGenerator {
 
         return nickname;
     }
+
+    public String generateUniqueFilename(String path, String originalFileName) {
+        String id;
+        do {
+            id = socialType.name() + "-" +  UUID.randomUUID().toString().replace("-", "").substring(0, 12); // 예: google-A1B2C3d4e5f6
+        } while (userRepository.findById(id).isPresent()); // 중복이면 다시 생성
+
+        return id;
+    }
 }

@@ -10,6 +10,10 @@ gdp:
   custom:
     oauth2-auth-uri: ${OAUTH2_AUTH_URI}
     oauth2-redirect-uri: ${OAUTH2_REDIRECT_URI}
+  file-server:
+    url: ${GDP_FILE_SERVER_URL}
+    dir:
+      profile: /profile
 
 auth:
   token:

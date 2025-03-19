@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/v1/login-user")
 @Tag(name = "GDP 로그인한 유저", description = "GDP 로그인한 회원 API")
@@ -87,13 +89,16 @@ public class LoginUserController {
         return ApiResponse.success(userDetails);
     }
 
+    /*
+    * RequestPart로 File과 Json 객체 분리하는 방법도 좋지만
+    * ModelAttribute로 구성 가능한지 확인하고 싶어서 구성한 메소드
+    */
     @Operation(
             summary = "내 정보 수정",
             description = "유저 - 내 정보 수정 API"
     )
     @PutMapping("/details")
-    public ApiResponse<Void> putUserDetails(@ModelAttribute UserDetailsUpdateRequest request) {
-
+    public ApiResponse<Void> putUserDetails(@ModelAttribute UserDetailsUpdateRequest request) throws IOException {
 
         userService.putUserDetails(request);
 
