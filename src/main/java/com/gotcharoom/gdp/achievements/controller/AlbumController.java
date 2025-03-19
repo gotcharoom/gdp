@@ -30,7 +30,7 @@ public class AlbumController {
 
     @Operation(
             summary = "앨범 수정하기",
-            description = "작성한 앨범 내용과 앨범에 등록한 도전과제를 수정"
+            description = "수정한 변경 사항을 저장"
     )
     @PostMapping("/r2")
     public ApiResponse<String> editAlbum(@RequestBody AlbumSaveRequest requestData) {
