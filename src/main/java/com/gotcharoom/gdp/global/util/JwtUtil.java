@@ -1,7 +1,6 @@
 package com.gotcharoom.gdp.global.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gotcharoom.gdp.auth.entity.BlacklistedToken;
 import com.gotcharoom.gdp.auth.entity.RefreshToken;
 import com.gotcharoom.gdp.auth.model.JwtToken;
@@ -10,8 +9,7 @@ import com.gotcharoom.gdp.auth.model.CookieEnum;
 import com.gotcharoom.gdp.auth.model.TokenLocationEnum;
 import com.gotcharoom.gdp.auth.repository.BlacklistedTokenRepository;
 import com.gotcharoom.gdp.auth.repository.RefreshTokenRepository;
-import com.gotcharoom.gdp.global.security.CustomUserDetailsService;
-import com.gotcharoom.gdp.user.repository.UserRepository;
+import com.gotcharoom.gdp.global.security.service.CustomUserDetailsService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

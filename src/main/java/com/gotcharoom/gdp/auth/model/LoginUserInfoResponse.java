@@ -12,13 +12,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LoginUserInfoResponse {
     private String id;
-    private String nickName;
+    private String nickname;
     private String name;
 
     public static LoginUserInfoResponse fromEntity(GdpUser gdpUser) {
         return LoginUserInfoResponse.builder()
                 .id(gdpUser.getId())
-                .nickName(gdpUser.getNickName())
+                .nickname(gdpUser.getNickname())
                 .name(gdpUser.getName())
                 .build();
     }

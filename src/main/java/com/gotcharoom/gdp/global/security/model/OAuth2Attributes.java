@@ -1,5 +1,7 @@
-package com.gotcharoom.gdp.global.security;
+package com.gotcharoom.gdp.global.security.model;
 
+import com.gotcharoom.gdp.global.security.service.UniqueGenerator;
+import com.gotcharoom.gdp.global.security.userInfo.*;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +20,7 @@ public class OAuth2Attributes {
         this.oauth2UserInfo = oauth2UserInfo;
     }
 
-    public static OAuth2Attributes of(SocialType socialType,Map<String, Object> attributes) {
+    public static OAuth2Attributes of(SocialType socialType, Map<String, Object> attributes) {
 
         if(socialType == SocialType.GDP) {
             return ofGdp(attributes);
@@ -62,14 +64,16 @@ public class OAuth2Attributes {
     }
 
     // TODO. [TR-YOO] Role 추가하기
-    public GdpUser toEntity(SocialType socialType, OAuth2UserInfo oauth2UserInfo) {
+    public GdpUser toEntity(SocialType socialType, OAuth2UserInfo oauth2UserInfo, UniqueGenerator uniqueGenerator) {
         return GdpUser.builder()
                 .socialType(socialType)
-                .id(oauth2UserInfo.getId())
+                .id(uniqueGenerator.generateUniqueId(socialType))
                 .socialId(oauth2UserInfo.getId())
-                .nickName(oauth2UserInfo.getNickname())
+                .nickname(uniqueGenerator.generateUniqueNickname())
+                .name(oauth2UserInfo.getName())
+                .email(oauth2UserInfo.getEmail())
                 .imageUrl(oauth2UserInfo.getImageUrl())
-                .role(Role.GUEST)
+                .role(Role.USER)
                 .build();
     }
 }

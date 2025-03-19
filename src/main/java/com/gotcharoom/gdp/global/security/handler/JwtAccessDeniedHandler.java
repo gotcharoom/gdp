@@ -1,4 +1,4 @@
-package com.gotcharoom.gdp.global.security;
+package com.gotcharoom.gdp.global.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gotcharoom.gdp.global.api.ApiResponse;
