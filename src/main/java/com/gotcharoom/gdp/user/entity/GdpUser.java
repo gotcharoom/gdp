@@ -4,11 +4,13 @@ import com.gotcharoom.gdp.global.security.model.Role;
 import com.gotcharoom.gdp.global.security.model.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Immutable;
 
 @Getter
 @Builder
 @NoArgsConstructor( access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Immutable
 @Entity
 @Table(name = "gdp_user")
 public class GdpUser {
