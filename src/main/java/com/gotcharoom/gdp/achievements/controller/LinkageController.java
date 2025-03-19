@@ -22,7 +22,7 @@ public class LinkageController {
     // 스팀과 연동된 내 계정의 도전과제 목록 가져오기 (모든 게임)
     @Operation(
             summary = "도전과제 목록",
-            description = "도전과제 목록 불러오기 / return 타입 : 도전과제 목록(List<SteamPlayerStat>)"
+            description = "도전과제 목록 불러오기(추후 변경) / return 타입 : 도전과제 목록(List<SteamPlayerStat>)"
     )
     @GetMapping("/r1")
     public ApiResponse<List<SteamPlayerStat>> requestMyAchievement(@AuthenticationPrincipal UserDetails userDetails) {
@@ -36,7 +36,7 @@ public class LinkageController {
 
     @Operation(
             summary = "연동한 도전과제 저장하기",
-            description = "연동에 성공한 도전과제를 저장 / return 타입 : 저장한 수(count)"
+            description = "연동에 성공한 도전과제를 저장(추후 변경) / return 타입 : 저장한 수(count)"
     )
     @PostMapping("/r2")
     public ApiResponse<Object> saveAchievements() {

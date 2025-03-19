@@ -16,7 +16,7 @@ public interface DisplayStandAlbumListRepository extends JpaRepository<DisplaySt
     // JPQL에선 DB의 테이블이 아닌 엔티티명과 그 필드명을 적어줘야함
     // 현재 앨범/앨범리스트 엔티티에 양방향 직렬화를 해놨기 때문에 이 두 테이블을 JOIN FETCH하면 무한 순환 오류 발생(사용 X)
     @Query(value = "SELECT b " +
-            "FROM AlbumAchievementList s " +
+            "FROM DisplayStandAlbumList s " +
             "JOIN s.userDisplayStand a " +
             "JOIN s.userAlbum b " +
             "WHERE a.id = :display_stand_id")

@@ -32,7 +32,7 @@ public class UserDisplayStand {
 
     // 전시대와 연동할 앨범 목록
     @OneToMany(mappedBy = "userDisplayStand", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default // 빈 리스트 작성을 위한 필수 설정
+    @Builder.Default // 빌드 패턴으로 빈 리스트 작성을 위한 필수 설정
     private List<DisplayStandAlbumList> albums = new ArrayList<>();
 
     // 업로드 날짜

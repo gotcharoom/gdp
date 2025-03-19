@@ -13,6 +13,6 @@ public interface UserDisplayStandRepository extends JpaRepository<UserDisplaySta
     // 새 객체에 매핑해서 SELECT
     @Query("SELECT DISTINCT new com.gotcharoom.gdp.achievements.model.response.DisplayStandGetListResponse" +
             "(s.id, s.title, s.image, s.uploadDate) " +
-            "FROM DisplayStand s JOIN s.albums ")
+            "FROM UserDisplayStand s JOIN s.albums ")
     Page<DisplayStandGetListResponse> findPageBy(Pageable page);
 }

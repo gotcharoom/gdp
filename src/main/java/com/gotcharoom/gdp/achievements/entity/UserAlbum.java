@@ -33,7 +33,7 @@ public class UserAlbum {
 
     // 앨범과 연동한 도전과제 목록
     @OneToMany(mappedBy = "userAlbum", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default // 빈 리스트 작성을 위한 필수 설정
+    @Builder.Default // 빌드 패턴으로 빈 리스트 작성을 위한 필수 설정
     private List<AlbumAchievementList> achievements = new ArrayList<>();
 
     // 업로드 날짜

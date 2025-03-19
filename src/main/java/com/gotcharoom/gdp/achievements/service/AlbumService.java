@@ -52,16 +52,50 @@ public class AlbumService {
                 .build();
     }
 
-    // 앨범 저장 & 수정 기능
+    // 앨범 저장 기능
     public void saveUserAlbum(AlbumSaveRequest requestData) {
-        // id가 null일시 => 새 앨범 생성
-        // id가 null이 아닐 시 => 수정 (중간 테이블(AlbumAchievementList)도 자동으로 갱신됨)
+        // 중간 테이블(AlbumAchievementList)도 자동으로 갱신됨
+
+        UserAlbum newAlbumData = UserAlbum.builder()
+                .title(requestData.getTitle())
+                .contentText(requestData.getContentText())
+                .image(requestData.getImage())
+                .userId("test")
+                .build();
+
+        requestData.getAchievements().forEach(item -> {
+            UserSteamAchievement sample = UserSteamAchievement.builder()
+                    .id(item)
+                    .build();
+
+            AlbumAchievementList newAchievement = AlbumAchievementList.builder()
+                    .achievement(sample)
+                    .build();
+
+            newAlbumData.addAchievement(newAchievement);
+        });
+
+        try {
+            userAlbumRepository.save(newAlbumData);
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalArgumentException("잘못된 앨범 번호 또는 도전과제 번호 입니다");
+        }
+    }
+
+    public void editUserAlbum(AlbumSaveRequest requestData) {
+        // 중간 테이블(AlbumAchievementList)도 자동으로 갱신됨
+
+        // 생성 날짜 불변을 위해 기존 데이터 조회
+        UserAlbum oldAlbumData = userAlbumRepository.findById(requestData.getId())
+                .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 앨범이 존재하지 않습니다.", 1));
+
         UserAlbum newAlbumData = UserAlbum.builder()
                 .id(requestData.getId())
                 .title(requestData.getTitle())
                 .contentText(requestData.getContentText())
                 .image(requestData.getImage())
-                .userId("test")
+                .userId(oldAlbumData.getUserId())
+                .uploadDate(oldAlbumData.getUploadDate())
                 .build();
 
         requestData.getAchievements().forEach(item -> {
@@ -107,4 +141,7 @@ public class AlbumService {
 
     // --------------------------------------- TEST Methods ---------------------------------------
 
+    public List<UserAlbum> test() {
+        return userAlbumRepository.findAll();
+    }
 }

@@ -50,12 +50,11 @@ public class DisplayStandService {
                 .build();
     }
 
-    // 앨범 저장 & 수정 기능
+    // 전시대 저장 기능
     public void saveUserDisplayStand(DisplayStandSaveRequset requestData) {
-        // id가 null일시 => 새 전시대 생성
-        // id가 null이 아닐 시 => 수정 (중간 테이블(DisplayStandAlbumList)도 자동으로 갱신됨)
+        // 중간 테이블(DisplayStandAlbumList)도 자동으로 갱신됨
+
         UserDisplayStand newDisplayStandData = UserDisplayStand.builder()
-                .id(requestData.getId())
                 .title(requestData.getTitle())
                 .contentText(requestData.getContentText())
                 .image(requestData.getImage())
@@ -82,7 +81,44 @@ public class DisplayStandService {
 
     }
 
-    // 앨범 삭제 기능
+    // 전시대 수정 기능
+    public void editUserDisplayStand(DisplayStandSaveRequset requestData) {
+        // 중간 테이블(DisplayStandAlbumList)도 자동으로 갱신됨
+
+        // 생성 날짜 불변을 위해 기존 데이터 조회
+        UserDisplayStand oldAlbumData = userDisplayStandRepository.findById(requestData.getId())
+                .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 전시대가 존재하지 않습니다.", 1));
+
+        UserDisplayStand newDisplayStandData = UserDisplayStand.builder()
+                .id(requestData.getId())
+                .title(requestData.getTitle())
+                .contentText(requestData.getContentText())
+                .image(requestData.getImage())
+                .userId(oldAlbumData.getUserId())
+                .uploadDate(oldAlbumData.getUploadDate())
+                .build();
+
+        requestData.getAlbums().forEach(item -> {
+            UserAlbum sample = UserAlbum.builder()
+                    .id(item)
+                    .build();
+
+            DisplayStandAlbumList newAlbum = DisplayStandAlbumList.builder()
+                    .userAlbum(sample)
+                    .build();
+
+            newDisplayStandData.addAlbum(newAlbum);
+        });
+
+        try {
+            userDisplayStandRepository.save(newDisplayStandData);
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalArgumentException("잘못된 전시대 번호 또는 앨범 번호 입니다");
+        }
+
+    }
+
+    // 전시대 삭제 기능
     @Transactional
     public void deleteUserDisplayStand(Long index) {
         System.out.println("index 값은 : " + index);

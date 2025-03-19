@@ -19,7 +19,7 @@ public class AlbumController {
     private final AlbumService albumService;
 
     @Operation(
-            summary = "앨범 저장/수정하기",
+            summary = "앨범 저장하기",
             description = "작성한 앨범 내용과 앨범에 등록한 도전과제를 저장"
     )
     @PostMapping("/r1")
@@ -29,10 +29,21 @@ public class AlbumController {
     }
 
     @Operation(
+            summary = "앨범 수정하기",
+            description = "작성한 앨범 내용과 앨범에 등록한 도전과제를 수정"
+    )
+    @PostMapping("/r2")
+    public ApiResponse<String> editAlbum(@RequestBody AlbumSaveRequest requestData) {
+        albumService.editUserAlbum(requestData);
+        return ApiResponse.success("ok");
+    }
+
+
+    @Operation(
             summary = "앨범 삭제",
             description = "선택한 앨범을 지우기"
     )
-    @PostMapping("/r2")
+    @PostMapping("/r3")
     public ApiResponse<String> deleteAlbum(@RequestBody long index) {
         albumService.deleteUserAlbum(index);
         return ApiResponse.success("ok");
@@ -42,7 +53,7 @@ public class AlbumController {
             summary = "앨범 가져오기(1건)",
             description = "선택한 앨범 정보 가져오기"
     )
-    @GetMapping("/r3")
+    @GetMapping("/r4")
     public ApiResponse<AlbumGetResponse> getAlbumDetail(@RequestParam("index") long index) {
         return ApiResponse.success(albumService.getUserAlbumOne(index));
     }
@@ -51,9 +62,20 @@ public class AlbumController {
             summary = "앨범 목록 가져오기",
             description = "앨범 정보 가져오기"
     )
-    @GetMapping("/r4")
+    @GetMapping("/r5")
     public ApiResponse<PagedModel<AlbumGetListResponse>> getAlbumList(@RequestParam int pageNo) {
         return ApiResponse.success(new PagedModel<>(albumService.getUserAlbums(pageNo, 5)));
+    }
+
+    // --------------------------------------- TEST API ---------------------------------------
+
+    @Operation(
+            summary = "외부 api 테스트 (GetSchemaForGame)",
+            description = "테스트 중"
+    )
+    @GetMapping("/test")
+    public ApiResponse<Object> test() {
+        return ApiResponse.success(albumService.test());
     }
 
 
