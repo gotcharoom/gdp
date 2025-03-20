@@ -39,12 +39,14 @@ public class UniqueGenerator {
         return nickname;
     }
 
-    public String generateUniqueFilename(String fileDir, String originalFileName) {
-        String fileName;
+    public String generateUniqueFilename(String fileDir, String fileName, String ext) {
+        String uniqueName;
         do {
-            fileName = originalFileName + "-" +  UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+            // 확장자가 존재하면 .을 추가해서 붙임
+            String extWithDot = (ext != null && !ext.isEmpty()) ? "." + ext : "";
+            uniqueName = fileName + "-" + UUID.randomUUID().toString().replace("-", "").substring(0, 12) + extWithDot;
         } while (uploadedFileRepository.findByFileDirAndFileNameAndDeletedYn(fileDir, fileName, YesNo.N).isPresent()); // 중복이면 다시 생성
 
-        return fileName;
+        return uniqueName;
     }
 }
