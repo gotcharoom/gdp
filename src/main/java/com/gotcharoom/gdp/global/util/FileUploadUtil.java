@@ -6,6 +6,8 @@ import com.gotcharoom.gdp.upload.entity.UploadedFile;
 import com.gotcharoom.gdp.upload.repository.UploadedFileRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -19,10 +21,13 @@ public class FileUploadUtil {
 
     private final UniqueGenerator uniqueGenerator;
 
+    private final WebClientUtil webClientUtil;
+
     private final UploadedFileRepository uploadedFileRepository;
 
-    public FileUploadUtil(UniqueGenerator uniqueGenerator, UploadedFileRepository uploadedFileRepository) {
+    public FileUploadUtil(UniqueGenerator uniqueGenerator, WebClientUtil webClientUtil, UploadedFileRepository uploadedFileRepository) {
         this.uniqueGenerator = uniqueGenerator;
+        this.webClientUtil = webClientUtil;
         this.uploadedFileRepository = uploadedFileRepository;
     }
 
@@ -56,6 +61,35 @@ public class FileUploadUtil {
 
         // 저장: (서버에 업로드되는 파일명, 업로드되는 경로)
         multipartFile.transferTo(new File(getFullPath(fileDir, serverUploadFileName)));
+
+        UploadedFile uploadedFile = UploadedFile.builder()
+                .fileDir(fileDir)
+                .fileName(serverUploadFileName)
+                .ext(ext)
+                .deletedYn(YesNo.N)
+                .build();
+
+        uploadedFileRepository.save(uploadedFile);
+
+        return serverUploadFileName;
+    }
+
+    public String serverUploadFileToFileServer(String fileDir, MultipartFile multipartFile) throws IOException {
+        if (multipartFile.isEmpty()) { // 파일이 없으면 null 반환
+            return null;
+        }
+
+        String originalFilename = multipartFile.getOriginalFilename(); // 원래 파일명
+        String serverUploadFileName = uniqueGenerator.generateUniqueFilename(fileDir, originalFilename); // UUID 기반 파일명 생성
+        String ext = extractExt(originalFilename);
+
+        // 저장: (서버에 업로드되는 파일명, 업로드되는 경로)
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", multipartFile.getResource()); // MultipartFile을 Resource로 변환하여 전송
+        body.add("filename", serverUploadFileName);
+
+        String serverDir = SERVER_URL + fileDir;
+        String response = webClientUtil.post(serverDir, body, String.class);
 
         UploadedFile uploadedFile = UploadedFile.builder()
                 .fileDir(fileDir)
