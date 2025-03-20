@@ -1,7 +1,6 @@
 package com.gotcharoom.gdp.upload.service;
 
 import com.gotcharoom.gdp.global.util.FileUploadUtil;
-import com.gotcharoom.gdp.user.entity.GdpUser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +20,7 @@ public class UploadFileService {
     }
 
     public String uploadProfileFile(String oldImageUrl, MultipartFile imageFile) throws IOException {
-        fileUploadUtil.deleteOldImage(PROFILE_DIR, oldImageUrl);
+        fileUploadUtil.deleteOldProfileImage(PROFILE_DIR, oldImageUrl);
 
         return fileUploadUtil.serverUploadFileToFileServer(PROFILE_DIR, imageFile);
     }

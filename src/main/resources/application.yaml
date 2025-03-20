@@ -11,7 +11,9 @@ gdp:
     oauth2-auth-uri: ${OAUTH2_AUTH_URI}
     oauth2-redirect-uri: ${OAUTH2_REDIRECT_URI}
   file-server:
-    url: ${GDP_FILE_SERVER_URL}
+    url:
+      upload: ${GDP_FILE_SERVER_UPLOAD_URL}
+      download: ${GDP_FILE_SERVER_DOWNLOAD_URL}
     dir:
       profile: /profile
 

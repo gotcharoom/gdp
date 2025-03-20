@@ -21,12 +21,6 @@ import java.io.IOException;
 @Service
 public class UserService {
 
-    @Value("${gdp.file-server.url}")
-    private String SERVER_URL;
-
-    @Value("${gdp.file-server.dir.profile}")
-    private String PROFILE_DIR;
-
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
