@@ -88,7 +88,7 @@ public class FileUploadUtil {
         body.add("file", multipartFile.getResource()); // MultipartFile을 Resource로 변환하여 전송
         body.add("filename", serverUploadFileName);
 
-        String serverDir = SERVER_URL + fileDir;
+        String serverDir = getFullPath(fileDir, serverUploadFileName);
         String response = webClientUtil.put(serverDir, body, String.class);
 
         UploadedFile uploadedFile = UploadedFile.builder()
