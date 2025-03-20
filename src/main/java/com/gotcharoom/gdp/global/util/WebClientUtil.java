@@ -122,6 +122,24 @@ public class WebClientUtil {
         return sendRequest(HttpMethod.PUT, url, requestBody, responseType, target).block();
     }
 
+    /**
+     * DELETE 요청
+     */
+    public <T> T delete(String url, TypeReference<T> responseType) {
+        return sendRequest(HttpMethod.DELETE, url, null, responseType, null).block();
+    }
+
+    public <T> T delete(String url, TypeReference<T> responseType, String target) {
+        return sendRequest(HttpMethod.DELETE, url, null, responseType, target).block();
+    }
+
+    public <T> T delete(String url, Class<T> responseType) {
+        return sendRequest(HttpMethod.DELETE, url, null, responseType, null).block();
+    }
+
+    public <T> T delete(String url, Class<T> responseType, String target) {
+        return sendRequest(HttpMethod.DELETE, url, null, responseType, target).block();
+    }
 
     /**
      * JSON에서 target 필드 추출 ('.' 및 '[index]' 지원)

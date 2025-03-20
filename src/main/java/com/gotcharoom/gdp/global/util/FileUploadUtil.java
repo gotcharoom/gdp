@@ -16,8 +16,11 @@ import java.io.IOException;
 @Component
 public class FileUploadUtil {
 
-    @Value("${gdp.file-server.url}")
-    private String SERVER_URL;
+    @Value("${gdp.file-server.url.upload}")
+    private String SERVER_UPLOAD_URL;
+
+    @Value("${gdp.file-server.url.download}")
+    private String SERVER_DOWNLOAD_URL;
 
     private final UniqueGenerator uniqueGenerator;
 
@@ -38,8 +41,12 @@ public class FileUploadUtil {
      * @param filename 서버에 업로드되는 파일명
      * @return 전체 파일 경로
      */
-    public String getFullPath(String fileDir, String filename) {
-        return SERVER_URL + fileDir + "/" + filename;
+    public String getUploadFullPath(String fileDir, String filename) {
+        return SERVER_UPLOAD_URL + fileDir + "/" + filename;
+    }
+
+    public String getDownloadFullPath(String fileDir, String filename) {
+        return SERVER_DOWNLOAD_URL + fileDir + "/" + filename;
     }
 
     public String serverUploadFileToFileServer(String fileDir, MultipartFile multipartFile) throws IOException {
@@ -58,8 +65,8 @@ public class FileUploadUtil {
         body.add("file", multipartFile.getResource()); // MultipartFile을 Resource로 변환하여 전송
         body.add("filename", serverUploadFileName);
 
-        String fullPath = getFullPath(fileDir, serverUploadFileName);
-        String response = webClientUtil.put(fullPath, body, String.class);
+        String uploadFullPath = getUploadFullPath(fileDir, serverUploadFileName);
+        String response = webClientUtil.put(uploadFullPath, body, String.class);
 
         UploadedFile uploadedFile = UploadedFile.builder()
                 .fileDir(fileDir)
@@ -70,7 +77,7 @@ public class FileUploadUtil {
 
         uploadedFileRepository.save(uploadedFile);
 
-        return fullPath;
+        return getDownloadFullPath(fileDir, serverUploadFileName);
     }
 
     private String extractFilenameWithoutExt(String originalFilename) {
@@ -97,12 +104,16 @@ public class FileUploadUtil {
         return oldImageUrl.substring(pos + 1);
     }
 
-    public void deleteOldImage(String fileDir, String oldImageUrl) {
+    public void deleteOldProfileImage(String fileDir, String oldImageUrl) {
         if (oldImageUrl == null || oldImageUrl.isEmpty()) {
             return ;
         }
 
-        File oldFile = new File(oldImageUrl);
+        // 파일 확인
+        String oldFileName = extractOldFileName(oldImageUrl);
+        String uploadFullPath = getUploadFullPath(fileDir, oldFileName);
+
+        File oldFile = new File(uploadFullPath);
 
         if (!oldFile.exists()) {
             return ;
@@ -112,14 +123,13 @@ public class FileUploadUtil {
             return;
         }
 
-        boolean isDeleted = oldFile.delete();  // 기존 이미지 삭제
+        // 삭제 실행
+        String response = webClientUtil.delete(uploadFullPath, String.class);
 
-        if(!isDeleted) {
-            //            throw new RuntimeException("Failed to delete image: " + oldFile.getAbsolutePath());
+        if (response == null || response.isEmpty()) {
             return;
         }
 
-        String oldFileName = extractOldFileName(oldImageUrl);
         UploadedFile file = uploadedFileRepository.findByFileDirAndFileNameAndDeletedYn(fileDir, oldFileName, YesNo.N).orElse(null);
 
         if(file == null) {
