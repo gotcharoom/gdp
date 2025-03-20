@@ -86,6 +86,10 @@ public class FileUploadUtil {
     }
 
     public void deleteOldImage(String fileDir, String oldImageUrl) {
+        if (oldImageUrl.isEmpty()) {
+            return ;
+        }
+
         File oldFile = new File(oldImageUrl);
 
         if (!oldFile.exists()) {
