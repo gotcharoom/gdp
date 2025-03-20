@@ -89,7 +89,7 @@ public class FileUploadUtil {
         body.add("filename", serverUploadFileName);
 
         String serverDir = SERVER_URL + fileDir;
-        String response = webClientUtil.post(serverDir, body, String.class);
+        String response = webClientUtil.put(serverDir, body, String.class);
 
         UploadedFile uploadedFile = UploadedFile.builder()
                 .fileDir(fileDir)
