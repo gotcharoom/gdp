@@ -2,6 +2,7 @@ package com.gotcharoom.gdp.user.service;
 
 import com.gotcharoom.gdp.global.security.model.SocialType;
 import com.gotcharoom.gdp.global.util.FileUploadUtil;
+import com.gotcharoom.gdp.upload.service.UploadFileService;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import com.gotcharoom.gdp.user.model.UserDetailsResponse;
 import com.gotcharoom.gdp.user.model.UserDetailsUpdateRequest;
@@ -13,8 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 
 @Service
@@ -30,12 +31,12 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final FileUploadUtil fileUploadUtil;
+    private final UploadFileService uploadFileService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, FileUploadUtil fileUploadUtil) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UploadFileService uploadFileService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.fileUploadUtil = fileUploadUtil;
+        this.uploadFileService = uploadFileService;
     }
 
     public boolean registerUser(UserSignUpRequest userSignUpRequest) {
@@ -120,6 +121,7 @@ public class UserService {
                 .build();
     }
 
+    @Transactional
     public void putUserDetails(UserDetailsUpdateRequest request) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -129,11 +131,9 @@ public class UserService {
 
         GdpUser user = userRepository.findById(authentication.getName()).orElseThrow();
 
-        fileUploadUtil.deleteOldImage(user.getImageUrl());
-        String fileUrl = SERVER_URL + PROFILE_DIR;
-        String imageUrl = fileUploadUtil.serverUploadFile(request.getImageFile(), fileUrl);
+        String imageUrl = uploadFileService.uploadProfileFile(user.getImageUrl(), request.getImageFile());
 
-        GdpUser updatedUser = user.updateProfile(request.getNickname(), request.getName(), request.getEmail(), imageUrl);
+        GdpUser updatedUser = user.updateProfile(request.getNickname(), request.getName(), request.getEmail(), imageUrl, request.getImageCropArea());
         userRepository.save(updatedUser);
     }
 }
