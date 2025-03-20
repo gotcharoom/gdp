@@ -32,6 +32,15 @@ public class JwtFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
 
+        List<String> swaggerPaths = List.of(
+                "/swagger",
+                "/swagger-ui.html",
+                "/swagger-ui/**",
+                "/api-docs",
+                "/api-docs/**",
+                "/v3/api-docs/**"
+        );
+
         List<String> excludedPaths = List.of(
                 "/api/v1/auth/login",
                 "/api/v1/auth/logout",
@@ -46,7 +55,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 "/api/v1/user/check/duplicate/email"
         );
 
-        return excludedPaths.stream().anyMatch(path::startsWith);
+        return swaggerPaths.stream().anyMatch(path::startsWith)  || excludedPaths.stream().anyMatch(path::startsWith);
     }
 
     // TODO. [TR-YOO] Exception 수정하기
