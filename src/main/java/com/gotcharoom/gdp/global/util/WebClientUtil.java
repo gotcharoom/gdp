@@ -104,6 +104,26 @@ public class WebClientUtil {
     }
 
     /**
+     * PUT 요청
+     */
+    public <T, V> T put(String url, V requestBody, TypeReference<T> responseType) {
+        return sendRequest(HttpMethod.PUT, url, requestBody, responseType, null).block();
+    }
+
+    public <T, V> T put(String url, V requestBody, TypeReference<T> responseType, String target) {
+        return sendRequest(HttpMethod.PUT, url, requestBody, responseType, target).block();
+    }
+
+    public <T, V> T put(String url, V requestBody, Class<T> responseType) {
+        return sendRequest(HttpMethod.PUT, url, requestBody, responseType, null).block();
+    }
+
+    public <T, V> T put(String url, V requestBody, Class<T> responseType, String target) {
+        return sendRequest(HttpMethod.PUT, url, requestBody, responseType, target).block();
+    }
+
+
+    /**
      * JSON에서 target 필드 추출 ('.' 및 '[index]' 지원)
      */
     private JsonNode extractTargetField(JsonNode json, String target) {
