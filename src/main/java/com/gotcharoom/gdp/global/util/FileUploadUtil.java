@@ -86,7 +86,7 @@ public class FileUploadUtil {
     }
 
     public void deleteOldImage(String fileDir, String oldImageUrl) {
-        if (oldImageUrl.isEmpty()) {
+        if (oldImageUrl == null || oldImageUrl.isEmpty()) {
             return ;
         }
 
