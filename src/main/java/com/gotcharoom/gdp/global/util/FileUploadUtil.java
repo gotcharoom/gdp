@@ -73,7 +73,7 @@ public class FileUploadUtil {
         };
 
         // WebClient PUT 요청 실행
-        String response = webClientUtil.put(uploadFullPath, BodyInserters.fromResource(fileResource), String.class, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        String response = webClientUtil.put(uploadFullPath, fileResource, String.class, MediaType.APPLICATION_OCTET_STREAM_VALUE);
 
         UploadedFile uploadedFile = UploadedFile.builder()
                 .fileDir(fileDir)
