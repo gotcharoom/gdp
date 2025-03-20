@@ -1,6 +1,7 @@
 package com.gotcharoom.gdp.auth.model;
 
 import com.gotcharoom.gdp.user.entity.GdpUser;
+import com.gotcharoom.gdp.user.model.CropArea;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,12 +15,16 @@ public class LoginUserInfoResponse {
     private String id;
     private String nickname;
     private String name;
+    private String imageUrl;
+    private CropArea imageCropArea;
 
     public static LoginUserInfoResponse fromEntity(GdpUser gdpUser) {
         return LoginUserInfoResponse.builder()
                 .id(gdpUser.getId())
                 .nickname(gdpUser.getNickname())
                 .name(gdpUser.getName())
+                .imageUrl(gdpUser.getImageUrl())
+                .imageCropArea(gdpUser.getCropArea())
                 .build();
     }
 }
