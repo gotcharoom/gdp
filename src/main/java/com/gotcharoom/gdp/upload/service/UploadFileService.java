@@ -23,6 +23,6 @@ public class UploadFileService {
     public String uploadProfileFile(String oldImageUrl, MultipartFile imageFile) throws IOException {
         fileUploadUtil.deleteOldImage(PROFILE_DIR, oldImageUrl);
 
-        return fileUploadUtil.serverUploadFile(PROFILE_DIR, imageFile);
+        return fileUploadUtil.serverUploadFileToFileServer(PROFILE_DIR, imageFile);
     }
 }
