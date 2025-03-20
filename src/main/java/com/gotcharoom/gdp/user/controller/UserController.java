@@ -81,32 +81,4 @@ public class UserController {
 
         return ApiResponse.success(isDuplicated);
     }
-
-
-    /* 유저 정보 */
-
-    @Operation(
-            summary = "내 정보",
-            description = "유저 - 내 정보 API"
-    )
-    @GetMapping("/details")
-    public ApiResponse<UserDetailsResponse> getUserDetails() {
-
-        UserDetailsResponse userDetails = userService.getUserDetails();
-
-        return ApiResponse.success(userDetails);
-    }
-
-    @Operation(
-            summary = "내 정보 수정",
-            description = "유저 - 내 정보 수정 API"
-    )
-    @PutMapping("/details")
-    public ApiResponse<Void> putUserDetails(UserDetailsUpdateRequest request) {
-
-
-        userService.putUserDetails(request);
-
-        return ApiResponse.success();
-    }
 }

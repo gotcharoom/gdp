@@ -1,6 +1,8 @@
 package com.gotcharoom.gdp.global.security.service;
 
+import com.gotcharoom.gdp.global.enums.YesNo;
 import com.gotcharoom.gdp.global.security.model.SocialType;
+import com.gotcharoom.gdp.upload.repository.UploadedFileRepository;
 import com.gotcharoom.gdp.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +13,13 @@ public class UniqueGenerator {
 
     private final UserRepository userRepository;
 
-    public UniqueGenerator(UserRepository userRepository) {
+    private final UploadedFileRepository uploadedFileRepository;
+
+    public UniqueGenerator(UserRepository userRepository, UploadedFileRepository uploadedFileRepository) {
         this.userRepository = userRepository;
+        this.uploadedFileRepository = uploadedFileRepository;
     }
+
 
     public String generateUniqueId(SocialType socialType) {
         String id;
@@ -31,5 +37,14 @@ public class UniqueGenerator {
         } while (userRepository.findByNickname(nickname).isPresent()); // 중복이면 다시 생성
 
         return nickname;
+    }
+
+    public String generateUniqueFilename(String fileDir, String originalFileName) {
+        String fileName;
+        do {
+            fileName = originalFileName + "-" +  UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+        } while (uploadedFileRepository.findByFileDirAndFileNameAndDeleteYn(fileDir, fileName, YesNo.N).isPresent()); // 중복이면 다시 생성
+
+        return fileName;
     }
 }

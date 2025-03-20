@@ -1,27 +1,42 @@
 package com.gotcharoom.gdp.user.service;
 
 import com.gotcharoom.gdp.global.security.model.SocialType;
+import com.gotcharoom.gdp.global.util.FileUploadUtil;
+import com.gotcharoom.gdp.upload.service.UploadFileService;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import com.gotcharoom.gdp.user.model.UserDetailsResponse;
 import com.gotcharoom.gdp.user.model.UserDetailsUpdateRequest;
 import com.gotcharoom.gdp.user.model.UserSignUpRequest;
 import com.gotcharoom.gdp.user.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.io.IOException;
+
 @Service
 public class UserService {
+
+    @Value("${gdp.file-server.url}")
+    private String SERVER_URL;
+
+    @Value("${gdp.file-server.dir.profile}")
+    private String PROFILE_DIR;
 
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    private final UploadFileService uploadFileService;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UploadFileService uploadFileService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.uploadFileService = uploadFileService;
     }
 
     public boolean registerUser(UserSignUpRequest userSignUpRequest) {
@@ -101,18 +116,24 @@ public class UserService {
         return UserDetailsResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
+                .name(user.getName())
                 .nickname(user.getNickname())
                 .build();
     }
 
-    public void putUserDetails(UserDetailsUpdateRequest request) {
+    @Transactional
+    public void putUserDetails(UserDetailsUpdateRequest request) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
             throw new RuntimeException();
         }
+
         GdpUser user = userRepository.findById(authentication.getName()).orElseThrow();
 
+        String imageUrl = uploadFileService.uploadProfileFile(user.getImageUrl(), request.getImageFile());
 
+        GdpUser updatedUser = user.updateProfile(request.getNickname(), request.getName(), request.getEmail(), imageUrl, request.getImageCropArea());
+        userRepository.save(updatedUser);
     }
 }
