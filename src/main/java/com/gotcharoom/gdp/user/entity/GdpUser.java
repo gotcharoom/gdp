@@ -59,7 +59,7 @@ public class GdpUser {
                 .build();
     }
 
-    public GdpUser updateProfile(String nickname, String name, String email, String imageUrl, CropArea copArea) {
+    public GdpUser updateProfile(String nickname, String name, String email, String imageUrl, CropArea cropArea) {
         return this.toBuilder()
                 .nickname(nickname)
                 .name(name)
