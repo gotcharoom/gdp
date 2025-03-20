@@ -42,40 +42,6 @@ public class FileUploadUtil {
         return SERVER_URL + fileDir + "/" + filename;
     }
 
-    /**
-     * 서버에 파일을 업로드하는 메서드
-     *
-     * @param fileDir       저장할 경로
-     * @param multipartFile 업로드할 파일
-     * @return 저장된 파일명 (UUID 포함)
-     * @throws IOException 파일 저장 중 오류 발생 시
-     */
-    public String serverUploadFile(String fileDir, MultipartFile multipartFile) throws IOException {
-        if (multipartFile.isEmpty()) { // 파일이 없으면 null 반환
-            return null;
-        }
-
-        String originalFilename = multipartFile.getOriginalFilename(); // 원래 파일명
-        String fileNameWithoutExt = extractFilenameWithoutExt(originalFilename);
-        String ext = extractExt(originalFilename);
-        String serverUploadFileName = uniqueGenerator.generateUniqueFilename(fileDir, fileNameWithoutExt, ext); // UUID 기반 파일명 생성
-
-
-        // 저장: (서버에 업로드되는 파일명, 업로드되는 경로)
-        multipartFile.transferTo(new File(getFullPath(fileDir, serverUploadFileName)));
-
-        UploadedFile uploadedFile = UploadedFile.builder()
-                .fileDir(fileDir)
-                .fileName(serverUploadFileName)
-                .ext(ext)
-                .deletedYn(YesNo.N)
-                .build();
-
-        uploadedFileRepository.save(uploadedFile);
-
-        return serverUploadFileName;
-    }
-
     public String serverUploadFileToFileServer(String fileDir, MultipartFile multipartFile) throws IOException {
         if (multipartFile.isEmpty()) { // 파일이 없으면 null 반환
             return null;
@@ -92,8 +58,8 @@ public class FileUploadUtil {
         body.add("file", multipartFile.getResource()); // MultipartFile을 Resource로 변환하여 전송
         body.add("filename", serverUploadFileName);
 
-        String serverDir = getFullPath(fileDir, serverUploadFileName);
-        String response = webClientUtil.put(serverDir, body, String.class);
+        String fullPath = getFullPath(fileDir, serverUploadFileName);
+        String response = webClientUtil.put(fullPath, body, String.class);
 
         UploadedFile uploadedFile = UploadedFile.builder()
                 .fileDir(fileDir)
@@ -104,7 +70,7 @@ public class FileUploadUtil {
 
         uploadedFileRepository.save(uploadedFile);
 
-        return serverUploadFileName;
+        return fullPath;
     }
 
     private String extractFilenameWithoutExt(String originalFilename) {
