@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface UploadedFileRepository extends JpaRepository<UploadedFile, Long> {
 
-    Optional<UploadedFile> findByFileDirAndFileNameAndDeleteYn(String fileDir, String fileName, YesNo deleteYn);
+    Optional<UploadedFile> findByFileDirAndFileNameAndDeletedYn(String fileDir, String fileName, YesNo deleteYn);
 }
