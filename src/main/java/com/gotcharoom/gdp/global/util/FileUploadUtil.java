@@ -56,8 +56,10 @@ public class FileUploadUtil {
         }
 
         String originalFilename = multipartFile.getOriginalFilename(); // 원래 파일명
-        String serverUploadFileName = uniqueGenerator.generateUniqueFilename(fileDir, originalFilename); // UUID 기반 파일명 생성
+        String fileNameWithoutExt = extractFilenameWithoutExt(originalFilename);
         String ext = extractExt(originalFilename);
+        String serverUploadFileName = uniqueGenerator.generateUniqueFilename(fileDir, fileNameWithoutExt, ext); // UUID 기반 파일명 생성
+
 
         // 저장: (서버에 업로드되는 파일명, 업로드되는 경로)
         multipartFile.transferTo(new File(getFullPath(fileDir, serverUploadFileName)));
@@ -80,8 +82,10 @@ public class FileUploadUtil {
         }
 
         String originalFilename = multipartFile.getOriginalFilename(); // 원래 파일명
-        String serverUploadFileName = uniqueGenerator.generateUniqueFilename(fileDir, originalFilename); // UUID 기반 파일명 생성
+        String fileNameWithoutExt = extractFilenameWithoutExt(originalFilename);
         String ext = extractExt(originalFilename);
+        String serverUploadFileName = uniqueGenerator.generateUniqueFilename(fileDir, fileNameWithoutExt, ext); // UUID 기반 파일명 생성
+
 
         // 저장: (서버에 업로드되는 파일명, 업로드되는 경로)
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
@@ -101,6 +105,14 @@ public class FileUploadUtil {
         uploadedFileRepository.save(uploadedFile);
 
         return serverUploadFileName;
+    }
+
+    private String extractFilenameWithoutExt(String originalFilename) {
+        int pos = originalFilename.lastIndexOf(".");
+        if (pos == -1) {
+            return originalFilename; // 확장자가 없는 경우 전체 파일명을 반환
+        }
+        return originalFilename.substring(0, pos); // 확장자 앞부분만 반환
     }
 
     /**
