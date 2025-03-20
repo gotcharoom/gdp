@@ -43,7 +43,7 @@ public class UniqueGenerator {
         String fileName;
         do {
             fileName = originalFileName + "-" +  UUID.randomUUID().toString().replace("-", "").substring(0, 12);
-        } while (uploadedFileRepository.findByFileDirAndFileNameAndDeleteYn(fileDir, fileName, YesNo.N).isPresent()); // 중복이면 다시 생성
+        } while (uploadedFileRepository.findByFileDirAndFileNameAndDeletedYn(fileDir, fileName, YesNo.N).isPresent()); // 중복이면 다시 생성
 
         return fileName;
     }

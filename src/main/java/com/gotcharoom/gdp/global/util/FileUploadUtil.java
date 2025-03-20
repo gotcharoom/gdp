@@ -104,7 +104,7 @@ public class FileUploadUtil {
         }
 
         String oldFileName = extractOldFileName(oldImageUrl);
-        UploadedFile file = uploadedFileRepository.findByFileDirAndFileNameAndDeleteYn(fileDir, oldFileName, YesNo.N).orElse(null);
+        UploadedFile file = uploadedFileRepository.findByFileDirAndFileNameAndDeletedYn(fileDir, oldFileName, YesNo.N).orElse(null);
 
         if(file == null) {
             return;
