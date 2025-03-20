@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gotcharoom.gdp.global.config.WebClientConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -242,8 +243,8 @@ public class WebClientUtil {
 
     private <V> String getContentType(V requestBody) {
         if (requestBody instanceof MultipartFile multipartFile) {
-            return multipartFile.getContentType() != null ? multipartFile.getContentType() : "application/octet-stream";
+            return multipartFile.getContentType() != null ? multipartFile.getContentType() : MediaType.APPLICATION_OCTET_STREAM_VALUE;
         }
-        return "application/octet-stream";
+        return MediaType.APPLICATION_OCTET_STREAM_VALUE;
     }
 }

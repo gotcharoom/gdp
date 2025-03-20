@@ -5,10 +5,13 @@ import com.gotcharoom.gdp.global.security.service.UniqueGenerator;
 import com.gotcharoom.gdp.upload.entity.UploadedFile;
 import com.gotcharoom.gdp.upload.repository.UploadedFileRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.BodyInserters;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,14 +62,18 @@ public class FileUploadUtil {
         String ext = extractExt(originalFilename);
         String serverUploadFileName = uniqueGenerator.generateUniqueFilename(fileDir, fileNameWithoutExt, ext); // UUID 기반 파일명 생성
 
-
-        // 저장: (서버에 업로드되는 파일명, 업로드되는 경로)
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", multipartFile.getResource()); // MultipartFile을 Resource로 변환하여 전송
-        body.add("filename", serverUploadFileName);
-
+        // 업로드 경로 생성
         String uploadFullPath = getUploadFullPath(fileDir, serverUploadFileName);
-        String response = webClientUtil.put(uploadFullPath, body, String.class);
+
+        ByteArrayResource fileResource = new ByteArrayResource(multipartFile.getBytes()) {
+            @Override
+            public String getFilename() {
+                return serverUploadFileName; // 서버에 저장할 파일명 반환
+            }
+        };
+
+        // WebClient PUT 요청 실행
+        String response = webClientUtil.put(uploadFullPath, BodyInserters.fromResource(fileResource), String.class, MediaType.APPLICATION_OCTET_STREAM_VALUE);
 
         UploadedFile uploadedFile = UploadedFile.builder()
                 .fileDir(fileDir)
