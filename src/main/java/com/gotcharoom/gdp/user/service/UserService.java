@@ -118,6 +118,8 @@ public class UserService {
                 .email(user.getEmail())
                 .name(user.getName())
                 .nickname(user.getNickname())
+                .imageUrl(user.getImageUrl())
+                .imageCropArea(user.getCropArea())
                 .build();
     }
 
