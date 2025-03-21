@@ -1,4 +1,4 @@
-package com.gotcharoom.gdp.global.security.service;
+package com.gotcharoom.gdp.global.util;
 
 import com.gotcharoom.gdp.global.enums.YesNo;
 import com.gotcharoom.gdp.global.security.model.SocialType;

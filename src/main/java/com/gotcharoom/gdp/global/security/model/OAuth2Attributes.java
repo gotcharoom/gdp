@@ -1,6 +1,6 @@
 package com.gotcharoom.gdp.global.security.model;
 
-import com.gotcharoom.gdp.global.security.service.UniqueGenerator;
+import com.gotcharoom.gdp.global.util.UniqueGenerator;
 import com.gotcharoom.gdp.global.security.userInfo.*;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import lombok.Builder;
@@ -68,7 +68,7 @@ public class OAuth2Attributes {
         return GdpUser.builder()
                 .socialType(socialType)
                 .id(uniqueGenerator.generateUniqueId(socialType))
-                .socialId(oauth2UserInfo.getId())
+                .socialId(oauth2UserInfo.getSocialId())
                 .nickname(uniqueGenerator.generateUniqueNickname())
                 .name(oauth2UserInfo.getName())
                 .email(oauth2UserInfo.getEmail())

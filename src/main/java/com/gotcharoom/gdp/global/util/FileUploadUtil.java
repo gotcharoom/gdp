@@ -1,17 +1,13 @@
 package com.gotcharoom.gdp.global.util;
 
 import com.gotcharoom.gdp.global.enums.YesNo;
-import com.gotcharoom.gdp.global.security.service.UniqueGenerator;
 import com.gotcharoom.gdp.upload.entity.UploadedFile;
 import com.gotcharoom.gdp.upload.repository.UploadedFileRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.BodyInserters;
 
 import java.io.File;
 import java.io.IOException;
