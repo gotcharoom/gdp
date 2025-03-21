@@ -30,7 +30,7 @@ public class OAuth2Util {
 
             OAuth2Attributes extractAttributes = OAuth2Attributes.of(socialType, attributes);
 
-            return extractAttributes.getOauth2UserInfo().getId();
+            return extractAttributes.getOauth2UserInfo().getSocialId();
         }
 
         return subject;

@@ -149,8 +149,8 @@ public class JwtUtil {
         }
 
 
-        String userName = userPrincipal.getSubject();
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(userName);
+        String subject = userPrincipal.getSubject();
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(subject);
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }

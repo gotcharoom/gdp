@@ -68,7 +68,7 @@ public class OAuth2Attributes {
         return GdpUser.builder()
                 .socialType(socialType)
                 .id(uniqueGenerator.generateUniqueId(socialType))
-                .socialId(oauth2UserInfo.getId())
+                .socialId(oauth2UserInfo.getSocialId())
                 .nickname(uniqueGenerator.generateUniqueNickname())
                 .name(oauth2UserInfo.getName())
                 .email(oauth2UserInfo.getEmail())
