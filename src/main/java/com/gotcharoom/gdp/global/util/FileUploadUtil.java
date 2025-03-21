@@ -116,14 +116,10 @@ public class FileUploadUtil {
         String oldFileName = extractOldFileName(oldImageUrl);
         String uploadFullPath = getUploadFullPath(fileDir, oldFileName);
 
-        File oldFile = new File(uploadFullPath);
+        boolean isExist = webClientUtil.existsByHead(uploadFullPath);
 
-        if (!oldFile.exists()) {
+        if (!isExist) {
             return ;
-        }
-
-        if (!oldFile.isFile()) {
-            return;
         }
 
         // 삭제 실행
