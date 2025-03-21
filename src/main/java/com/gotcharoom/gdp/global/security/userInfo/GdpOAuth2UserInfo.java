@@ -16,7 +16,7 @@ public class GdpOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
-    public String getId() {
+    public String getSocialId() {
         return (String) attributes.get(usernameAttributeName);
     }
 

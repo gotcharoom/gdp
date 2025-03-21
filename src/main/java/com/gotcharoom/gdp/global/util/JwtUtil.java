@@ -78,13 +78,13 @@ public class JwtUtil {
 
     // AccessToken 생성
     public String createAccessToken(Authentication authentication) throws JsonProcessingException {
-        String id = oAuth2Util.getSocialIdFromAuthentication(authentication);
+        String id = oAuth2Util.getIdFromAuthentication(authentication);
         return createToken(id, ACCESS_EXPIRATION_TIME);
     }
 
     // Refresh Token 생성
     public String createRefreshToken(Authentication authentication) throws JsonProcessingException {
-        String id = oAuth2Util.getSocialIdFromAuthentication(authentication);
+        String id = oAuth2Util.getIdFromAuthentication(authentication);
         String refreshToken = createToken(id, REFRESH_EXPIRATION_TIME);
 
         RefreshTokenRequest refreshTokenRequest = RefreshTokenRequest.builder()
@@ -149,8 +149,8 @@ public class JwtUtil {
         }
 
 
-        String userName = userPrincipal.getSubject();
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(userName);
+        String subject = userPrincipal.getSubject();
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(subject);
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }

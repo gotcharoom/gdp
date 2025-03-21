@@ -23,10 +23,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
 
-        GdpUser gdpUser = userRepository.findById(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        GdpUser gdpUser = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + id));
 
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
 
