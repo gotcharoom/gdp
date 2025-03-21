@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gotcharoom.gdp.global.config.WebClientConfig;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -246,5 +248,28 @@ public class WebClientUtil {
             return multipartFile.getContentType() != null ? multipartFile.getContentType() : MediaType.APPLICATION_OCTET_STREAM_VALUE;
         }
         return MediaType.APPLICATION_OCTET_STREAM_VALUE;
+    }
+
+    public boolean existsByHead(String url) {
+        try {
+            ResponseEntity<Void> response = webClientConfig.webClient()
+                    .method(HttpMethod.HEAD)
+                    .uri(url)
+                    .retrieve()
+                    .toBodilessEntity() // HEAD는 body가 없으니 이걸로
+                    .block();
+
+            HttpHeaders headers = response.getHeaders();
+            headers.getContentType();
+            String contentType = headers.getContentType().toString();
+
+            if (!contentType.startsWith("image/") && !contentType.equals("application/octet-stream")) {
+                throw new RuntimeException("This fileDir is not a file");
+            }
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
