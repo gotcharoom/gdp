@@ -1,6 +1,6 @@
 package com.gotcharoom.gdp.global.security.model;
 
-import com.gotcharoom.gdp.global.security.service.UniqueGenerator;
+import com.gotcharoom.gdp.global.util.UniqueGenerator;
 import com.gotcharoom.gdp.global.security.userInfo.*;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import lombok.Builder;

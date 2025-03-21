@@ -4,6 +4,7 @@ import com.gotcharoom.gdp.global.security.model.OAuth2Attributes;
 import com.gotcharoom.gdp.global.security.model.CustomOAuth2User;
 import com.gotcharoom.gdp.global.security.model.SocialType;
 import com.gotcharoom.gdp.global.util.OAuth2Util;
+import com.gotcharoom.gdp.global.util.UniqueGenerator;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import com.gotcharoom.gdp.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
