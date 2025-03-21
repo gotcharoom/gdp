@@ -7,31 +7,25 @@ import com.gotcharoom.gdp.achievements.model.response.DisplayStandGetResponse;
 import com.gotcharoom.gdp.achievements.repository.DisplayStandAlbumListRepository;
 import com.gotcharoom.gdp.achievements.repository.UserDisplayStandRepository;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class DisplayStandService {
     private final UserDisplayStandRepository userDisplayStandRepository;
     private final DisplayStandAlbumListRepository displayStandAlbumListRepository;
 
-    public DisplayStandService(UserDisplayStandRepository userDisplayStandRepository, DisplayStandAlbumListRepository displayStandAlbumListRepository) {
-        this.userDisplayStandRepository = userDisplayStandRepository;
-        this.displayStandAlbumListRepository = displayStandAlbumListRepository;
-    }
-
     // 전시대 전체 목록 가져오기
     public Page<DisplayStandGetListResponse> getUserDisplayStands(int pageNo, int pageSize) {
-
         return userDisplayStandRepository.findPageBy(PageRequest.of(pageNo, pageSize, Sort.by("id").descending()));
-
     }
 
     // 전시대 내용 가져오기 (details)
@@ -119,7 +113,7 @@ public class DisplayStandService {
     }
 
     // 전시대 삭제 기능
-    @Transactional
+    // @Transactional
     public void deleteUserDisplayStand(Long index) {
         System.out.println("index 값은 : " + index);
         try {

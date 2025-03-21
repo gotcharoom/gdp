@@ -1,7 +1,13 @@
 package com.gotcharoom.gdp.achievements.repository;
 
-import java.util.List;
+import com.gotcharoom.gdp.achievements.model.response.AlbumGetListResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CustomUserAlbumRepository {
-    List<String> title();
+    // 앨범 전체 목록
+    Page<AlbumGetListResponse> findPageBy(Pageable page);
+
+    // 앨범 제목 검색
+    Page<AlbumGetListResponse> findAllByTitleContains(String title, Pageable page);
 }

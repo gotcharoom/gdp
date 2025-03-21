@@ -9,31 +9,24 @@ import com.gotcharoom.gdp.achievements.model.response.AlbumGetResponse;
 import com.gotcharoom.gdp.achievements.repository.AlbumAchievementListRepository;
 import com.gotcharoom.gdp.achievements.repository.UserAlbumRepository;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class AlbumService {
     private final UserAlbumRepository userAlbumRepository;
     private final AlbumAchievementListRepository albumAchievementListRepository;
 
-    public AlbumService(UserAlbumRepository userAlbumRepository, AlbumAchievementListRepository albumAchievementListRepository) {
-        this.userAlbumRepository = userAlbumRepository;
-        this.albumAchievementListRepository = albumAchievementListRepository;
-    }
-
     // 앨범 전체 목록 가져오기
     public Page<AlbumGetListResponse> getUserAlbums(int pageNo, int pageSize) {
-
-        return userAlbumRepository.findPageBy(PageRequest.of(pageNo, pageSize, Sort.by("id").descending()));
-
+        return userAlbumRepository.findPageBy(PageRequest.of(pageNo, pageSize));
     }
 
     // 앨범 내용 가져오기 (details)
@@ -118,7 +111,7 @@ public class AlbumService {
     }
 
     // 앨범 삭제 기능
-    @Transactional
+    // @Transactional
     public void deleteUserAlbum(Long index) {
         System.out.println("index 값은 : " + index);
         try {
@@ -141,7 +134,7 @@ public class AlbumService {
 
     // --------------------------------------- TEST Methods ---------------------------------------
 
-    public List<UserAlbum> test() {
-        return userAlbumRepository.findAllByTitleContains("수정된 앨범");
+    public Page<AlbumGetListResponse> test() {
+        return userAlbumRepository.findAllByTitleContains("수정된 앨범", PageRequest.of(0, 5));
     }
 }
