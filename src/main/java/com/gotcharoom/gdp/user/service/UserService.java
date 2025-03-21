@@ -140,7 +140,8 @@ public class UserService {
             throw new ChangePasswordException(ErrorResponse.PASSWORD_CHANGE_GDP_USER_ONLY);
         }
 
-        if (!request.getPrevPassword().equals(user.getPassword())) {
+        String currentPassword = passwordEncoder.encode(user.getPassword());
+        if (!request.getPrevPassword().equals(currentPassword)) {
             throw new ChangePasswordException(ErrorResponse.PASSWORD_CHANGE_NOT_CORRESPOND_CURRENT_PASSWORD);
         }
 
@@ -148,7 +149,8 @@ public class UserService {
             throw new ChangePasswordException(ErrorResponse.PASSWORD_CHANGE_PASSWORD_MISMATCH);
         }
 
-        GdpUser updatedUser = user.changePassword(request.getNewPassword());
+        String newPassword = passwordEncoder.encode(request.getNewPassword());
+        GdpUser updatedUser = user.changePassword(newPassword);
         userRepository.save(updatedUser);
     }
 }
