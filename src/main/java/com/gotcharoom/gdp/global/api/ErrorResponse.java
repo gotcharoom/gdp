@@ -12,9 +12,11 @@ public enum ErrorResponse {
     SAMPLE_ERROR(9997, "SAMPLEE RROR"),
     LOGIN_UNAUTHORIZED(1401, "인증되지 않은 로그인"),
     LOGIN_FORBIDDEN(1403, "권한 없음"),
-    NOT_CORRESPOND_CURRENT_PASSWORD(2001, "기존 비밀번호와 일치하지 않습니다");
+    PASSWORD_CHANGE_GDP_USER_ONLY(2001, "GDP 유저만 비밀번호를 변경할 수 있습니다"),
+    PASSWORD_CHANGE_NOT_CORRESPOND_CURRENT_PASSWORD(2002, "기존 비밀번호와 일치하지 않습니다"),
+    PASSWORD_CHANGE_PASSWORD_MISMATCH(2003, "새로운 비밀번호와 확인 값이 일치하지 않습니다");
 
 
-    private Integer code;
-    private String message;
+    private final Integer code;
+    private final String message;
 }
