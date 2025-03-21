@@ -140,8 +140,7 @@ public class UserService {
             throw new ChangePasswordException(ErrorResponse.PASSWORD_CHANGE_GDP_USER_ONLY);
         }
 
-        String currentPassword = passwordEncoder.encode(user.getPassword());
-        if (!request.getPrevPassword().equals(currentPassword)) {
+        if (!passwordEncoder.matches(request.getPrevPassword(), user.getPassword())) {
             throw new ChangePasswordException(ErrorResponse.PASSWORD_CHANGE_NOT_CORRESPOND_CURRENT_PASSWORD);
         }
 
