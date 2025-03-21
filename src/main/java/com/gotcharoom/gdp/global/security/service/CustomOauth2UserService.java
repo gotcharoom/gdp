@@ -25,7 +25,6 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private final OAuth2Util oAuth2Util;
     private final UserRepository userRepository;
-
     private final UniqueGenerator uniqueGenerator;
 
     public CustomOauth2UserService(
@@ -40,32 +39,33 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        log.info("CustomOAuth2UserService.loadUser() 실행 - OAuth2 로그인 요청 진입");
+        log.info("OAuth2 로그인 요청 처리 시작");
 
-        // 전달받은 기본 User 객체 가져오기
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
+        log.info("OAuth2 기본 사용자 정보 로드 완료");
 
-        //registrationId로 저장되어 있는 Social Type을 가져와서 Enum으로 변환
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         SocialType socialType = oAuth2Util.getSocialType(registrationId);
+        log.info("소셜 타입 매핑 완료 - registrationId: {}, socialType: {}", registrationId, socialType);
 
-        // OAuth2 로그인 시 키(PK)가 되는 값
-//        String userNameAttributeName = userRequest.getClientRegistration()
-//                .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
-
-        // 기본 User 객체를 Key, Value의 Map으로 가져오기
         Map<String, Object> attributes = oAuth2User.getAttributes();
+        log.info("OAuth2 사용자 Attributes 수신 - keys: {}", attributes.keySet());
 
-        // socialType에 따라 유저 정보를 통해 OAuthAttributes 객체 생성
         OAuth2Attributes extractAttributes = OAuth2Attributes.of(socialType, attributes);
+        log.info("OAuth2Attributes 생성 완료 - name: {}", extractAttributes.getOauth2UserInfo().getName());
 
-        // Social 정보로 User 객체 가져오기 (없다면 생성됨)
         GdpUser gdpUser = getUser(extractAttributes, socialType);
 
-        if(gdpUser == null) {
+        if (gdpUser != null) {
+            log.info("기존 사용자 조회 성공 - ID: {}", gdpUser.getId());
+        } else {
+            log.info("기존 사용자 없음, 신규 사용자 등록 시도");
             gdpUser = registerUser(extractAttributes, socialType);
+            log.info("신규 사용자 등록 완료 - ID: {}", gdpUser.getId());
         }
+
+        log.info("CustomOAuth2User 생성 및 반환");
 
         return new CustomOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority(gdpUser.getRole().getKey())),
@@ -75,17 +75,20 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
         );
     }
 
-
-
     private GdpUser getUser(OAuth2Attributes attributes, SocialType socialType) {
-        return userRepository.findBySocialTypeAndSocialId(socialType,
-                attributes.getOauth2UserInfo().getSocialId()).orElse(null);
+        String socialId = attributes.getOauth2UserInfo().getSocialId();
+        log.info("기존 사용자 조회 시도 - socialType: {}, socialId: {}", socialType, socialId);
+
+        return userRepository.findBySocialTypeAndSocialId(socialType, socialId).orElse(null);
     }
 
     private GdpUser registerUser(OAuth2Attributes attributes, SocialType socialType) {
+        log.info("신규 사용자 등록 시작");
+
         GdpUser createdUser = attributes.toEntity(socialType, attributes.getOauth2UserInfo(), uniqueGenerator);
         userRepository.save(createdUser);
 
+        log.info("신규 사용자 저장 완료 - ID: {}", createdUser.getId());
         return createdUser;
     }
 }
