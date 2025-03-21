@@ -147,6 +147,23 @@ public class WebClientUtil {
         return sendRequest(HttpMethod.DELETE, url, null, responseType, target).block();
     }
 
+    public boolean deleteWithoutBody(String url) {
+        try {
+            webClientConfig.webClient()
+                    .method(HttpMethod.DELETE)
+                    .uri(url)
+                    .retrieve()
+                    .toBodilessEntity()
+                    .block();
+
+            log.info("DELETE 요청 성공 - URL: {}", url);
+            return true;
+        } catch (Exception e) {
+            log.warn("DELETE 요청 실패 - URL: {}, 이유: {}", url, e.getMessage());
+            return false;
+        }
+    }
+
     // JSON field extractor
     private JsonNode extractTargetField(JsonNode json, String target) {
         if (target == null || target.isEmpty()) {
@@ -221,7 +238,6 @@ public class WebClientUtil {
 
     public boolean existsByHead(String url) {
         try {
-            log.info("Checking HEAD for URL: {}", url);
             ResponseEntity<Void> response = webClientConfig.webClient()
                     .method(HttpMethod.HEAD)
                     .uri(url)
@@ -229,18 +245,10 @@ public class WebClientUtil {
                     .toBodilessEntity()
                     .block();
 
-            HttpHeaders headers = response.getHeaders();
-            String contentType = headers.getContentType().toString();
-            log.info("HEAD response content-type: {}", contentType);
-
-            if (!contentType.startsWith("image/") && !contentType.equals("application/octet-stream")) {
-                log.warn("Invalid content type: {}", contentType);
-                throw new RuntimeException("This fileDir is not a file");
-            }
-
-            return true;
+            log.info("HEAD 요청 성공 - URL: {}, 상태코드: {}", url, response.getStatusCode());
+            return response.getStatusCode().is2xxSuccessful();
         } catch (Exception e) {
-            log.error("HEAD request failed for URL: {} - {}", url, e.getMessage());
+            log.warn("HEAD 요청 실패 - URL: {}, 이유: {}", url, e.getMessage());
             return false;
         }
     }
