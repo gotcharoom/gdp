@@ -78,7 +78,7 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 
     private GdpUser getUser(OAuth2Attributes attributes, SocialType socialType) {
-        return userRepository.findBySocialTypeAndId(socialType,
+        return userRepository.findBySocialTypeAndSocialId(socialType,
                 attributes.getOauth2UserInfo().getSocialId()).orElse(null);
     }
 
