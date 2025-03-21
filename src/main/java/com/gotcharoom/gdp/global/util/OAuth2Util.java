@@ -14,9 +14,9 @@ import java.util.Map;
 public class OAuth2Util {
 
     private static final String GDP = "GDP";
-    private static final String GOOGLE = "google";
-    private static final String NAVER = "naver";
-    private static final String KAKAO = "kakao";
+    private static final String GOOGLE = "GOOGLE";
+    private static final String NAVER = "NAVER";
+    private static final String KAKAO = "KAKAO";
 
     public String getSocialIdFromAuthentication(Authentication authentication) throws JsonProcessingException {
         String subject = authentication.getName();

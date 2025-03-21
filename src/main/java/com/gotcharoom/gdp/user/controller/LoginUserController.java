@@ -2,10 +2,17 @@ package com.gotcharoom.gdp.user.controller;
 
 import com.gotcharoom.gdp.auth.model.JwtToken;
 import com.gotcharoom.gdp.global.api.ApiResponse;
+import com.gotcharoom.gdp.global.exception.common.CustomException;
+import com.gotcharoom.gdp.global.exception.custom.ChangePasswordException;
+import com.gotcharoom.gdp.user.model.UserDetailsResponse;
+import com.gotcharoom.gdp.user.model.UserDetailsUpdateRequest;
+import com.gotcharoom.gdp.user.model.UserPasswordUpdateRequest;
 import com.gotcharoom.gdp.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/login-user")
@@ -71,4 +78,49 @@ public class LoginUserController {
         return ApiResponse.success(isDuplicated);
     }
 
+    /* 유저 정보 */
+
+    @Operation(
+            summary = "내 정보",
+            description = "유저 - 내 정보 API"
+    )
+    @GetMapping("/details")
+    public ApiResponse<UserDetailsResponse> getUserDetails() {
+
+        UserDetailsResponse userDetails = userService.getUserDetails();
+
+        return ApiResponse.success(userDetails);
+    }
+
+    /*
+    * RequestPart로 File과 Json 객체 분리하는 방법도 좋지만
+    * ModelAttribute로 구성 가능한지 확인하고 싶어서 구성한 메소드
+    */
+    @Operation(
+            summary = "내 정보 수정",
+            description = "유저 - 내 정보 수정 API"
+    )
+    @PutMapping("/details")
+    public ApiResponse<Void> putUserDetails(@ModelAttribute UserDetailsUpdateRequest request) throws IOException {
+
+        userService.putUserDetails(request);
+
+        return ApiResponse.success();
+    }
+
+    @Operation(
+            summary = "비밀번호 변경",
+            description = "유저 - 비밀번호 변경 API"
+    )
+    @PutMapping("/password")
+    public ApiResponse<Void> putUserPassword(@RequestBody UserPasswordUpdateRequest request) {
+
+        try {
+            userService.putUserPassword(request);
+
+            return ApiResponse.success();
+        } catch (ChangePasswordException e) {
+            return ApiResponse.error(e);
+        }
+    }
 }

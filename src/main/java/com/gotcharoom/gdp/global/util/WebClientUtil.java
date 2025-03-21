@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gotcharoom.gdp.global.config.WebClientConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -65,6 +67,30 @@ public class WebClientUtil {
                 .map(json -> extractAndConvert(json, target, responseType));
     }
 
+    private <T, V> Mono<T> sendRequest(HttpMethod method, String url, V requestBody, Class<T> responseType, String target, String contentType) {
+        WebClient.RequestBodySpec requestSpec = webClientConfig.webClient()
+                .method(method)
+                .uri(url);
+
+        if (requestBody != null && method != HttpMethod.GET) {
+            requestSpec.bodyValue(requestBody);
+        } else if (method != HttpMethod.GET) {
+            requestSpec.body(BodyInserters.empty());
+        }
+
+        if (contentType != null) {
+            requestSpec.header("Content-Type", contentType);
+        }
+
+        Mono<JsonNode> responseMono = requestSpec
+                .retrieve()
+                .bodyToMono(JsonNode.class);
+
+        return responseMono
+                .map(json -> extractAndConvert(json, target, responseType));
+    }
+
+
     /**
      * GET 요청
      */
@@ -101,6 +127,45 @@ public class WebClientUtil {
 
     public <T, V> T post(String url, V requestDto, Class<T> responseType, String target) {
         return sendRequest(HttpMethod.POST, url, requestDto, responseType, target).block();
+    }
+
+    /**
+     * PUT 요청
+     */
+    public <T, V> T put(String url, V requestBody, TypeReference<T> responseType) {
+        return sendRequest(HttpMethod.PUT, url, requestBody, responseType, null).block();
+    }
+
+
+    public <T, V> T put(String url, V requestBody, TypeReference<T> responseType, String target) {
+        return sendRequest(HttpMethod.PUT, url, requestBody, responseType, target).block();
+    }
+
+    public <T, V> T put(String url, V requestBody, Class<T> responseType) {
+        return sendRequest(HttpMethod.PUT, url, requestBody, responseType, null, getContentType(requestBody)).block();
+    }
+
+    public <T, V> T put(String url, V requestBody, Class<T> responseType, String target) {
+        return sendRequest(HttpMethod.PUT, url, requestBody, responseType, target, getContentType(requestBody)).block();
+    }
+
+    /**
+     * DELETE 요청
+     */
+    public <T> T delete(String url, TypeReference<T> responseType) {
+        return sendRequest(HttpMethod.DELETE, url, null, responseType, null).block();
+    }
+
+    public <T> T delete(String url, TypeReference<T> responseType, String target) {
+        return sendRequest(HttpMethod.DELETE, url, null, responseType, target).block();
+    }
+
+    public <T> T delete(String url, Class<T> responseType) {
+        return sendRequest(HttpMethod.DELETE, url, null, responseType, null).block();
+    }
+
+    public <T> T delete(String url, Class<T> responseType, String target) {
+        return sendRequest(HttpMethod.DELETE, url, null, responseType, target).block();
     }
 
     /**
@@ -174,5 +239,12 @@ public class WebClientUtil {
         }
 
         return objectMapper.convertValue(json, responseType);
+    }
+
+    private <V> String getContentType(V requestBody) {
+        if (requestBody instanceof MultipartFile multipartFile) {
+            return multipartFile.getContentType() != null ? multipartFile.getContentType() : MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        }
+        return MediaType.APPLICATION_OCTET_STREAM_VALUE;
     }
 }

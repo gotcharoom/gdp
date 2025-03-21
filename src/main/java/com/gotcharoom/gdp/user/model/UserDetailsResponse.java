@@ -14,7 +14,10 @@ import java.util.Map;
 public class UserDetailsResponse {
     private String id;
     private String email;
+    private String name;
     private String nickname;
+    private String imageUrl;
+    private CropArea imageCropArea;
     private Map<String, String> platforms;
     private Map<String, String> socials;
 }
