@@ -119,11 +119,10 @@ public class FileUploadUtil {
             return;
         }
 
-        String response = webClientUtil.delete(uploadFullPath, String.class);
-        log.info("Delete response: {}", response);
+        boolean deleted = webClientUtil.deleteWithoutBody(uploadFullPath);
 
-        if (response == null || response.isEmpty()) {
-            log.warn("Delete response is null or empty. Aborting DB update.");
+        if (!deleted) {
+            log.warn("파일 삭제 실패 - URL: {}", uploadFullPath);
             return;
         }
 
