@@ -3,16 +3,17 @@ package com.gotcharoom.gdp.global.util;
 import com.gotcharoom.gdp.global.enums.YesNo;
 import com.gotcharoom.gdp.upload.entity.UploadedFile;
 import com.gotcharoom.gdp.upload.repository.UploadedFileRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 
 @Component
+@Slf4j
 public class FileUploadUtil {
 
     @Value("${gdp.file-server.url.upload}")
@@ -22,9 +23,7 @@ public class FileUploadUtil {
     private String SERVER_DOWNLOAD_URL;
 
     private final UniqueGenerator uniqueGenerator;
-
     private final WebClientUtil webClientUtil;
-
     private final UploadedFileRepository uploadedFileRepository;
 
     public FileUploadUtil(UniqueGenerator uniqueGenerator, WebClientUtil webClientUtil, UploadedFileRepository uploadedFileRepository) {
@@ -33,43 +32,42 @@ public class FileUploadUtil {
         this.uploadedFileRepository = uploadedFileRepository;
     }
 
-    /**
-     * 파일이 저장되는 전체 경로를 반환
-     *
-     * @param fileDir  파일이 저장되는 경로
-     * @param filename 서버에 업로드되는 파일명
-     * @return 전체 파일 경로
-     */
     public String getUploadFullPath(String fileDir, String filename) {
-        return SERVER_UPLOAD_URL + fileDir + "/" + filename;
+        String path = SERVER_UPLOAD_URL + fileDir + "/" + filename;
+        log.info("Generated upload full path: {}", path);
+        return path;
     }
 
     public String getDownloadFullPath(String fileDir, String filename) {
-        return SERVER_DOWNLOAD_URL + fileDir + "/" + filename;
+        String path = SERVER_DOWNLOAD_URL + fileDir + "/" + filename;
+        log.info("Generated download full path: {}", path);
+        return path;
     }
 
     public String serverUploadFileToFileServer(String fileDir, MultipartFile multipartFile) throws IOException {
-        if (multipartFile.isEmpty()) { // 파일이 없으면 null 반환
+        if (multipartFile.isEmpty()) {
+            log.warn("No file to upload for directory: {}", fileDir);
             return null;
         }
 
-        String originalFilename = multipartFile.getOriginalFilename(); // 원래 파일명
+        String originalFilename = multipartFile.getOriginalFilename();
         String fileNameWithoutExt = extractFilenameWithoutExt(originalFilename);
         String ext = extractExt(originalFilename);
-        String serverUploadFileName = uniqueGenerator.generateUniqueFilename(fileDir, fileNameWithoutExt, ext); // UUID 기반 파일명 생성
+        String serverUploadFileName = uniqueGenerator.generateUniqueFilename(fileDir, fileNameWithoutExt, ext);
 
-        // 업로드 경로 생성
         String uploadFullPath = getUploadFullPath(fileDir, serverUploadFileName);
+
+        log.info("Uploading file: original='{}', stored='{}', path='{}'", originalFilename, serverUploadFileName, uploadFullPath);
 
         ByteArrayResource fileResource = new ByteArrayResource(multipartFile.getBytes()) {
             @Override
             public String getFilename() {
-                return serverUploadFileName; // 서버에 저장할 파일명 반환
+                return serverUploadFileName;
             }
         };
 
-        // WebClient PUT 요청 실행
         String response = webClientUtil.put(uploadFullPath, fileResource, String.class, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        log.info("Upload response: {}", response);
 
         UploadedFile uploadedFile = UploadedFile.builder()
                 .fileDir(fileDir)
@@ -79,67 +77,63 @@ public class FileUploadUtil {
                 .build();
 
         uploadedFileRepository.save(uploadedFile);
+        log.info("Saved uploaded file record: dir='{}', name='{}'", fileDir, serverUploadFileName);
 
         return getDownloadFullPath(fileDir, serverUploadFileName);
     }
 
     private String extractFilenameWithoutExt(String originalFilename) {
         int pos = originalFilename.lastIndexOf(".");
-        if (pos == -1) {
-            return originalFilename; // 확장자가 없는 경우 전체 파일명을 반환
-        }
-        return originalFilename.substring(0, pos); // 확장자 앞부분만 반환
+        String name = (pos == -1) ? originalFilename : originalFilename.substring(0, pos);
+        log.info("Extracted filename without extension: {}", name);
+        return name;
     }
 
-    /**
-     * 원래 파일명에서 확장자 추출 (.jpg, .png 등)
-     *
-     * @param originalFilename 원본 파일명
-     * @return 확장자
-     */
     private String extractExt(String originalFilename) {
         int pos = originalFilename.lastIndexOf(".");
-        return originalFilename.substring(pos + 1);
+        String ext = originalFilename.substring(pos + 1);
+        log.info("Extracted file extension: {}", ext);
+        return ext;
     }
 
     private String extractOldFileName(String oldImageUrl) {
         int pos = oldImageUrl.lastIndexOf("/");
-        return oldImageUrl.substring(pos + 1);
+        String name = oldImageUrl.substring(pos + 1);
+        log.info("Extracted old file name from URL: {}", name);
+        return name;
     }
 
     public void deleteOldProfileImage(String fileDir, String oldImageUrl) {
         if (oldImageUrl == null || oldImageUrl.isEmpty()) {
-            return ;
-        }
-
-        // 파일 확인
-        String oldFileName = extractOldFileName(oldImageUrl);
-        String uploadFullPath = getUploadFullPath(fileDir, oldFileName);
-
-        File oldFile = new File(uploadFullPath);
-
-        if (!oldFile.exists()) {
-            return ;
-        }
-
-        if (!oldFile.isFile()) {
+            log.warn("Old image URL is null or empty, skipping deletion.");
             return;
         }
 
-        // 삭제 실행
-        String response = webClientUtil.delete(uploadFullPath, String.class);
+        String oldFileName = extractOldFileName(oldImageUrl);
+        String uploadFullPath = getUploadFullPath(fileDir, oldFileName);
+        log.info("Attempting to delete old profile image at: {}", uploadFullPath);
 
-        if (response == null || response.isEmpty()) {
+        boolean isExist = webClientUtil.existsByHead(uploadFullPath);
+        if (!isExist) {
+            log.warn("Old file does not exist on server: {}", uploadFullPath);
+            return;
+        }
+
+        boolean deleted = webClientUtil.deleteWithoutBody(uploadFullPath);
+
+        if (!deleted) {
+            log.warn("파일 삭제 실패 - URL: {}", uploadFullPath);
             return;
         }
 
         UploadedFile file = uploadedFileRepository.findByFileDirAndFileNameAndDeletedYn(fileDir, oldFileName, YesNo.N).orElse(null);
-
-        if(file == null) {
+        if (file == null) {
+            log.warn("No matching file record found in DB for deletion: {}", oldFileName);
             return;
         }
 
         UploadedFile deletedFile = file.updateDelete();
         uploadedFileRepository.save(deletedFile);
+        log.info("Marked file as deleted in DB: {}", oldFileName);
     }
 }
