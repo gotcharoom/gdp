@@ -11,9 +11,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DisplayStandSaveRequset {
-    private Long id;
-
+public class DisplayStandSaveRequest {
     private String title;
 
     private String contentText;

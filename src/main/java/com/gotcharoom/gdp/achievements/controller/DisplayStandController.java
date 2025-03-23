@@ -1,6 +1,6 @@
 package com.gotcharoom.gdp.achievements.controller;
 
-import com.gotcharoom.gdp.achievements.model.request.DisplayStandSaveRequset;
+import com.gotcharoom.gdp.achievements.model.request.DisplayStandSaveRequest;
 import com.gotcharoom.gdp.achievements.model.response.DisplayStandGetListResponse;
 import com.gotcharoom.gdp.achievements.model.response.DisplayStandGetResponse;
 import com.gotcharoom.gdp.achievements.service.DisplayStandService;
@@ -23,7 +23,7 @@ public class DisplayStandController {
             description = "작성한 전시대 내용과 전시대에 등록한 도전과제를 저장"
     )
     @PostMapping("/r1")
-    public ApiResponse<String> saveDisplayStand(@RequestBody DisplayStandSaveRequset requestData) {
+    public ApiResponse<String> saveDisplayStand(@RequestBody DisplayStandSaveRequest requestData) {
         displayStandService.saveUserDisplayStand(requestData);
         return ApiResponse.success("ok");
     }
@@ -32,9 +32,9 @@ public class DisplayStandController {
             summary = "전시대 수정하기",
             description = "수정한 변경 사항을 저장"
     )
-    @PostMapping("/r2")
-    public ApiResponse<String> editDisplayStand(@RequestBody DisplayStandSaveRequset requestData) {
-        displayStandService.editUserDisplayStand(requestData);
+    @PostMapping("/r2/{id}")
+    public ApiResponse<String> editDisplayStand(@PathVariable Long id, @RequestBody DisplayStandSaveRequest requestData) {
+        displayStandService.editUserDisplayStand(id, requestData);
         return ApiResponse.success("ok");
     }
 

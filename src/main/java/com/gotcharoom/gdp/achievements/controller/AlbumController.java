@@ -32,9 +32,9 @@ public class AlbumController {
             summary = "앨범 수정하기",
             description = "수정한 변경 사항을 저장"
     )
-    @PostMapping("/r2")
-    public ApiResponse<String> editAlbum(@RequestBody AlbumSaveRequest requestData) {
-        albumService.editUserAlbum(requestData);
+    @PutMapping("/r2/{id}")
+    public ApiResponse<String> editAlbum(@PathVariable Long id, @RequestBody AlbumSaveRequest requestData) {
+        albumService.editUserAlbum(id, requestData);
         return ApiResponse.success("ok");
     }
 

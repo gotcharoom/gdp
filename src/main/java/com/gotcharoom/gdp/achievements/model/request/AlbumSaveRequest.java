@@ -1,6 +1,5 @@
 package com.gotcharoom.gdp.achievements.model.request;
 
-import com.gotcharoom.gdp.achievements.entity.UserSteamAchievement;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,8 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AlbumSaveRequest {
-    private Long id;
-
     private String title;
 
     private String contentText;

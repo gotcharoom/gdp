@@ -1,7 +1,7 @@
 package com.gotcharoom.gdp.achievements.service;
 
 import com.gotcharoom.gdp.achievements.entity.*;
-import com.gotcharoom.gdp.achievements.model.request.DisplayStandSaveRequset;
+import com.gotcharoom.gdp.achievements.model.request.DisplayStandSaveRequest;
 import com.gotcharoom.gdp.achievements.model.response.DisplayStandGetListResponse;
 import com.gotcharoom.gdp.achievements.model.response.DisplayStandGetResponse;
 import com.gotcharoom.gdp.achievements.repository.DisplayStandAlbumListRepository;
@@ -45,7 +45,7 @@ public class DisplayStandService {
     }
 
     // 전시대 저장 기능
-    public void saveUserDisplayStand(DisplayStandSaveRequset requestData) {
+    public void saveUserDisplayStand(DisplayStandSaveRequest requestData) {
         // 중간 테이블(DisplayStandAlbumList)도 자동으로 갱신됨
 
         UserDisplayStand newDisplayStandData = UserDisplayStand.builder()
@@ -76,15 +76,15 @@ public class DisplayStandService {
     }
 
     // 전시대 수정 기능
-    public void editUserDisplayStand(DisplayStandSaveRequset requestData) {
+    public void editUserDisplayStand(Long displayStandId, DisplayStandSaveRequest requestData) {
         // 중간 테이블(DisplayStandAlbumList)도 자동으로 갱신됨
 
         // 생성 날짜 불변을 위해 기존 데이터 조회
-        UserDisplayStand oldAlbumData = userDisplayStandRepository.findById(requestData.getId())
+        UserDisplayStand oldAlbumData = userDisplayStandRepository.findById(displayStandId)
                 .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 전시대가 존재하지 않습니다.", 1));
 
         UserDisplayStand newDisplayStandData = UserDisplayStand.builder()
-                .id(requestData.getId())
+                .id(displayStandId)
                 .title(requestData.getTitle())
                 .contentText(requestData.getContentText())
                 .image(requestData.getImage())

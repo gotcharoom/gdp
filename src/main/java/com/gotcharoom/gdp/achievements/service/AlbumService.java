@@ -75,15 +75,15 @@ public class AlbumService {
         }
     }
 
-    public void editUserAlbum(AlbumSaveRequest requestData) {
+    public void editUserAlbum(Long albumId, AlbumSaveRequest requestData) {
         // 중간 테이블(AlbumAchievementList)도 자동으로 갱신됨
 
         // 생성 날짜 불변을 위해 기존 데이터 조회
-        UserAlbum oldAlbumData = userAlbumRepository.findById(requestData.getId())
+        UserAlbum oldAlbumData = userAlbumRepository.findById(albumId)
                 .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 앨범이 존재하지 않습니다.", 1));
 
         UserAlbum newAlbumData = UserAlbum.builder()
-                .id(requestData.getId())
+                .id(albumId)
                 .title(requestData.getTitle())
                 .contentText(requestData.getContentText())
                 .image(requestData.getImage())
@@ -91,6 +91,7 @@ public class AlbumService {
                 .uploadDate(oldAlbumData.getUploadDate())
                 .build();
 
+        // 앨범에 연동된 도전과제 데이터를 앨범 객체에 세팅
         requestData.getAchievements().forEach(item -> {
             UserSteamAchievement sample = UserSteamAchievement.builder()
                     .id(item)
