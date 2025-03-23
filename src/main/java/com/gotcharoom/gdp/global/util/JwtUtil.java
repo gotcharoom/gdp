@@ -341,19 +341,17 @@ public class JwtUtil {
         response.addCookie(cookie);
     }
 
-    public void setPlatformConnectionToken(HttpServletResponse response) {
+    public void setPlatformConnectionCookie(HttpServletResponse response) {
         String platformConnectionStr = CookieEnum.PLATFORM_CONNECTION.getType();
         Cookie cookie = new Cookie(platformConnectionStr, "true");
-        cookie.setHttpOnly(true); // CSRF 방지
         cookie.setPath("/");
         cookie.setMaxAge(-1);
         response.addCookie(cookie);
     }
 
-    public void removePlatformConnectionToken(HttpServletResponse response) {
+    public void removePlatformConnectionCookie(HttpServletResponse response) {
         String platformConnectionStr = CookieEnum.PLATFORM_CONNECTION.getType();
         Cookie cookie = new Cookie(platformConnectionStr, null);
-        cookie.setHttpOnly(true); // CSRF 방지
         cookie.setPath("/");
         cookie.setMaxAge(-1);
         response.addCookie(cookie);

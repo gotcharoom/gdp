@@ -1,31 +1,29 @@
 package com.gotcharoom.gdp.platform.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
+import java.util.Map;
 
 @Getter
-@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class SteamRequest extends PlatformCallbackRequest {
-    private String openid_ns;
-    private String openid_mode;
-    private String openid_op_endpoint;
-    private String openid_claimed_id;
-    private String openid_identity;
-    private String openid_return_to;
-    private String openid_response_nonce;
-    private String openid_assoc_handle;
-    private String openid_signed;
-    private String openid_sig;
+    private String openidNs;
+    private String openidMode;
+    private String openidOpEndpoint;
+    private String openidClaimedId;
+    private String openidIdentity;
+    private String openidReturnOo;
+    private String openidResponseNonce;
+    private String openidAssocHandle;
+    private String openidSigned;
+    private String openidSig;
 
     @Override
     public String getPlatformUserId() {
-        return extractSteamId(this.openid_claimed_id);
+        return extractSteamId(this.openidClaimedId);
     }
 
     private String extractSteamId(String claimedId) {
@@ -37,5 +35,20 @@ public class SteamRequest extends PlatformCallbackRequest {
         }
 
         return claimedId.substring(lastSlash + 1);
+    }
+
+    public static SteamRequest fromParams(Map<String, String> params) {
+        return SteamRequest.builder()
+                .openidNs(params.get("openid.ns"))
+                .openidMode(params.get("openid.mode"))
+                .openidOpEndpoint(params.get("openid.op_endpoint"))
+                .openidClaimedId(params.get("openid.claimed_id"))
+                .openidIdentity(params.get("openid.identity"))
+                .openidReturnOo(params.get("openid.return_to"))
+                .openidResponseNonce(params.get("openid.response_nonce"))
+                .openidAssocHandle(params.get("openid.assoc_handle"))
+                .openidSigned(params.get("openid.signed"))
+                .openidSig(params.get("openid.sig"))
+                .build();
     }
 }

@@ -7,16 +7,23 @@ import com.gotcharoom.gdp.platform.model.SteamRequest;
 import com.gotcharoom.gdp.platform.service.PlatformService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/connect")
 @Tag(name = "플랫폼 연동", description = "플랫폼 연동 API 컨트롤러")
 public class ConnectController {
+
+    @Value("${gdp.application.front-uri}")
+    private String FRONT_URI;
+
+    private final String USER_INFO_PAGE = "/user/info";
 
     private final PlatformService platformService;
 
@@ -29,9 +36,31 @@ public class ConnectController {
             description = "플랫폼 연결 콜백 API"
     )
     @GetMapping("/steam/callback")
-    public ApiResponse<Void> connectSteam(@ModelAttribute SteamRequest request, HttpServletResponse response) {
+    public Void connectSteam(@RequestParam Map<String, String> params, HttpServletResponse response) {
+
+        SteamRequest request = SteamRequest.fromParams(params);
 
         platformService.connectPlatform(PlatformType.STEAM, request, response);
+
+        try {
+
+            response.sendRedirect(FRONT_URI + USER_INFO_PAGE);
+
+        } catch (IOException e) {
+            throw new RuntimeException("리디렉션 실패", e);
+        }
+
+        return null;
+    }
+
+    @Operation(
+            summary = "연동 확인용 쿠키 제거",
+            description = "연동 확인용 쿠키 제거 API"
+    )
+    @PutMapping("/connection-cookie/clear")
+    public ApiResponse<Void> clearConnectionCookie(HttpServletResponse response) {
+
+        platformService.removeConnectionCookie(response);
 
         return ApiResponse.success();
     }

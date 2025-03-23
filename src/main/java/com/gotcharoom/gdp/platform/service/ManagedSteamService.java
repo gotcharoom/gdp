@@ -7,7 +7,9 @@ import com.gotcharoom.gdp.platform.model.PlatformType;
 import com.gotcharoom.gdp.platform.repository.PlatformRepository;
 import com.gotcharoom.gdp.platform.repository.UserPlatformRepository;
 import com.gotcharoom.gdp.user.entity.GdpUser;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ManagedSteamService extends ManagedPlatformService {
 
     public ManagedSteamService(
