@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum CookieEnum {
     REMEMBER_ME("remember-me"),
     ACCESS_TOKEN("access_token"),
-    REFRESH_TOKEN("refresh_token");
+    REFRESH_TOKEN("refresh_token"),
+    PLATFORM_CONNECTION("platform_connection");
 
     private final String type;
 }
