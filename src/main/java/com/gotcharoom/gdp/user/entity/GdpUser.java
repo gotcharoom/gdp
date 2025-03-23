@@ -55,6 +55,7 @@ public class GdpUser {
     @Column(name="role", nullable = false)
     private Role role;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserPlatform> platforms = new ArrayList<>();
 

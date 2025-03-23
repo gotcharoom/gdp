@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -18,6 +19,6 @@ public class UserDetailsResponse {
     private String nickname;
     private String imageUrl;
     private CropArea imageCropArea;
-    private Map<String, String> platforms;
+    private List<UserDetailPlatform> platforms;
     private Map<String, String> socials;
 }

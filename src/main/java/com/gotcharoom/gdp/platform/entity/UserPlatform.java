@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "user_platform")
+@Table(name = "user_platform", uniqueConstraints = @UniqueConstraint(name = "uk_user_platform", columnNames = {"user_id", "platform_id"}))
 @Getter
 @Builder
 @NoArgsConstructor
@@ -26,6 +26,9 @@ public class UserPlatform {
     @JoinColumn(name = "platform_id", nullable = false)
     private Platform platform;
 
-    @Column(name = "custom_url")
-    private String customUrl;
+    @Column(name="platform_user_id", nullable = false)
+    private String platformUserId;
+
+    @Column(name="platform_user_secret")
+    private String platformUserSecret;
 }
