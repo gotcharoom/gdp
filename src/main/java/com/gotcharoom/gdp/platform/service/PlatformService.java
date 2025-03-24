@@ -10,7 +10,6 @@ import com.gotcharoom.gdp.platform.repository.UserPlatformRepository;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import com.gotcharoom.gdp.user.model.UserDetailPlatform;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -83,7 +82,7 @@ public class PlatformService {
 
         ManagedPlatformService managedPlatformService = platformServiceRouter.getServiceImplements(platformType);
 
-        managedPlatformService.updatePlatformUserCert(request, user);
+        managedPlatformService.createPlatformUserCert(request, user);
 
         setConnectionCookie(response);
     }

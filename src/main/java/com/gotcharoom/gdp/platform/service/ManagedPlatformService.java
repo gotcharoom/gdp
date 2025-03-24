@@ -1,12 +1,10 @@
 package com.gotcharoom.gdp.platform.service;
 
-import com.gotcharoom.gdp.platform.entity.UserPlatform;
 import com.gotcharoom.gdp.platform.model.PlatformCallbackRequest;
 import com.gotcharoom.gdp.platform.model.PlatformType;
 import com.gotcharoom.gdp.platform.repository.PlatformRepository;
 import com.gotcharoom.gdp.platform.repository.UserPlatformRepository;
 import com.gotcharoom.gdp.user.entity.GdpUser;
-import com.gotcharoom.gdp.user.repository.UserRepository;
 
 public abstract class ManagedPlatformService {
 
@@ -19,6 +17,8 @@ public abstract class ManagedPlatformService {
     }
 
     public abstract PlatformType getPlatformType();
+
+    public abstract void createPlatformUserCert(PlatformCallbackRequest request, GdpUser user);
 
     public abstract void updatePlatformUserCert(PlatformCallbackRequest request, GdpUser user);
 }
