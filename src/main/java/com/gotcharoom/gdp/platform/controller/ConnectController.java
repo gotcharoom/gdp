@@ -32,8 +32,22 @@ public class ConnectController {
     }
 
     @Operation(
-            summary = "플랫폼 연결 콜백",
-            description = "플랫폼 연결 콜백 API"
+            summary = "연동 확인용 쿠키 제거",
+            description = "연동 확인용 쿠키 제거 API"
+    )
+    @PutMapping("/connection-cookie/clear")
+    public ApiResponse<Void> clearConnectionCookie(HttpServletResponse response) {
+
+        platformService.removeConnectionCookie(response);
+
+        return ApiResponse.success();
+    }
+
+    /* STEAM */
+
+    @Operation(
+            summary = "스팀 연결 콜백",
+            description = "스팀 연결 콜백 API"
     )
     @GetMapping("/steam/callback")
     public Void connectSteam(@RequestParam Map<String, String> params, HttpServletResponse response) {
@@ -54,14 +68,46 @@ public class ConnectController {
     }
 
     @Operation(
-            summary = "연동 확인용 쿠키 제거",
-            description = "연동 확인용 쿠키 제거 API"
+            summary = "개발용 - 스팀 (Dev 환경) 연결 콜백",
+            description = "스팀 (Dev 환경) 콜백 API"
     )
-    @PutMapping("/connection-cookie/clear")
-    public ApiResponse<Void> clearConnectionCookie(HttpServletResponse response) {
+    @GetMapping("/steam-dev/callback")
+    public Void connectSteamDev(@RequestParam Map<String, String> params, HttpServletResponse response) {
 
-        platformService.removeConnectionCookie(response);
+        SteamRequest request = SteamRequest.fromParams(params);
 
-        return ApiResponse.success();
+        platformService.connectPlatform(PlatformType.STEAM_DEV, request, response);
+
+        try {
+
+            response.sendRedirect(FRONT_URI + USER_INFO_PAGE);
+
+        } catch (IOException e) {
+            throw new RuntimeException("리디렉션 실패", e);
+        }
+
+        return null;
+    }
+
+    @Operation(
+            summary = "개발용 - 스팀 (Dev 환경) 연결 콜백",
+            description = "스팀 (Dev 환경) 콜백 API"
+    )
+    @GetMapping("/steam-local/callback")
+    public Void connectSteamLocal(@RequestParam Map<String, String> params, HttpServletResponse response) {
+
+        SteamRequest request = SteamRequest.fromParams(params);
+
+        platformService.connectPlatform(PlatformType.STEAM_LOCAL, request, response);
+
+        try {
+
+            response.sendRedirect(FRONT_URI + USER_INFO_PAGE);
+
+        } catch (IOException e) {
+            throw new RuntimeException("리디렉션 실패", e);
+        }
+
+        return null;
     }
 }
