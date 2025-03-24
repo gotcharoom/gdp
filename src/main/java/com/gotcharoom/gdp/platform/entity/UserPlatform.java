@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "user_platform", uniqueConstraints = @UniqueConstraint(name = "uk_user_platform", columnNames = {"user_id", "platform_id"}))
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserPlatform {
@@ -31,4 +31,11 @@ public class UserPlatform {
 
     @Column(name="platform_user_secret")
     private String platformUserSecret;
+
+    public UserPlatform updateUserCert(String platformUserId, String platformUserSecret) {
+        return this.toBuilder()
+                .platformUserId(platformUserId)
+                .platformUserSecret(platformUserSecret)
+                .build();
+    }
 }

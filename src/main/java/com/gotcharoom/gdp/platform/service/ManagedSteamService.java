@@ -25,19 +25,28 @@ public class ManagedSteamService extends ManagedPlatformService {
     }
 
     @Override
-    public void updatePlatformUserCert(PlatformCallbackRequest request, GdpUser user) {
+    public void createPlatformUserCert(PlatformCallbackRequest request, GdpUser user) {
 
         Platform platform = platformRepository.findByType(PlatformType.STEAM).orElseThrow();
 
-        UserPlatform userPlatform = userPlatformRepository.findByUserAndPlatform(user, platform).orElse(
-                UserPlatform.builder()
-                        .user(user)
-                        .platform(platform)
-                        .platformUserId(request.getPlatformUserId())
-                        .platformUserSecret(null)
-                        .build()
-        );
+        UserPlatform userPlatform = UserPlatform.builder()
+                .user(user)
+                .platform(platform)
+                .platformUserId(request.getPlatformUserId())
+                .platformUserSecret(null)
+                .build();
 
         userPlatformRepository.save(userPlatform);
+    }
+
+    @Override
+    public void updatePlatformUserCert(PlatformCallbackRequest request, GdpUser user) {
+        Platform platform = platformRepository.findByType(PlatformType.STEAM).orElseThrow();
+
+        UserPlatform userPlatform = userPlatformRepository.findByUserAndPlatform(user, platform).orElseThrow();
+
+        UserPlatform updatedUserPlatform = userPlatform.updateUserCert(request.getPlatformUserId(), null);
+
+        userPlatformRepository.save(updatedUserPlatform);
     }
 }
