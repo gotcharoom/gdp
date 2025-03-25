@@ -32,11 +32,11 @@ public class DisplayStandService {
     }
 
     // 전시대 내용 가져오기 (details)
-    public DisplayStandGetResponse getUserDisplayStandOne(Long index) {
-        UserDisplayStand displayStand = userDisplayStandRepository.findById(index)
+    public DisplayStandGetResponse getUserDisplayStandOne(Long id) {
+        UserDisplayStand displayStand = userDisplayStandRepository.findById(id)
                 .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 전시대가 존재하지 않습니다.", 1));
 
-        List<UserAlbum> albumList = displayStandAlbumListRepository.findAlbumList(index);
+        List<UserAlbum> albumList = displayStandAlbumListRepository.findAlbumList(id);
 
         return DisplayStandGetResponse.builder()
                 .id(displayStand.getId())

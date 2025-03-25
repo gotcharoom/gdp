@@ -55,12 +55,12 @@ public class AlbumController {
     }
 
     @Operation(
-            summary = "앨범 가져오기(1건)",
+            summary = "앨범 가져오기(1건 상세보기)",
             description = "선택한 앨범 정보 가져오기"
     )
     @GetMapping("/r4")
-    public ApiResponse<AlbumGetResponse> getAlbumDetail(@RequestParam("index") long index) {
-        return ApiResponse.success(albumService.getUserAlbumOne(index));
+    public ApiResponse<AlbumGetResponse> getAlbumDetail(@RequestParam("id") Long id) {
+        return ApiResponse.success(albumService.getUserAlbumOne(id));
     }
 
     @Operation(

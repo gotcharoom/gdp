@@ -34,11 +34,11 @@ public class AlbumService {
     }
 
     // 앨범 내용 가져오기 (details)
-    public AlbumGetResponse getUserAlbumOne(Long index) {
-        UserAlbum album = userAlbumRepository.findById(index)
+    public AlbumGetResponse getUserAlbumOne(Long id) {
+        UserAlbum album = userAlbumRepository.findById(id)
                 .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 앨범이 존재하지 않습니다.", 1));
 
-        List<UserSteamAchievement> achievementList = albumAchievementListRepository.findAchievementList(index);
+        List<UserSteamAchievement> achievementList = albumAchievementListRepository.findAchievementList(id);
 
         return AlbumGetResponse.builder()
                 .id(album.getId())

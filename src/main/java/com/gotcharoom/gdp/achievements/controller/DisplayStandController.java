@@ -53,12 +53,12 @@ public class DisplayStandController {
     }
 
     @Operation(
-            summary = "전시대 가져오기(1건)",
+            summary = "전시대 가져오기(1건 상세보기)",
             description = "선택한 전시대 정보 가져오기"
     )
     @GetMapping("/r4")
-    public ApiResponse<DisplayStandGetResponse> getDisplayStandDetail(@RequestParam("index") long index) {
-        return ApiResponse.success(displayStandService.getUserDisplayStandOne(index));
+    public ApiResponse<DisplayStandGetResponse> getDisplayStandDetail(@RequestParam("id") Long id) {
+        return ApiResponse.success(displayStandService.getUserDisplayStandOne(id));
     }
 
     @Operation(
