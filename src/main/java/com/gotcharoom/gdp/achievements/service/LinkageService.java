@@ -7,7 +7,9 @@ import com.gotcharoom.gdp.achievements.model.steamAPI.SteamOwnGames;
 import com.gotcharoom.gdp.achievements.model.steamAPI.SteamPlayerStat;
 import com.gotcharoom.gdp.achievements.repository.SteamAchievmentRepository;
 import com.gotcharoom.gdp.global.util.WebClientUtil;
+import com.gotcharoom.gdp.platform.repository.UserPlatformRepository;
 import com.gotcharoom.gdp.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -16,28 +18,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class LinkageService {
 
     private final SteamAchievmentRepository steamAchievmentRepository;
     private final UserRepository userRepository;
+    private final UserPlatformRepository userPlatformRepository;
 
     private static final String STEAM_API_KEY = "C9926F5CBA82A0101A90A59BE0665295";  // 발급받은 API 키
     private static final String STEAM_API_URL = "https://api.steampowered.com";
 
     private final WebClientUtil webClientUtil;
 
-    public LinkageService(SteamAchievmentRepository steamAchievmentRepository, UserRepository userRepository, WebClientUtil webClientUtil) {
-        this.steamAchievmentRepository = steamAchievmentRepository;
-        this.userRepository = userRepository;
-        this.webClientUtil = webClientUtil;
-    }
 
     // 연동한 스팀 계정의 게임 도전과제 목록 전부 불러오기
     public List<SteamPlayerStat> getSteamPlayerAchievement(String userName) {
 
         // 1. 현재 접속한 유저의 스팀id 확인 (현재는 생략)
-        String steamId = "76561198230645968";
+        // String steamId = "76561198230645968";
+        String steamId = userPlatformRepository.findUserSteamId(userName).orElseThrow();
+
         // 2. 소유한 게임 목록 불러오기
         List<Integer>appids = getSteamOwnedGamesAppid(steamId);
 
@@ -178,7 +179,9 @@ public class LinkageService {
 
     }
 
-
+    public Object test3(String userName) {
+        return userPlatformRepository.findUserSteamId(userName).orElseThrow();
+    }
 
 
 }

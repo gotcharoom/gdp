@@ -3,6 +3,7 @@ package com.gotcharoom.gdp.platform.repository;
 import com.gotcharoom.gdp.platform.entity.QPlatform;
 import com.gotcharoom.gdp.platform.entity.QUserPlatform;
 import com.gotcharoom.gdp.platform.model.PlatformUseYn;
+import com.gotcharoom.gdp.user.entity.QGdpUser;
 import com.gotcharoom.gdp.user.model.UserDetailPlatform;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -53,6 +54,22 @@ public class CustomUserPlatformRepositoryImpl implements CustomUserPlatformRepos
                 )
                 .where(qPlatform.useYn.eq(PlatformUseYn.Y))
                 .fetch();
+
+        return Optional.of(result);
+    }
+
+    @Override
+    public Optional<String> findUserSteamId(String userName) {
+        QUserPlatform qUserPlatform = QUserPlatform.userPlatform;
+        QGdpUser qGdpUser = QGdpUser.gdpUser;
+
+        String result = jpaQueryFactory
+                .select(qUserPlatform.platformUserId)
+                .from(qUserPlatform)
+                .leftJoin(qUserPlatform.user, qGdpUser)
+                .where(qUserPlatform.user.id.eq(userName))
+                .fetchOne();
+
 
         return Optional.of(result);
     }

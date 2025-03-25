@@ -21,16 +21,12 @@ public class LinkageController {
 
     // 스팀과 연동된 내 계정의 도전과제 목록 가져오기 (모든 게임)
     @Operation(
-            summary = "도전과제 목록",
-            description = "도전과제 목록 불러오기(추후 변경) / return 타입 : 도전과제 목록(List<SteamPlayerStat>)"
+            summary = "스팀 도전과제 목록",
+            description = "스팀 도전과제 목록 불러오기"
     )
     @GetMapping("/r1")
     public ApiResponse<List<SteamPlayerStat>> requestMyAchievement(@AuthenticationPrincipal UserDetails userDetails) {
-        // todo. 나중에 유저 이름으로 steamID 불러오는 코드 추가
-        // @AuthenticationPrincipal UserDetails userDetails
-        // userDetails.getUsername();
-
-        List<SteamPlayerStat> result = linkageService.getSteamPlayerAchievement("ss");
+        List<SteamPlayerStat> result = linkageService.getSteamPlayerAchievement(userDetails.getUsername());
         return ApiResponse.success(result);
     }
 
@@ -77,4 +73,16 @@ public class LinkageController {
     public ApiResponse<Object> test3() {
         return ApiResponse.success(linkageService.getSteamPlayerAchievementsOne(1623730, "76561198230645968"));
     }
+
+    @Operation(
+            summary = "",
+            description = ""
+    )
+    @GetMapping("/test4")
+    public ApiResponse<Object> test4(@AuthenticationPrincipal UserDetails userDetails) {
+        return ApiResponse.success(linkageService.test3(userDetails.getUsername()));
+    }
+
+
+
 }
