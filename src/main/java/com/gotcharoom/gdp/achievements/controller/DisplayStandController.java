@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.data.web.PagedModel;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/v1/displayStand")
@@ -33,8 +35,10 @@ public class DisplayStandController {
             description = "수정한 변경 사항을 저장"
     )
     @PostMapping("/r2/{id}")
-    public ApiResponse<String> editDisplayStand(@PathVariable Long id, @RequestBody DisplayStandSaveRequest requestData) {
-        displayStandService.editUserDisplayStand(id, requestData);
+    public ApiResponse<String> editDisplayStand(@AuthenticationPrincipal UserDetails userDetails,
+                                                @PathVariable Long id,
+                                                @RequestBody DisplayStandSaveRequest requestData) {
+        displayStandService.editUserDisplayStand(userDetails.getUsername(), id, requestData);
         return ApiResponse.success("ok");
     }
 
@@ -43,8 +47,8 @@ public class DisplayStandController {
             description = "선택한 전시대 지우기"
     )
     @PostMapping("/r3")
-    public ApiResponse<String> deleteDisplayStand(@RequestBody long index) {
-        displayStandService.deleteUserDisplayStand(index);
+    public ApiResponse<String> deleteDisplayStand(@AuthenticationPrincipal UserDetails userDetails, @RequestBody long index) {
+        displayStandService.deleteUserDisplayStand(userDetails.getUsername(), index);
         return ApiResponse.success("ok");
     }
 

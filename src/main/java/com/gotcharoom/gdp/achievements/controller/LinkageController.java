@@ -35,9 +35,9 @@ public class LinkageController {
             description = "연동에 성공한 도전과제를 저장(추후 변경) / return 타입 : 저장한 수(count)"
     )
     @PostMapping("/r2")
-    public ApiResponse<Integer> saveAchievements() {
+    public ApiResponse<Integer> saveAchievements(@AuthenticationPrincipal UserDetails userDetails) {
         // todo. 리스트 불러오기 -> 프론트 개발 후 프론트측에서 파라미터로 받아오는걸로 추후 변경
-        List<SteamPlayerStat> achievementList = linkageService.getSteamPlayerAchievement("ss");
+        List<SteamPlayerStat> achievementList = linkageService.getSteamPlayerAchievement(userDetails.getUsername());
 
         return ApiResponse.success(linkageService.saveSteamAchievements(achievementList));
     }
@@ -73,16 +73,5 @@ public class LinkageController {
     public ApiResponse<Object> test3() {
         return ApiResponse.success(linkageService.getSteamPlayerAchievementsOne(1623730, "76561198230645968"));
     }
-
-    @Operation(
-            summary = "",
-            description = ""
-    )
-    @GetMapping("/test4")
-    public ApiResponse<Object> test4(@AuthenticationPrincipal UserDetails userDetails) {
-        return ApiResponse.success(linkageService.test3(userDetails.getUsername()));
-    }
-
-
 
 }

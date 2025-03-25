@@ -13,6 +13,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +23,8 @@ import java.util.List;
 public class DisplayStandService {
     private final UserDisplayStandRepository userDisplayStandRepository;
     private final DisplayStandAlbumListRepository displayStandAlbumListRepository;
+
+    // --------------------------------------------- CRUD ---------------------------------------------
 
     // 전시대 전체 목록 가져오기
     public Page<DisplayStandGetListResponse> getUserDisplayStands(int pageNo, int pageSize) {
@@ -46,7 +49,7 @@ public class DisplayStandService {
 
     // 전시대 저장 기능
     public void saveUserDisplayStand(DisplayStandSaveRequest requestData) {
-        // 중간 테이블(DisplayStandAlbumList)도 자동으로 갱신됨
+        // 전시대 수정 시 중간 테이블(DisplayStandAlbumList)도 자동으로 갱신됨 (DB Cascade 설정)
 
         UserDisplayStand newDisplayStandData = UserDisplayStand.builder()
                 .title(requestData.getTitle())
@@ -76,12 +79,14 @@ public class DisplayStandService {
     }
 
     // 전시대 수정 기능
-    public void editUserDisplayStand(Long displayStandId, DisplayStandSaveRequest requestData) {
-        // 중간 테이블(DisplayStandAlbumList)도 자동으로 갱신됨
+    public void editUserDisplayStand(String userName, Long displayStandId, DisplayStandSaveRequest requestData) {
+        // 전시대 수정 시 중간 테이블(DisplayStandAlbumList)도 자동으로 갱신됨 (DB Cascade 설정)
 
         // 생성 날짜 불변을 위해 기존 데이터 조회
         UserDisplayStand oldAlbumData = userDisplayStandRepository.findById(displayStandId)
                 .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 전시대가 존재하지 않습니다.", 1));
+
+        isCorrectUser(userName, oldAlbumData);
 
         UserDisplayStand newDisplayStandData = UserDisplayStand.builder()
                 .id(displayStandId)
@@ -114,12 +119,15 @@ public class DisplayStandService {
 
     // 전시대 삭제 기능
     // @Transactional
-    public void deleteUserDisplayStand(Long index) {
+    public void deleteUserDisplayStand(String userName, Long index) {
         System.out.println("index 값은 : " + index);
         try {
             // deleteById 메소드를 쓰면 Exception이 발생 안함 -> 오류 캐치를 위해 findById와 delete 메소드 사용
             UserDisplayStand displayStand = userDisplayStandRepository.findById(index)
                     .orElseThrow(() -> new EmptyResultDataAccessException(1));
+
+            isCorrectUser(userName, displayStand);
+
             userDisplayStandRepository.delete(displayStand);
 
         } catch (EmptyResultDataAccessException e) {
@@ -131,5 +139,11 @@ public class DisplayStandService {
         } catch (Exception e) {
             throw new IllegalArgumentException("기타 예외 발생");
         }
+    }
+
+    // ------------------------------------------- 권한 검사 -------------------------------------------
+
+    public void isCorrectUser(String userName, UserDisplayStand displayStand) {
+        if (!displayStand.getUserId().equals(userName)) { throw new AccessDeniedException("권한이 없습니다."); }
     }
 }

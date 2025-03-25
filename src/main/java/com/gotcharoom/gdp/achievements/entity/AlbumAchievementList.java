@@ -8,15 +8,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
-@Table(
-        name = "user_album_achievment_list",
-        uniqueConstraints = {
-            @UniqueConstraint(name = "unique_user_steam_achievement", columnNames = {
-                    "USER_ALBUM_ID",
-                    "USER_ACHIEVEMENT_ID",
-                })
-        }
-)
+@Table(name = "user_album_achievment_list")
 // 앨범에 저장된 도전과제 목록 (중간 매핑 테이블)
 public class AlbumAchievementList {
     @Id

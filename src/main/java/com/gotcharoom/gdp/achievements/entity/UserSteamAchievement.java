@@ -40,7 +40,7 @@ public class UserSteamAchievement {
     private String apiname;
 
     // 해금 시간 (unix 시간)
-    @Column(nullable = false)
+    @Column(name="unlocktime", nullable = false)
     private Long unlocktime;
 
     // 도전과제 명칭
@@ -48,7 +48,7 @@ public class UserSteamAchievement {
     private String name;
 
     // 도전과제 상세 설명
-    @Column(nullable = false)
+    @Column(name="description", nullable = false)
     private String description;
 
     // 연동 날짜

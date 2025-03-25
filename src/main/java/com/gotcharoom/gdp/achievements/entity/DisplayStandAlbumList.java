@@ -8,15 +8,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Entity
-@Table(
-        name = "user_display_stand_album_list",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "unique_user_album", columnNames = {
-                        "USER_DISPLAY_STAND_ID",
-                        "USER_ALBUM_ID",
-                })
-        }
-)
+@Table(name = "user_display_stand_album_list")
 public class DisplayStandAlbumList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

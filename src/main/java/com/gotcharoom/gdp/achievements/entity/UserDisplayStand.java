@@ -19,15 +19,16 @@ public class UserDisplayStand {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name="title", nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name="content_text", columnDefinition = "TEXT")
     private String contentText;
 
+    @Column(name="image")
     private String image;
 
-    @Column(nullable = false)
+    @Column(name="user_id", nullable = false)
     private String userId;
 
     // 전시대와 연동할 앨범 목록

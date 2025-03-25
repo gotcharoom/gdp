@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.data.web.PagedModel;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/v1/displayStand/album")
@@ -33,8 +35,11 @@ public class AlbumController {
             description = "수정한 변경 사항을 저장"
     )
     @PutMapping("/r2/{id}")
-    public ApiResponse<String> editAlbum(@PathVariable Long id, @RequestBody AlbumSaveRequest requestData) {
-        albumService.editUserAlbum(id, requestData);
+    public ApiResponse<String> editAlbum(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long id,
+            @RequestBody AlbumSaveRequest requestData) {
+        albumService.editUserAlbum(userDetails.getUsername(), id, requestData);
         return ApiResponse.success("ok");
     }
 
@@ -44,8 +49,8 @@ public class AlbumController {
             description = "선택한 앨범을 지우기"
     )
     @PostMapping("/r3")
-    public ApiResponse<String> deleteAlbum(@RequestBody long index) {
-        albumService.deleteUserAlbum(index);
+    public ApiResponse<String> deleteAlbum(@AuthenticationPrincipal UserDetails userDetails, @RequestBody long index) {
+        albumService.deleteUserAlbum(userDetails.getUsername(), index);
         return ApiResponse.success("ok");
     }
 

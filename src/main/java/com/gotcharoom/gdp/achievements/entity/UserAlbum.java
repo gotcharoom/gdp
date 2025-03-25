@@ -20,12 +20,13 @@ public class UserAlbum {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name="title", nullable = false)
     private String title;
 
     @Column(name="content_text", columnDefinition = "TEXT")
     private String contentText;
 
+    @Column(name="image")
     private String image;
 
     @Column(name="user_id", nullable = false)

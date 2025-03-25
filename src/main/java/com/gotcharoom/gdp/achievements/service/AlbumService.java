@@ -8,12 +8,14 @@ import com.gotcharoom.gdp.achievements.model.response.AlbumGetListResponse;
 import com.gotcharoom.gdp.achievements.model.response.AlbumGetResponse;
 import com.gotcharoom.gdp.achievements.repository.AlbumAchievementListRepository;
 import com.gotcharoom.gdp.achievements.repository.UserAlbumRepository;
+import com.gotcharoom.gdp.user.repository.UserRepository;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +25,9 @@ import java.util.List;
 public class AlbumService {
     private final UserAlbumRepository userAlbumRepository;
     private final AlbumAchievementListRepository albumAchievementListRepository;
+    private final UserRepository userRepository;
+
+    // --------------------------------------------- CRUD ---------------------------------------------
 
     // 앨범 전체 목록 가져오기
     public Page<AlbumGetListResponse> getUserAlbums(int pageNo, int pageSize) {
@@ -75,12 +80,14 @@ public class AlbumService {
         }
     }
 
-    public void editUserAlbum(Long albumId, AlbumSaveRequest requestData) {
-        // 중간 테이블(AlbumAchievementList)도 자동으로 갱신됨
+    public void editUserAlbum(String userName, Long albumId, AlbumSaveRequest requestData) {
+        // 앨범 수정 시 중간 테이블(AlbumAchievementList)도 자동으로 갱신됨 (DB Cascade 설정)
 
         // 생성 날짜 불변을 위해 기존 데이터 조회
         UserAlbum oldAlbumData = userAlbumRepository.findById(albumId)
                 .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 앨범이 존재하지 않습니다.", 1));
+
+        isCorrectUser(userName, oldAlbumData);
 
         UserAlbum newAlbumData = UserAlbum.builder()
                 .id(albumId)
@@ -113,12 +120,15 @@ public class AlbumService {
 
     // 앨범 삭제 기능
     // @Transactional
-    public void deleteUserAlbum(Long index) {
+    public void deleteUserAlbum(String userName, Long index) {
         System.out.println("index 값은 : " + index);
         try {
             // deleteById 메소드를 쓰면 Exception이 발생 안함 -> 오류 캐치를 위해 findById와 delete 메소드 사용
             UserAlbum album = userAlbumRepository.findById(index)
                     .orElseThrow(() -> new EmptyResultDataAccessException(1));
+
+            isCorrectUser(userName, album);
+
             userAlbumRepository.delete(album);
 
         } catch (EmptyResultDataAccessException e) {
@@ -132,8 +142,13 @@ public class AlbumService {
         }
     }
 
+    // ------------------------------------------- 권한 검사 -------------------------------------------
 
-    // --------------------------------------- TEST Methods ---------------------------------------
+    public void isCorrectUser(String userName, UserAlbum album) {
+        if (!album.getUserId().equals(userName)) { throw new AccessDeniedException("권한이 없습니다."); }
+    }
+
+    // --------------------------------------------- Test ---------------------------------------------
 
     public Page<AlbumGetListResponse> test() {
         return userAlbumRepository.findAllByTitleContains("수정된 앨범", PageRequest.of(0, 5));

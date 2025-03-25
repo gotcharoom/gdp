@@ -30,12 +30,10 @@ public class LinkageService {
     private static final String STEAM_API_URL = "https://api.steampowered.com";
 
     private final WebClientUtil webClientUtil;
-
-
+    
     // 연동한 스팀 계정의 게임 도전과제 목록 전부 불러오기
     public List<SteamPlayerStat> getSteamPlayerAchievement(String userName) {
-
-        // 1. 현재 접속한 유저의 스팀id 확인 (현재는 생략)
+        // 1. 현재 접속한 유저의 스팀id 확인
         // String steamId = "76561198230645968";
         String steamId = userPlatformRepository.findUserSteamId(userName).orElseThrow();
 
@@ -177,10 +175,6 @@ public class LinkageService {
 
         return webClientUtil.get(url, Object.class, "response");
 
-    }
-
-    public Object test3(String userName) {
-        return userPlatformRepository.findUserSteamId(userName).orElseThrow();
     }
 
 

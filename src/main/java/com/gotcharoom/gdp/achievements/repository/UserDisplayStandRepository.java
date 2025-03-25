@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserDisplayStandRepository extends JpaRepository<UserDisplayStand, Long>, CustomUserDisplayStandRepository {
     // 새 객체에 매핑해서 SELECT
-//    @Query("SELECT DISTINCT new com.gotcharoom.gdp.achievements.model.response.DisplayStandGetListResponse" +
-//            "(s.id, s.title, s.image, s.uploadDate) " +
-//            "FROM UserDisplayStand s JOIN s.albums ")
-//    Page<DisplayStandGetListResponse> findPageBy(Pageable page);
+    //    @Query("SELECT DISTINCT new com.gotcharoom.gdp.achievements.model.response.DisplayStandGetListResponse" +
+    //            "(s.id, s.title, s.image, s.uploadDate) " +
+    //            "FROM UserDisplayStand s JOIN s.albums ")
+    //    Page<DisplayStandGetListResponse> findPageBy(Pageable page);
 }
