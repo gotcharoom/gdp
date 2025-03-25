@@ -8,7 +8,6 @@ import com.gotcharoom.gdp.achievements.model.response.AlbumGetListResponse;
 import com.gotcharoom.gdp.achievements.model.response.AlbumGetResponse;
 import com.gotcharoom.gdp.achievements.repository.AlbumAchievementListRepository;
 import com.gotcharoom.gdp.achievements.repository.UserAlbumRepository;
-import com.gotcharoom.gdp.user.repository.UserRepository;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -46,6 +45,8 @@ public class AlbumService {
                 .contentText(album.getContentText())
                 .image(album.getImage())
                 .achievements(achievementList)
+                .create_date(album.getCreatedAt())
+                .update_date(album.getUpdatedAt())
                 .build();
     }
 
@@ -94,7 +95,7 @@ public class AlbumService {
                 .contentText(requestData.getContentText())
                 .image(requestData.getImage())
                 .userId(oldAlbumData.getUserId())
-                .uploadDate(oldAlbumData.getUploadDate())
+                .createdAt(oldAlbumData.getCreatedAt())
                 .build();
 
         // 앨범에 연동된 도전과제 데이터를 앨범 객체에 세팅

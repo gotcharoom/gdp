@@ -25,7 +25,8 @@ public class CustomUserDisplayStandRepositoryImpl implements CustomUserDisplaySt
                         displayStand.id,
                         displayStand.title,
                         displayStand.image,
-                        displayStand.uploadDate
+                        displayStand.createdAt,
+                        displayStand.updatedAt
                 ))
                 .from(displayStand)
                 .offset(page.getOffset())

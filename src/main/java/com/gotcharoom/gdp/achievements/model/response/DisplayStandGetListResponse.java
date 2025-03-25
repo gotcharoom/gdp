@@ -15,5 +15,6 @@ public class DisplayStandGetListResponse {
     private Long id;
     private String title;
     private String image;
-    private LocalDateTime uploadDate;
+    private LocalDateTime create_date;
+    private LocalDateTime update_date;
 }

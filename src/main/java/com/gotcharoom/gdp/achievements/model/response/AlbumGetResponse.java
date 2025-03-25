@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -18,4 +19,6 @@ public class AlbumGetResponse {
     private String contentText;
     private String image;
     List<UserSteamAchievement> achievements;
+    private LocalDateTime create_date;
+    private LocalDateTime update_date;
 }

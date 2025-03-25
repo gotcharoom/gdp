@@ -34,7 +34,7 @@ public class DisplayStandController {
             summary = "전시대 수정하기",
             description = "수정한 변경 사항을 저장"
     )
-    @PostMapping("/r2/{id}")
+    @PutMapping("/r2/{id}")
     public ApiResponse<String> editDisplayStand(@AuthenticationPrincipal UserDetails userDetails,
                                                 @PathVariable Long id,
                                                 @RequestBody DisplayStandSaveRequest requestData) {

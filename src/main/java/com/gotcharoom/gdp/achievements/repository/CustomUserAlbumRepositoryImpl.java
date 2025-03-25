@@ -27,7 +27,8 @@ public class CustomUserAlbumRepositoryImpl implements CustomUserAlbumRepository 
                         album.id,
                         album.title,
                         album.image,
-                        album.uploadDate
+                        album.createdAt,
+                        album.updatedAt
                 ))
                 .from(album)
                 .offset(page.getOffset())
@@ -53,7 +54,8 @@ public class CustomUserAlbumRepositoryImpl implements CustomUserAlbumRepository 
                         album.id,
                         album.title,
                         album.image,
-                        album.uploadDate
+                        album.createdAt,
+                        album.updatedAt
                 ))
                 .from(album)
                 .where(album.title.contains(title))

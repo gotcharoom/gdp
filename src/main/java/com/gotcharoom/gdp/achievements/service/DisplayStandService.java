@@ -44,6 +44,8 @@ public class DisplayStandService {
                 .contentText(displayStand.getContentText())
                 .image(displayStand.getImage())
                 .albums(albumList)
+                .create_date(displayStand.getCreatedAt())
+                .update_date(displayStand.getUpdatedAt())
                 .build();
     }
 
@@ -94,7 +96,7 @@ public class DisplayStandService {
                 .contentText(requestData.getContentText())
                 .image(requestData.getImage())
                 .userId(oldAlbumData.getUserId())
-                .uploadDate(oldAlbumData.getUploadDate())
+                .createdAt(oldAlbumData.getCreatedAt())
                 .build();
 
         requestData.getAlbums().forEach(item -> {
