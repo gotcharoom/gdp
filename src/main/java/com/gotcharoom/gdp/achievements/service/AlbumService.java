@@ -25,7 +25,6 @@ import java.util.List;
 public class AlbumService {
     private final UserAlbumRepository userAlbumRepository;
     private final AlbumAchievementListRepository albumAchievementListRepository;
-    private final UserRepository userRepository;
 
     // --------------------------------------------- CRUD ---------------------------------------------
 

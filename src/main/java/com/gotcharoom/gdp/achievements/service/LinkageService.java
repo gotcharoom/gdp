@@ -8,7 +8,6 @@ import com.gotcharoom.gdp.achievements.model.steamAPI.SteamPlayerStat;
 import com.gotcharoom.gdp.achievements.repository.SteamAchievmentRepository;
 import com.gotcharoom.gdp.global.util.WebClientUtil;
 import com.gotcharoom.gdp.platform.repository.UserPlatformRepository;
-import com.gotcharoom.gdp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 public class LinkageService {
 
     private final SteamAchievmentRepository steamAchievmentRepository;
-    private final UserRepository userRepository;
     private final UserPlatformRepository userPlatformRepository;
 
     private static final String STEAM_API_KEY = "C9926F5CBA82A0101A90A59BE0665295";  // 발급받은 API 키

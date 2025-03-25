@@ -119,11 +119,11 @@ public class DisplayStandService {
 
     // 전시대 삭제 기능
     // @Transactional
-    public void deleteUserDisplayStand(String userName, Long index) {
-        System.out.println("index 값은 : " + index);
+    public void deleteUserDisplayStand(String userName, Long id) {
+        System.out.println("id 값은 : " + id);
         try {
             // deleteById 메소드를 쓰면 Exception이 발생 안함 -> 오류 캐치를 위해 findById와 delete 메소드 사용
-            UserDisplayStand displayStand = userDisplayStandRepository.findById(index)
+            UserDisplayStand displayStand = userDisplayStandRepository.findById(id)
                     .orElseThrow(() -> new EmptyResultDataAccessException(1));
 
             isCorrectUser(userName, displayStand);
@@ -131,7 +131,7 @@ public class DisplayStandService {
             userDisplayStandRepository.delete(displayStand);
 
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalArgumentException("해당 전시대가 존재하지 않습니다: " + index);
+            throw new IllegalArgumentException("해당 전시대가 존재하지 않습니다: " + id);
 
         } catch (DataIntegrityViolationException | ConstraintViolationException e) {
             throw new IllegalArgumentException("제약 조건 위반 오류 발생");

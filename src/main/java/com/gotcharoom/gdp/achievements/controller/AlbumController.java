@@ -48,9 +48,9 @@ public class AlbumController {
             summary = "앨범 삭제",
             description = "선택한 앨범을 지우기"
     )
-    @PostMapping("/r3")
-    public ApiResponse<String> deleteAlbum(@AuthenticationPrincipal UserDetails userDetails, @RequestBody long index) {
-        albumService.deleteUserAlbum(userDetails.getUsername(), index);
+    @DeleteMapping("/r3/{id}")
+    public ApiResponse<String> deleteAlbum(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long id) {
+        albumService.deleteUserAlbum(userDetails.getUsername(), id);
         return ApiResponse.success("ok");
     }
 

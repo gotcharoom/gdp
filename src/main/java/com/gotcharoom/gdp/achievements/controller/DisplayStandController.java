@@ -46,9 +46,9 @@ public class DisplayStandController {
             summary = "전시대 삭제",
             description = "선택한 전시대 지우기"
     )
-    @PostMapping("/r3")
-    public ApiResponse<String> deleteDisplayStand(@AuthenticationPrincipal UserDetails userDetails, @RequestBody long index) {
-        displayStandService.deleteUserDisplayStand(userDetails.getUsername(), index);
+    @DeleteMapping("/r3/{id}")
+    public ApiResponse<String> deleteDisplayStand(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long id) {
+        displayStandService.deleteUserDisplayStand(userDetails.getUsername(), id);
         return ApiResponse.success("ok");
     }
 
