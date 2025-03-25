@@ -340,4 +340,20 @@ public class JwtUtil {
         cookie.setMaxAge(-1);
         response.addCookie(cookie);
     }
+
+    public void setPlatformConnectionCookie(HttpServletResponse response) {
+        String platformConnectionStr = CookieEnum.PLATFORM_CONNECTION.getType();
+        Cookie cookie = new Cookie(platformConnectionStr, "true");
+        cookie.setPath("/");
+        cookie.setMaxAge(-1);
+        response.addCookie(cookie);
+    }
+
+    public void removePlatformConnectionCookie(HttpServletResponse response) {
+        String platformConnectionStr = CookieEnum.PLATFORM_CONNECTION.getType();
+        Cookie cookie = new Cookie(platformConnectionStr, null);
+        cookie.setPath("/");
+        cookie.setMaxAge(-1);
+        response.addCookie(cookie);
+    }
 }

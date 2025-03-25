@@ -2,12 +2,14 @@ package com.gotcharoom.gdp.user.entity;
 
 import com.gotcharoom.gdp.global.security.model.Role;
 import com.gotcharoom.gdp.global.security.model.SocialType;
+import com.gotcharoom.gdp.platform.entity.UserPlatform;
 import com.gotcharoom.gdp.user.model.CropArea;
-import com.gotcharoom.gdp.user.model.UserDetailsUpdateRequest;
 import com.gotcharoom.gdp.user.service.CropAreaConverter;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Immutable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Builder(toBuilder = true)
@@ -52,6 +54,10 @@ public class GdpUser {
     @Enumerated(EnumType.STRING)
     @Column(name="role", nullable = false)
     private Role role;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserPlatform> platforms = new ArrayList<>();
 
     public GdpUser changePassword(String changedPassword) {
         return this.toBuilder()

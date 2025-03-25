@@ -5,12 +5,10 @@ import com.gotcharoom.gdp.global.exception.custom.ChangePasswordException;
 import com.gotcharoom.gdp.global.security.model.SocialType;
 import com.gotcharoom.gdp.global.util.FileUploadUtil;
 import com.gotcharoom.gdp.global.util.UserUtil;
+import com.gotcharoom.gdp.platform.service.PlatformService;
 import com.gotcharoom.gdp.upload.service.UploadFileService;
 import com.gotcharoom.gdp.user.entity.GdpUser;
-import com.gotcharoom.gdp.user.model.UserDetailsResponse;
-import com.gotcharoom.gdp.user.model.UserDetailsUpdateRequest;
-import com.gotcharoom.gdp.user.model.UserPasswordUpdateRequest;
-import com.gotcharoom.gdp.user.model.UserSignUpRequest;
+import com.gotcharoom.gdp.user.model.*;
 import com.gotcharoom.gdp.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -21,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -29,16 +28,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UploadFileService uploadFileService;
+    private final PlatformService platformService;
     private final UserUtil userUtil;
 
     public UserService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             UploadFileService uploadFileService,
+            PlatformService platformService,
             UserUtil userUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.uploadFileService = uploadFileService;
+        this.platformService = platformService;
         this.userUtil = userUtil;
     }
 
@@ -107,6 +109,8 @@ public class UserService {
         log.info("회원 정보 조회 요청 수신");
         GdpUser user = userUtil.getUserFromContext();
 
+        List<UserDetailPlatform> userDetailPlatformList = platformService.getUserDetailPlatforms(user.getUid());
+
         return UserDetailsResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -114,6 +118,7 @@ public class UserService {
                 .nickname(user.getNickname())
                 .imageUrl(user.getImageUrl())
                 .imageCropArea(user.getCropArea())
+                .platforms(userDetailPlatformList)
                 .build();
     }
 
