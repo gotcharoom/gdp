@@ -106,8 +106,11 @@ spring:
           ssl:
             trust: ${MAIL_HOST}
             checkserveridentity: false
-
-
+  elasticsearch:
+    username: ${ELASTICSEARCH_USERNAME}
+    password: ${ELASTICSEARCH_PASSWORD}
+    uris:
+      ${ELASTICSEARCH_URI}
 
 # swagger setting
 springdoc:
