@@ -1,9 +1,12 @@
 package com.gotcharoom.gdp.elastic.entity;
 
+import com.gotcharoom.gdp.board.entity.Board;
 import com.gotcharoom.gdp.elastic.model.BoardCategory;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -15,6 +18,8 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 @Document(indexName = "board")
 @Setting(replicas = 0)
+@NoArgsConstructor
+@AllArgsConstructor
 public class BoardDocument {
     @Id
     private String id;
@@ -43,7 +48,7 @@ public class BoardDocument {
     @Field(name = "updated_at", type = FieldType.Date)
     private LocalDateTime updatedAt;
 
-    public static BoardDocument fromEntity() {
+    public static BoardDocument fromEntity(Board board) {
         return BoardDocument.builder().build();
     }
 }
