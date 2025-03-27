@@ -2,6 +2,7 @@ package com.gotcharoom.gdp.elastic.entity;
 
 import com.gotcharoom.gdp.board.entity.Board;
 import com.gotcharoom.gdp.elastic.model.BoardCategory;
+import com.gotcharoom.gdp.elastic.model.ElasticIndex;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,10 +14,12 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.annotations.Setting;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Builder(toBuilder = true)
-@Document(indexName = "board")
+@Document(indexName = ElasticIndex.BOARD)
 @Setting(replicas = 0)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -47,6 +50,9 @@ public class BoardDocument {
 
     @Field(name = "updated_at", type = FieldType.Date)
     private LocalDateTime updatedAt;
+
+    @Field(name = "tags", type = FieldType.Object)
+    private List<Tag> tags = new ArrayList<>();
 
     public static BoardDocument fromEntity(Board board) {
         return BoardDocument.builder().build();
