@@ -1,13 +1,12 @@
-package com.gotcharoom.gdp.ssetest.service;
+package com.gotcharoom.gdp.notification.service;
 
-import com.gotcharoom.gdp.global.api.ApiResponse;
 import com.gotcharoom.gdp.global.util.UserUtil;
-import com.gotcharoom.gdp.ssetest.entity.Notification;
-import com.gotcharoom.gdp.ssetest.model.NotificationDto;
-import com.gotcharoom.gdp.ssetest.model.NotificationSendRequest;
-import com.gotcharoom.gdp.ssetest.model.NotificationType;
-import com.gotcharoom.gdp.ssetest.repository.EmitterRepository;
-import com.gotcharoom.gdp.ssetest.repository.NotificationRepository;
+import com.gotcharoom.gdp.notification.entity.Notification;
+import com.gotcharoom.gdp.notification.model.NotificationDto;
+import com.gotcharoom.gdp.notification.model.NotificationSendRequest;
+import com.gotcharoom.gdp.notification.model.NotificationType;
+import com.gotcharoom.gdp.notification.repository.EmitterRepository;
+import com.gotcharoom.gdp.notification.repository.NotificationRepository;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import com.gotcharoom.gdp.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,7 @@ import java.util.Map;
 
 @Service
 @Transactional
-public class NotificationTestService {
+public class NotificationService {
 
     // Timeout 1시간
     private final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
@@ -29,7 +28,7 @@ public class NotificationTestService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
 
-    public NotificationTestService(
+    public NotificationService(
             UserUtil userUtil,
             EmitterRepository emitterRepository,
             NotificationRepository notificationRepository,
@@ -51,7 +50,10 @@ public class NotificationTestService {
         emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
         emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
 
-        sendToClient(emitter, emitterId, "Event Stream Created. [memberId=" + memberId + "]");
+        String initialContent = "Event Stream Created. [memberId=" + memberId + "]";
+        Notification notification = Notification.createNotification(gdpUser, NotificationType.SYSTEM, initialContent, "", "Admin", false);
+
+        sendToClient(emitter, emitterId, NotificationDto.from(notification));
 
         if(!lastEventId.isEmpty()) {
             Map<String, Object> events = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(memberId));
@@ -84,7 +86,7 @@ public class NotificationTestService {
         sseEmitters.forEach((key, emitter) -> {
             emitterRepository.saveEventCache(key, notification);
             // Entity는 직렬화가 안되기 때문에 별도의 Dto 만들어주어야 함
-            sendToClient(emitter, key, ApiResponse.success(NotificationDto.from(notification)));
+            sendToClient(emitter, key, NotificationDto.from(notification));
         });
     }
 

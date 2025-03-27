@@ -1,6 +1,6 @@
-package com.gotcharoom.gdp.ssetest.entity;
+package com.gotcharoom.gdp.notification.entity;
 
-import com.gotcharoom.gdp.ssetest.model.NotificationType;
+import com.gotcharoom.gdp.notification.model.NotificationType;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import jakarta.persistence.*;
 import lombok.*;

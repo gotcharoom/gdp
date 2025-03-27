@@ -1,6 +1,6 @@
-package com.gotcharoom.gdp.ssetest.model;
+package com.gotcharoom.gdp.notification.model;
 
-import com.gotcharoom.gdp.ssetest.entity.Notification;
+import com.gotcharoom.gdp.notification.entity.Notification;
 
 public record NotificationDto(
         Long id,

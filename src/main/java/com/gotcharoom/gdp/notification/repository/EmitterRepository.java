@@ -1,4 +1,4 @@
-package com.gotcharoom.gdp.ssetest.repository;
+package com.gotcharoom.gdp.notification.repository;
 
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 

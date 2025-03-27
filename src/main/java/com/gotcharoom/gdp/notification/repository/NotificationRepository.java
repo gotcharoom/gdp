@@ -1,6 +1,6 @@
-package com.gotcharoom.gdp.ssetest.repository;
+package com.gotcharoom.gdp.notification.repository;
 
-import com.gotcharoom.gdp.ssetest.entity.Notification;
+import com.gotcharoom.gdp.notification.entity.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {

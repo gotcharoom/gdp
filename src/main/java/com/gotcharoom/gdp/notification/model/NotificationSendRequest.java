@@ -1,4 +1,4 @@
-package com.gotcharoom.gdp.ssetest.model;
+package com.gotcharoom.gdp.notification.model;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
