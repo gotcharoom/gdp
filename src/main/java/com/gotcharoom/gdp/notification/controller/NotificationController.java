@@ -1,5 +1,6 @@
 package com.gotcharoom.gdp.notification.controller;
 
+import com.gotcharoom.gdp.global.api.ApiResponse;
 import com.gotcharoom.gdp.notification.model.NotificationSendRequest;
 import com.gotcharoom.gdp.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,5 +43,17 @@ public class NotificationController {
         notificationService.sendRequest(request);
 
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "SSE 알림 읽음 처리",
+            description = "SSE 알림 읽음 처리 API"
+    )
+    @PutMapping(value = "/read")
+    public ApiResponse<Void> readMessage(@RequestParam Long notificationId) {
+
+        notificationService.readNotification(notificationId);
+
+        return ApiResponse.success();
     }
 }

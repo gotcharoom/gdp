@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -50,10 +51,18 @@ public class NotificationService {
         emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
         emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
 
+        // 1. 초기 연결 확인용 System Notification 정송
         String initialContent = "Event Stream Created. [memberId=" + memberId + "]";
         Notification notification = Notification.createNotification(gdpUser, NotificationType.SYSTEM, initialContent, "", "Admin", false);
 
         sendToClient(emitter, emitterId, NotificationDto.from(notification));
+
+        // 2. DB에서 읽지 않은 알림 조회 일괄 전송
+        List<Notification> unreadNotifications = notificationRepository.findAllByIdAndIsReadFalse(memberId);
+
+        unreadNotifications.forEach(unreadNotification -> {
+            sendToClient(emitter, emitterId + "-" + unreadNotification.getId(), NotificationDto.from(unreadNotification));
+        });
 
         if(!lastEventId.isEmpty()) {
             Map<String, Object> events = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(memberId));
@@ -93,5 +102,11 @@ public class NotificationService {
     public void sendRequest(NotificationSendRequest request) {
         GdpUser gdpUser = userRepository.findById(request.getMemberId()).orElseThrow();
         send(gdpUser, request.getNotificationType(), request.getContent(), request.getUrl(), request.getToName());
+    }
+
+    public void readNotification(Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId).orElseThrow();
+        Notification updatedNotification = notification.readNotification(notificationId);
+        notificationRepository.save(updatedNotification);
     }
 }

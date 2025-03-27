@@ -8,7 +8,7 @@ import lombok.*;
 /* Extend Auditable 고려 */
 @Entity(name="notification")
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = "receiver")
@@ -51,6 +51,12 @@ public class Notification {
                 .isRead(isRead)
                 .notificationType(notificationType)
                 .receiver(receiver)
+                .build();
+    }
+
+    public Notification readNotification(Long id) {
+        return this.toBuilder()
+                .isRead(true)
                 .build();
     }
 }
