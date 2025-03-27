@@ -3,6 +3,7 @@ package com.gotcharoom.gdp.notification.service;
 import com.gotcharoom.gdp.global.util.UserUtil;
 import com.gotcharoom.gdp.notification.entity.Notification;
 import com.gotcharoom.gdp.notification.model.NotificationDto;
+import com.gotcharoom.gdp.notification.model.NotificationReadRequest;
 import com.gotcharoom.gdp.notification.model.NotificationSendRequest;
 import com.gotcharoom.gdp.notification.model.NotificationType;
 import com.gotcharoom.gdp.notification.repository.EmitterRepository;
@@ -58,7 +59,7 @@ public class NotificationService {
         sendToClient(emitter, emitterId, NotificationDto.from(notification));
 
         // 2. DB에서 읽지 않은 알림 조회 일괄 전송
-        List<Notification> unreadNotifications = notificationRepository.findAllByIdAndIsReadFalse(memberId);
+        List<Notification> unreadNotifications = notificationRepository.findByReceiverAndIsReadFalse(gdpUser);
 
         unreadNotifications.forEach(unreadNotification -> {
             sendToClient(emitter, emitterId + "-" + unreadNotification.getId(), NotificationDto.from(unreadNotification));
@@ -104,9 +105,9 @@ public class NotificationService {
         send(gdpUser, request.getNotificationType(), request.getContent(), request.getUrl(), request.getToName());
     }
 
-    public void readNotification(Long notificationId) {
-        Notification notification = notificationRepository.findById(notificationId).orElseThrow();
-        Notification updatedNotification = notification.readNotification(notificationId);
+    public void readNotification(NotificationReadRequest request) {
+        Notification notification = notificationRepository.findById(request.getNotificationId()).orElseThrow();
+        Notification updatedNotification = notification.readNotification(request.getNotificationId());
         notificationRepository.save(updatedNotification);
     }
 }

@@ -1,6 +1,7 @@
 package com.gotcharoom.gdp.notification.controller;
 
 import com.gotcharoom.gdp.global.api.ApiResponse;
+import com.gotcharoom.gdp.notification.model.NotificationReadRequest;
 import com.gotcharoom.gdp.notification.model.NotificationSendRequest;
 import com.gotcharoom.gdp.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
-@RequestMapping("/api/v1/sse")
+@RequestMapping("/api/v1/notification")
 @Tag(name = "SSE 알람", description = "SSE 알람 컨트롤러")
 public class NotificationController {
 
@@ -50,9 +51,9 @@ public class NotificationController {
             description = "SSE 알림 읽음 처리 API"
     )
     @PutMapping(value = "/read")
-    public ApiResponse<Void> readMessage(@RequestParam Long notificationId) {
+    public ApiResponse<Void> readMessage(@RequestBody NotificationReadRequest request) {
 
-        notificationService.readNotification(notificationId);
+        notificationService.readNotification(request);
 
         return ApiResponse.success();
     }
