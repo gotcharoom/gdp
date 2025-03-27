@@ -51,14 +51,14 @@ public class AlbumService {
     }
 
     // 앨범 저장 기능
-    public void saveUserAlbum(AlbumSaveRequest requestData) {
+    public void saveUserAlbum(String userName, AlbumSaveRequest requestData) {
         // 중간 테이블(AlbumAchievementList)도 자동으로 갱신됨
 
         UserAlbum newAlbumData = UserAlbum.builder()
                 .title(requestData.getTitle())
                 .contentText(requestData.getContentText())
                 .image(requestData.getImage())
-                .userId("test")
+                .userId(userName)
                 .build();
 
         requestData.getAchievements().forEach(item -> {

@@ -25,8 +25,9 @@ public class DisplayStandController {
             description = "작성한 전시대 내용과 전시대에 등록한 도전과제를 저장"
     )
     @PostMapping("/r1")
-    public ApiResponse<String> saveDisplayStand(@RequestBody DisplayStandSaveRequest requestData) {
-        displayStandService.saveUserDisplayStand(requestData);
+    public ApiResponse<String> saveDisplayStand(@AuthenticationPrincipal UserDetails userDetails,
+                                                @RequestBody DisplayStandSaveRequest requestData) {
+        displayStandService.saveUserDisplayStand(userDetails.getUsername(), requestData);
         return ApiResponse.success("ok");
     }
 
@@ -47,7 +48,8 @@ public class DisplayStandController {
             description = "선택한 전시대 지우기"
     )
     @DeleteMapping("/r3/{id}")
-    public ApiResponse<String> deleteDisplayStand(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long id) {
+    public ApiResponse<String> deleteDisplayStand(@AuthenticationPrincipal UserDetails userDetails,
+                                                  @PathVariable Long id) {
         displayStandService.deleteUserDisplayStand(userDetails.getUsername(), id);
         return ApiResponse.success("ok");
     }

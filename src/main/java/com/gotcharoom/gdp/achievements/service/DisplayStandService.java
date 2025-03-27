@@ -50,14 +50,14 @@ public class DisplayStandService {
     }
 
     // 전시대 저장 기능
-    public void saveUserDisplayStand(DisplayStandSaveRequest requestData) {
+    public void saveUserDisplayStand(String userName,DisplayStandSaveRequest requestData) {
         // 전시대 수정 시 중간 테이블(DisplayStandAlbumList)도 자동으로 갱신됨 (DB Cascade 설정)
 
         UserDisplayStand newDisplayStandData = UserDisplayStand.builder()
                 .title(requestData.getTitle())
                 .contentText(requestData.getContentText())
                 .image(requestData.getImage())
-                .userId("test")
+                .userId(userName)
                 .build();
 
         requestData.getAlbums().forEach(item -> {

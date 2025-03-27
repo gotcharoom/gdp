@@ -25,8 +25,9 @@ public class AlbumController {
             description = "작성한 앨범 내용과 앨범에 등록한 도전과제를 저장"
     )
     @PostMapping("/r1")
-    public ApiResponse<String> saveAlbum(@RequestBody AlbumSaveRequest requestData) {
-        albumService.saveUserAlbum(requestData);
+    public ApiResponse<String> saveAlbum(@AuthenticationPrincipal UserDetails userDetails,
+                                         @RequestBody AlbumSaveRequest requestData) {
+        albumService.saveUserAlbum(userDetails.getUsername(), requestData);
         return ApiResponse.success("ok");
     }
 
@@ -35,10 +36,9 @@ public class AlbumController {
             description = "수정한 변경 사항을 저장"
     )
     @PutMapping("/r2/{id}")
-    public ApiResponse<String> editAlbum(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long id,
-            @RequestBody AlbumSaveRequest requestData) {
+    public ApiResponse<String> editAlbum(@AuthenticationPrincipal UserDetails userDetails,
+                                         @PathVariable Long id,
+                                         @RequestBody AlbumSaveRequest requestData) {
         albumService.editUserAlbum(userDetails.getUsername(), id, requestData);
         return ApiResponse.success("ok");
     }
@@ -49,7 +49,8 @@ public class AlbumController {
             description = "선택한 앨범을 지우기"
     )
     @DeleteMapping("/r3/{id}")
-    public ApiResponse<String> deleteAlbum(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long id) {
+    public ApiResponse<String> deleteAlbum(@AuthenticationPrincipal UserDetails userDetails,
+                                           @PathVariable Long id) {
         albumService.deleteUserAlbum(userDetails.getUsername(), id);
         return ApiResponse.success("ok");
     }
