@@ -1,15 +1,13 @@
 package com.gotcharoom.gdp.ssetest.controller;
 
 import com.gotcharoom.gdp.global.api.ApiResponse;
+import com.gotcharoom.gdp.ssetest.model.NotificationSendRequest;
 import com.gotcharoom.gdp.ssetest.service.NotificationTestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
@@ -39,10 +37,10 @@ public class NotificationTestController {
             summary = "SSE 테스트",
             description = "SSE 테스트 API"
     )
-    @GetMapping(value = "/send")
-    public ApiResponse<Void> sendTest() {
+    @PostMapping(value = "/send")
+    public ApiResponse<Void> sendTest(@RequestBody NotificationSendRequest request) {
 
-        notificationTestService.sendTest();
+        notificationTestService.sendRequest(request);
 
         return ApiResponse.success();
     }

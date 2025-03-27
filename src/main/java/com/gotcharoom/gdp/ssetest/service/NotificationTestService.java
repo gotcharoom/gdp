@@ -4,12 +4,12 @@ import com.gotcharoom.gdp.global.api.ApiResponse;
 import com.gotcharoom.gdp.global.util.UserUtil;
 import com.gotcharoom.gdp.ssetest.entity.Notification;
 import com.gotcharoom.gdp.ssetest.model.NotificationDto;
+import com.gotcharoom.gdp.ssetest.model.NotificationSendRequest;
 import com.gotcharoom.gdp.ssetest.model.NotificationType;
 import com.gotcharoom.gdp.ssetest.repository.EmitterRepository;
 import com.gotcharoom.gdp.ssetest.repository.NotificationRepository;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import com.gotcharoom.gdp.user.repository.UserRepository;
-import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -88,8 +88,8 @@ public class NotificationTestService {
         });
     }
 
-    public void sendTest() {
-        GdpUser gdpUser = userUtil.getUserFromContext();
-        send(gdpUser, NotificationType.COMMENT, "테스트입니다", "/test/url", "Admin");
+    public void sendRequest(NotificationSendRequest request) {
+        GdpUser gdpUser = userRepository.findById(request.getMemberId()).orElseThrow();
+        send(gdpUser, request.getNotificationType(), request.getContent(), request.getUrl(), request.getToName());
     }
 }
