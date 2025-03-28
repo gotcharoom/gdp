@@ -10,6 +10,8 @@ import com.gotcharoom.gdp.notification.repository.EmitterRepository;
 import com.gotcharoom.gdp.notification.repository.NotificationRepository;
 import com.gotcharoom.gdp.user.entity.GdpUser;
 import com.gotcharoom.gdp.user.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -21,6 +23,8 @@ import java.util.Map;
 @Service
 @Transactional
 public class NotificationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
     // Timeout 1시간
     private final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
@@ -46,30 +50,44 @@ public class NotificationService {
         GdpUser gdpUser = userUtil.getUserFromContext();
         Long memberId = gdpUser.getUid();
 
+        logger.info("Subscribing to notifications. MemberId: {}", memberId);
+
         String emitterId = memberId + "-" + System.currentTimeMillis();
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 
-        emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
-        emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
+        emitter.onCompletion(() -> {
+            emitterRepository.deleteById(emitterId);
+            logger.info("SSE emitter completed. EmitterId: {}", emitterId);
+        });
 
-        // 1. 초기 연결 확인용 System Notification 정송
+        emitter.onTimeout(() -> {
+            emitterRepository.deleteById(emitterId);
+            logger.info("SSE emitter timed out. EmitterId: {}", emitterId);
+        });
+
         String initialContent = "Event Stream Created. [memberId=" + memberId + "]";
         Notification notification = Notification.createNotification(gdpUser, NotificationType.SYSTEM, initialContent, "", "Admin", false);
 
         sendToClient(emitter, emitterId, NotificationDto.from(notification));
+        logger.info("Sent initial system notification to memberId: {}", memberId);
 
-        // 2. DB에서 읽지 않은 알림 조회 일괄 전송
         List<Notification> unreadNotifications = notificationRepository.findByReceiverAndIsReadFalse(gdpUser);
+        logger.info("Found {} unread notifications for memberId: {}", unreadNotifications.size(), memberId);
 
         unreadNotifications.forEach(unreadNotification -> {
             sendToClient(emitter, emitterId + "-" + unreadNotification.getId(), NotificationDto.from(unreadNotification));
+            logger.info("Sent unread notification. Id: {}", unreadNotification.getId());
         });
 
-        if(!lastEventId.isEmpty()) {
+        if (!lastEventId.isEmpty()) {
+            logger.info("Checking for missed events since lastEventId: {}", lastEventId);
             Map<String, Object> events = emitterRepository.findAllEventCacheStartWithByMemberId(String.valueOf(memberId));
             events.entrySet().stream()
                     .filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
-                    .forEach(entry -> sendToClient(emitter, entry.getKey(), entry.getValue()));
+                    .forEach(entry -> {
+                        sendToClient(emitter, entry.getKey(), entry.getValue());
+                        logger.info("Resent missed event. EventId: {}", entry.getKey());
+                    });
         }
 
         return emitter;
@@ -82,32 +100,45 @@ public class NotificationService {
                     .data(data));
         } catch (IOException exception) {
             emitterRepository.deleteById(emitterId);
+            logger.info("Failed to send event to client. EmitterId: {}", emitterId);
             throw new RuntimeException("전송 실패");
         }
     }
 
     public void send(GdpUser receiver, NotificationType notificationType, String content, String url, String toName) {
+        logger.info("Sending notification to user. ReceiverId: {}, Type: {}, ToName: {}", receiver.getUid(), notificationType, toName);
+
         Notification newNotification = Notification.createNotification(receiver, notificationType, content, url, toName, false);
         Notification notification = notificationRepository.save(newNotification);
 
         String memberId = String.valueOf(receiver.getUid());
-
         Map<String, SseEmitter> sseEmitters = emitterRepository.fidAllEmitterStartWithByMemberId(memberId);
+
+        logger.info("Found {} SSE emitters for memberId: {}", sseEmitters.size(), memberId);
+
         sseEmitters.forEach((key, emitter) -> {
             emitterRepository.saveEventCache(key, notification);
-            // Entity는 직렬화가 안되기 때문에 별도의 Dto 만들어주어야 함
             sendToClient(emitter, key, NotificationDto.from(notification));
+            logger.info("Notification sent through SSE. NotificationId: {}, EmitterKey: {}", notification.getId(), key);
         });
     }
 
     public void sendRequest(NotificationSendRequest request) {
+        logger.info("Sending notification via request. TargetMemberId: {}", request.getMemberId());
+
         GdpUser gdpUser = userRepository.findById(request.getMemberId()).orElseThrow();
         send(gdpUser, request.getNotificationType(), request.getContent(), request.getUrl(), request.getToName());
+
+        logger.info("Notification request completed. TargetMemberId: {}", request.getMemberId());
     }
 
     public void readNotification(NotificationReadRequest request) {
+        logger.info("Marking notification as read. NotificationId: {}", request.getNotificationId());
+
         Notification notification = notificationRepository.findById(request.getNotificationId()).orElseThrow();
         Notification updatedNotification = notification.readNotification(request.getNotificationId());
         notificationRepository.save(updatedNotification);
+
+        logger.info("Notification marked as read. NotificationId: {}", request.getNotificationId());
     }
 }
