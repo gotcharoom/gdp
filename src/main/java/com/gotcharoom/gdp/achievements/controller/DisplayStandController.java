@@ -24,7 +24,7 @@ public class DisplayStandController {
             summary = "전시대 저장하기",
             description = "작성한 전시대 내용과 전시대에 등록한 도전과제를 저장"
     )
-    @PostMapping("/r1")
+    @PostMapping
     public ApiResponse<String> saveDisplayStand(@AuthenticationPrincipal UserDetails userDetails,
                                                 @RequestBody DisplayStandSaveRequest requestData) {
         displayStandService.saveUserDisplayStand(userDetails.getUsername(), requestData);
@@ -35,7 +35,7 @@ public class DisplayStandController {
             summary = "전시대 수정하기",
             description = "수정한 변경 사항을 저장"
     )
-    @PutMapping("/r2/{id}")
+    @PutMapping("/{id}")
     public ApiResponse<String> editDisplayStand(@AuthenticationPrincipal UserDetails userDetails,
                                                 @PathVariable Long id,
                                                 @RequestBody DisplayStandSaveRequest requestData) {
@@ -47,7 +47,7 @@ public class DisplayStandController {
             summary = "전시대 삭제",
             description = "선택한 전시대 지우기"
     )
-    @DeleteMapping("/r3/{id}")
+    @DeleteMapping("/{id}")
     public ApiResponse<String> deleteDisplayStand(@AuthenticationPrincipal UserDetails userDetails,
                                                   @PathVariable Long id) {
         displayStandService.deleteUserDisplayStand(userDetails.getUsername(), id);
@@ -58,7 +58,7 @@ public class DisplayStandController {
             summary = "전시대 가져오기(1건 상세보기)",
             description = "선택한 전시대 정보 가져오기"
     )
-    @GetMapping("/r4")
+    @GetMapping("/detail")
     public ApiResponse<DisplayStandGetResponse> getDisplayStandDetail(@RequestParam("id") Long id) {
         return ApiResponse.success(displayStandService.getUserDisplayStandOne(id));
     }
@@ -67,8 +67,10 @@ public class DisplayStandController {
             summary = "전시대 목록 가져오기",
             description = "전시대 정보 가져오기"
     )
-    @GetMapping("/r5")
-    public ApiResponse<PagedModel<DisplayStandGetListResponse>> getDisplayStandList(@RequestParam int pageNo) {
-        return ApiResponse.success(new PagedModel<>(displayStandService.getUserDisplayStands(pageNo, 5)));
+    @GetMapping
+    public ApiResponse<PagedModel<DisplayStandGetListResponse>> getDisplayStandList(
+            @RequestParam("page_no") int pageNo,
+            @RequestParam(value = "page_size", required = false, defaultValue = "10") int pageSize) {
+        return ApiResponse.success(new PagedModel<>(displayStandService.getUserDisplayStands(pageNo, pageSize)));
     }
 }

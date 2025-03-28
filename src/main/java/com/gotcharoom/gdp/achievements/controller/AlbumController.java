@@ -24,7 +24,7 @@ public class AlbumController {
             summary = "앨범 저장하기",
             description = "작성한 앨범 내용과 앨범에 등록한 도전과제를 저장"
     )
-    @PostMapping("/r1")
+    @PostMapping
     public ApiResponse<String> saveAlbum(@AuthenticationPrincipal UserDetails userDetails,
                                          @RequestBody AlbumSaveRequest requestData) {
         albumService.saveUserAlbum(userDetails.getUsername(), requestData);
@@ -35,7 +35,7 @@ public class AlbumController {
             summary = "앨범 수정하기",
             description = "수정한 변경 사항을 저장"
     )
-    @PutMapping("/r2/{id}")
+    @PutMapping("/{id}")
     public ApiResponse<String> editAlbum(@AuthenticationPrincipal UserDetails userDetails,
                                          @PathVariable Long id,
                                          @RequestBody AlbumSaveRequest requestData) {
@@ -48,7 +48,7 @@ public class AlbumController {
             summary = "앨범 삭제",
             description = "선택한 앨범을 지우기"
     )
-    @DeleteMapping("/r3/{id}")
+    @DeleteMapping("/{id}")
     public ApiResponse<String> deleteAlbum(@AuthenticationPrincipal UserDetails userDetails,
                                            @PathVariable Long id) {
         albumService.deleteUserAlbum(userDetails.getUsername(), id);
@@ -59,7 +59,7 @@ public class AlbumController {
             summary = "앨범 가져오기(1건 상세보기)",
             description = "선택한 앨범 정보 가져오기"
     )
-    @GetMapping("/r4")
+    @GetMapping("/detail")
     public ApiResponse<AlbumGetResponse> getAlbumDetail(@RequestParam("id") Long id) {
         return ApiResponse.success(albumService.getUserAlbumOne(id));
     }
@@ -68,9 +68,11 @@ public class AlbumController {
             summary = "앨범 목록 가져오기",
             description = "앨범 정보 가져오기"
     )
-    @GetMapping("/r5")
-    public ApiResponse<PagedModel<AlbumGetListResponse>> getAlbumList(@RequestParam int pageNo) {
-        return ApiResponse.success(new PagedModel<>(albumService.getUserAlbums(pageNo, 5)));
+    @GetMapping
+    public ApiResponse<PagedModel<AlbumGetListResponse>> getAlbumList(
+            @RequestParam("page_no") int pageNo,
+            @RequestParam(value = "page_size", required = false, defaultValue = "10") int pageSize) {
+        return ApiResponse.success(new PagedModel<>(albumService.getUserAlbums(pageNo, pageSize)));
     }
 
     // --------------------------------------- TEST API ---------------------------------------
