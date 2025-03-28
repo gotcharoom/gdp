@@ -1,5 +1,6 @@
 package com.gotcharoom.gdp.achievements.model.request;
 
+import com.gotcharoom.gdp.achievements.entity.UserDisplayStand;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,8 +19,16 @@ public class DisplayStandSaveRequest {
 
     private String image;
 
-//    private String userId;
-
     // 연동한 앨범 id값
     private List<Long> albums;
+
+    public UserDisplayStand toEntity(String userName, Long id) {
+        return UserDisplayStand.builder()
+                .id(id)
+                .title(this.getTitle())
+                .contentText(this.getContentText())
+                .image(this.getImage())
+                .userId(userName)
+                .build();
+    }
 }

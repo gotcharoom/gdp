@@ -32,7 +32,6 @@ public class LinkageService {
     // 연동한 스팀 계정의 게임 도전과제 목록 전부 불러오기
     public List<SteamPlayerStat> getSteamPlayerAchievement(String userName) {
         // 1. 현재 접속한 유저의 스팀id 확인
-        // String steamId = "76561198230645968";
         String steamId = userPlatformRepository.findUserSteamId(userName).orElseThrow();
 
         // 2. 소유한 게임 목록 불러오기
@@ -62,7 +61,7 @@ public class LinkageService {
                 .queryParam("key", STEAM_API_KEY)
                 .queryParam("appid", appId)
                 .queryParam("steamid", steamId)
-                .queryParam("l", "koreana")
+                .queryParam("l", "koreana") // 오탈자 아님
                 .toUriString()
                 .trim();
 
@@ -87,7 +86,6 @@ public class LinkageService {
 
         // 추출된 목록을 새 객체에 담아 return
         return result.toBuilder(filteredList);
-
     }
 
     // 보유한 스팀 게임 appid 목록 불러오기

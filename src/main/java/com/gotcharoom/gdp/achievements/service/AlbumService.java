@@ -39,36 +39,19 @@ public class AlbumService {
 
         List<UserSteamAchievement> achievementList = albumAchievementListRepository.findAchievementList(id);
 
-        return AlbumGetResponse.builder()
-                .id(album.getId())
-                .title(album.getTitle())
-                .contentText(album.getContentText())
-                .image(album.getImage())
-                .achievements(achievementList)
-                .create_date(album.getCreatedAt())
-                .update_date(album.getUpdatedAt())
-                .build();
+        return AlbumGetResponse.fromAlbumDetail(album, achievementList);
     }
 
     // 앨범 저장 기능
     public void saveUserAlbum(String userName, AlbumSaveRequest requestData) {
         // 중간 테이블(AlbumAchievementList)도 자동으로 갱신됨
 
-        UserAlbum newAlbumData = UserAlbum.builder()
-                .title(requestData.getTitle())
-                .contentText(requestData.getContentText())
-                .image(requestData.getImage())
-                .userId(userName)
-                .build();
+        UserAlbum newAlbumData = requestData.toEntity(userName, null);
 
         requestData.getAchievements().forEach(item -> {
-            UserSteamAchievement sample = UserSteamAchievement.builder()
-                    .id(item)
-                    .build();
+            UserSteamAchievement sample = UserSteamAchievement.builder().id(item).build();
 
-            AlbumAchievementList newAchievement = AlbumAchievementList.builder()
-                    .achievement(sample)
-                    .build();
+            AlbumAchievementList newAchievement = AlbumAchievementList.builder().achievement(sample).build();
 
             newAlbumData.addAchievement(newAchievement);
         });
@@ -83,32 +66,21 @@ public class AlbumService {
     public void editUserAlbum(String userName, Long albumId, AlbumSaveRequest requestData) {
         // 앨범 수정 시 중간 테이블(AlbumAchievementList)도 자동으로 갱신됨 (DB Cascade 설정)
 
-        // 생성 날짜 불변을 위해 기존 데이터 조회
+        // 기존 데이터 조회 후 유효성 검사
         UserAlbum oldAlbumData = userAlbumRepository.findById(albumId)
                 .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 앨범이 존재하지 않습니다.", 1));
 
         isCorrectUser(userName, oldAlbumData);
 
-        UserAlbum newAlbumData = UserAlbum.builder()
-                .id(albumId)
-                .title(requestData.getTitle())
-                .contentText(requestData.getContentText())
-                .image(requestData.getImage())
-                .userId(oldAlbumData.getUserId())
-                .createdAt(oldAlbumData.getCreatedAt())
-                .build();
+        UserAlbum newAlbumData = requestData.toEntity(userName, albumId);
 
         // 앨범에 연동된 도전과제 데이터를 앨범 객체에 세팅
         requestData.getAchievements().forEach(item -> {
-            UserSteamAchievement sample = UserSteamAchievement.builder()
-                    .id(item)
-                    .build();
+            UserSteamAchievement data = UserSteamAchievement.builder().id(item).build();
 
-            AlbumAchievementList newAchievement = AlbumAchievementList.builder()
-                    .achievement(sample)
-                    .build();
+            AlbumAchievementList newData = AlbumAchievementList.builder().achievement(data).build();
 
-            newAlbumData.addAchievement(newAchievement);
+            newAlbumData.addAchievement(newData);
         });
 
         try {

@@ -38,36 +38,19 @@ public class DisplayStandService {
 
         List<UserAlbum> albumList = displayStandAlbumListRepository.findAlbumList(id);
 
-        return DisplayStandGetResponse.builder()
-                .id(displayStand.getId())
-                .title(displayStand.getTitle())
-                .contentText(displayStand.getContentText())
-                .image(displayStand.getImage())
-                .albums(albumList)
-                .create_date(displayStand.getCreatedAt())
-                .update_date(displayStand.getUpdatedAt())
-                .build();
+        return DisplayStandGetResponse.fromDisplayStandDetail(displayStand, albumList);
     }
 
     // 전시대 저장 기능
     public void saveUserDisplayStand(String userName,DisplayStandSaveRequest requestData) {
         // 전시대 수정 시 중간 테이블(DisplayStandAlbumList)도 자동으로 갱신됨 (DB Cascade 설정)
 
-        UserDisplayStand newDisplayStandData = UserDisplayStand.builder()
-                .title(requestData.getTitle())
-                .contentText(requestData.getContentText())
-                .image(requestData.getImage())
-                .userId(userName)
-                .build();
+        UserDisplayStand newDisplayStandData = requestData.toEntity(userName, null);
 
         requestData.getAlbums().forEach(item -> {
-            UserAlbum sample = UserAlbum.builder()
-                    .id(item)
-                    .build();
+            UserAlbum sample = UserAlbum.builder().id(item).build();
 
-            DisplayStandAlbumList newAlbum = DisplayStandAlbumList.builder()
-                    .userAlbum(sample)
-                    .build();
+            DisplayStandAlbumList newAlbum = DisplayStandAlbumList.builder().userAlbum(sample).build();
 
             newDisplayStandData.addAlbum(newAlbum);
         });
@@ -84,29 +67,19 @@ public class DisplayStandService {
     public void editUserDisplayStand(String userName, Long displayStandId, DisplayStandSaveRequest requestData) {
         // 전시대 수정 시 중간 테이블(DisplayStandAlbumList)도 자동으로 갱신됨 (DB Cascade 설정)
 
-        // 생성 날짜 불변을 위해 기존 데이터 조회
+        // 기존 데이터 조회 후 유효성 검사
         UserDisplayStand oldAlbumData = userDisplayStandRepository.findById(displayStandId)
                 .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 전시대가 존재하지 않습니다.", 1));
 
         isCorrectUser(userName, oldAlbumData);
 
-        UserDisplayStand newDisplayStandData = UserDisplayStand.builder()
-                .id(displayStandId)
-                .title(requestData.getTitle())
-                .contentText(requestData.getContentText())
-                .image(requestData.getImage())
-                .userId(oldAlbumData.getUserId())
-                .createdAt(oldAlbumData.getCreatedAt())
-                .build();
+        UserDisplayStand newDisplayStandData = requestData.toEntity(userName, displayStandId);
 
+        // 전시대에 연동된 앨범 데이터를 전시대 객체에 세팅
         requestData.getAlbums().forEach(item -> {
-            UserAlbum sample = UserAlbum.builder()
-                    .id(item)
-                    .build();
+            UserAlbum sample = UserAlbum.builder().id(item).build();
 
-            DisplayStandAlbumList newAlbum = DisplayStandAlbumList.builder()
-                    .userAlbum(sample)
-                    .build();
+            DisplayStandAlbumList newAlbum = DisplayStandAlbumList.builder().userAlbum(sample).build();
 
             newDisplayStandData.addAlbum(newAlbum);
         });

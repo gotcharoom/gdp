@@ -1,5 +1,6 @@
 package com.gotcharoom.gdp.achievements.model.response;
 
+import com.gotcharoom.gdp.achievements.entity.UserAlbum;
 import com.gotcharoom.gdp.achievements.entity.UserSteamAchievement;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,4 +22,16 @@ public class AlbumGetResponse {
     List<UserSteamAchievement> achievements;
     private LocalDateTime create_date;
     private LocalDateTime update_date;
+
+    public static AlbumGetResponse fromAlbumDetail(UserAlbum album, List<UserSteamAchievement> achievementList) {
+        return AlbumGetResponse.builder()
+                .id(album.getId())
+                .title(album.getTitle())
+                .contentText(album.getContentText())
+                .image(album.getImage())
+                .achievements(achievementList)
+                .create_date(album.getCreatedAt())
+                .update_date(album.getUpdatedAt())
+                .build();
+    }
 }

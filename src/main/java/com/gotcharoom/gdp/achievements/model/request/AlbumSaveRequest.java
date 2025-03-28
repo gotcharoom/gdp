@@ -1,5 +1,6 @@
 package com.gotcharoom.gdp.achievements.model.request;
 
+import com.gotcharoom.gdp.achievements.entity.UserAlbum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,8 +19,18 @@ public class AlbumSaveRequest {
 
     private String image;
 
-//    private String userId;
-
     // 연동한 도전과제 id값
     private List<Long> achievements;
+
+    public UserAlbum toEntity(String userName, Long id) {
+        return UserAlbum.builder()
+                .id(id)
+                .title(this.getTitle())
+                .contentText(this.getContentText())
+                .image(this.getImage())
+                .userId(userName)
+                .build();
+    }
+
+
 }
