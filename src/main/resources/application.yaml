@@ -41,8 +41,10 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        format_sql: true #To beautify or pretty print the SQL
-        show_sql: true #show sql
+        format_sql: true # To beautify or pretty print the SQL
+        show_sql: true # show sql
+    open-in-view: false # 영속성 컨텍스트가 데이터베이스 커넥션을 바로 반납하도록 하는 설정
+
 
   security:
     oauth2:
