@@ -27,15 +27,18 @@ public class SseService {
     private final UserUtil userUtil;
     private final EmitterRepository emitterRepository;
     private final NotificationRepository notificationRepository;
+    private final SseAsyncSender sseAsyncSender;
 
     public SseService(
             UserUtil userUtil,
             EmitterRepository emitterRepository,
-            NotificationRepository notificationRepository
+            NotificationRepository notificationRepository,
+            SseAsyncSender sseAsyncSender
     ) {
         this.userUtil = userUtil;
         this.emitterRepository = emitterRepository;
         this.notificationRepository = notificationRepository;
+        this.sseAsyncSender = sseAsyncSender;
     }
 
     public SseEmitter subscribe(String lastEventId) {
@@ -87,10 +90,8 @@ public class SseService {
 
     private void sendToClient(SseEmitter emitter, String emitterId, Object data) {
         try {
-            emitter.send(SseEmitter.event()
-                    .id(emitterId)
-                    .data(data));
-        } catch (IOException exception) {
+            sseAsyncSender.send(emitter, emitterId, data);
+        } catch (Exception exception) {
             emitterRepository.deleteById(emitterId);
             log.info("Failed to send event to client. EmitterId: {}", emitterId);
             throw new RuntimeException("전송 실패");
