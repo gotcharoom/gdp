@@ -5,6 +5,8 @@ import com.gotcharoom.gdp.user.entity.GdpUser;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 /* Extend Auditable 고려 */
 @Entity(name="notification")
 @Getter
@@ -43,6 +45,10 @@ public class Notification {
     @JoinColumn(name = "member_id")
     private GdpUser receiver;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+
     public static Notification createNotification(GdpUser receiver, NotificationType notificationType, String content, String url, String toName, Boolean isRead) {
         return Notification.builder()
                 .content(content)
@@ -51,6 +57,7 @@ public class Notification {
                 .isRead(isRead)
                 .notificationType(notificationType)
                 .receiver(receiver)
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 
