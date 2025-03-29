@@ -4,6 +4,7 @@ import com.gotcharoom.gdp.global.api.ApiResponse;
 import com.gotcharoom.gdp.notification.model.NotificationReadRequest;
 import com.gotcharoom.gdp.notification.model.NotificationSendRequest;
 import com.gotcharoom.gdp.notification.service.NotificationService;
+import com.gotcharoom.gdp.notification.service.SseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
@@ -13,12 +14,17 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequestMapping("/api/v1/notification")
-@Tag(name = "SSE 알람", description = "SSE 알람 컨트롤러")
+@Tag(name = "SSE 알림", description = "SSE 알림 컨트롤러")
 public class NotificationController {
 
+    private final SseService sseService;
     private final NotificationService notificationService;
 
-    public NotificationController(NotificationService notificationService) {
+    public NotificationController(
+            SseService sseService,
+            NotificationService notificationService
+    ) {
+        this.sseService = sseService;
         this.notificationService = notificationService;
     }
 
@@ -29,7 +35,7 @@ public class NotificationController {
     @GetMapping(value = "/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> connectNotification(@RequestHeader(value = "Last-Event-ID", required = false, defaultValue = "") String lastEventId) {
 
-        SseEmitter response = notificationService.subscribe(lastEventId);
+        SseEmitter response = sseService.subscribe(lastEventId);
 
         return ResponseEntity.ok(response);
     }
