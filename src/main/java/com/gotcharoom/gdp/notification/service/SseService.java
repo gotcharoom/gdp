@@ -16,6 +16,9 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -28,6 +31,9 @@ public class SseService {
     private final EmitterRepository emitterRepository;
     private final NotificationRepository notificationRepository;
     private final SseAsyncSender sseAsyncSender;
+
+    // Thread Pool 최대 30개까지만 (동시에 30개 처리)
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(30);
 
     public SseService(
             UserUtil userUtil,
@@ -50,15 +56,20 @@ public class SseService {
         String emitterId = memberId + "-" + System.currentTimeMillis();
         SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 
+        // 정상 종료 했을 시
         emitter.onCompletion(() -> {
             emitterRepository.deleteById(emitterId);
             log.info("SSE emitter completed. EmitterId: {}", emitterId);
         });
 
+        // Timeout 했을 시
         emitter.onTimeout(() -> {
             emitterRepository.deleteById(emitterId);
             log.info("SSE emitter timed out. EmitterId: {}", emitterId);
         });
+
+        // Ping으로 Close 체크
+        startPing(emitter, emitterId);
 
         String initialContent = "Event Stream Created. [memberId=" + memberId + "]";
         Notification notification = Notification.createNotification(gdpUser, NotificationType.SYSTEM, initialContent, "", "Admin", false);
@@ -96,6 +107,19 @@ public class SseService {
             log.info("Failed to send event to client. EmitterId: {}", emitterId);
             throw new RuntimeException("전송 실패");
         }
+    }
+
+    // 주기적으로 + 비동기 방식으로 ping 보내서 Connection Close 됐는지 확인
+    // Thread를 항상 점유하는 방식 X => Ping send 한번 보내면 Thread Pool이 비워짐 => 다음 요청 처리
+    private void startPing(SseEmitter emitter, String emitterId) {
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                emitter.send(SseEmitter.event().comment("ping"));
+            } catch (IOException e) {
+                emitter.complete();
+                emitterRepository.deleteById(emitterId);
+            }
+        }, 0, 15, TimeUnit.SECONDS);
     }
 
     @Transactional
