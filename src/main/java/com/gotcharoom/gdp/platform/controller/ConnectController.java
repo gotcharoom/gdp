@@ -1,13 +1,11 @@
 package com.gotcharoom.gdp.platform.controller;
 
 import com.gotcharoom.gdp.global.api.ApiResponse;
-import com.gotcharoom.gdp.platform.model.PlatformCallbackRequest;
 import com.gotcharoom.gdp.platform.model.PlatformType;
 import com.gotcharoom.gdp.platform.model.SteamRequest;
 import com.gotcharoom.gdp.platform.service.PlatformService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
