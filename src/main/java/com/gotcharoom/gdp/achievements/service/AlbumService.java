@@ -29,6 +29,8 @@ public class AlbumService {
 
     // 앨범 전체 목록 가져오기
     public Page<AlbumGetListResponse> getUserAlbums(int pageNo, int pageSize) {
+        pageNo = pageNo == 0 || pageNo < 0 ? 0 : pageNo-1;
+        System.out.println("page 넘버는 " + pageNo);
         return userAlbumRepository.findPageBy(PageRequest.of(pageNo, pageSize));
     }
 

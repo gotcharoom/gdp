@@ -28,6 +28,8 @@ public class DisplayStandService {
 
     // 전시대 전체 목록 가져오기
     public Page<DisplayStandGetListResponse> getUserDisplayStands(int pageNo, int pageSize) {
+        pageNo = pageNo == 0 || pageNo < 0 ? 0 : pageNo-1;
+        System.out.println("page 넘버는 " + pageNo);
         return userDisplayStandRepository.findPageBy(PageRequest.of(pageNo, pageSize, Sort.by("id").descending()));
     }
 
