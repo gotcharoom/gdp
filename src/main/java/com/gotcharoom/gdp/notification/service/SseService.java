@@ -109,7 +109,7 @@ public class SseService {
         }
     }
 
-    // 주기적으로 + 비동기 방식으로 ping 보내서 Connection Close 됐는지 확인
+    // 주기적으로 + 비동기 방식으로 ping 보내서 Connection Close 됐는지 확인 (SSE Connection 정리를 위해 Schedule로 실행)
     // Thread를 항상 점유하는 방식 X => Ping send 한번 보내면 Thread Pool이 비워짐 => 다음 요청 처리
     private void startPing(SseEmitter emitter, String emitterId) {
         scheduler.scheduleAtFixedRate(() -> {
