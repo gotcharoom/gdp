@@ -19,18 +19,20 @@ public class CustomUserAlbumRepositoryImpl implements CustomUserAlbumRepository 
     private final QUserAlbum album = QUserAlbum.userAlbum;
 
     @Override
-    public Page<AlbumGetListResponse> findPageBy(Pageable page) {
+    public Page<AlbumGetListResponse> findPageBy(Long displayStandId, Pageable page) {
 
         List<AlbumGetListResponse> results = jpaQueryFactory
                 .select(Projections.constructor(
                         AlbumGetListResponse.class,
                         album.id,
+                        album.displayStandId,
                         album.title,
                         album.image,
                         album.createdAt,
                         album.updatedAt
                 ))
                 .from(album)
+                .where(album.displayStandId.eq(displayStandId))
                 .offset(page.getOffset())
                 .limit(page.getPageSize())
                 .orderBy(album.id.desc())
@@ -38,6 +40,7 @@ public class CustomUserAlbumRepositoryImpl implements CustomUserAlbumRepository 
 
         JPAQuery<Long> total = jpaQueryFactory
                 .select(album.count())
+                .where(album.displayStandId.eq(displayStandId))
                 .from(album);
 
         // NullPointerException주의 사항 무시 (null로 들어갈 일이 없음)
@@ -52,6 +55,7 @@ public class CustomUserAlbumRepositoryImpl implements CustomUserAlbumRepository 
                 .select(Projections.constructor(
                         AlbumGetListResponse.class,
                         album.id,
+                        album.displayStandId,
                         album.title,
                         album.image,
                         album.createdAt,
@@ -71,6 +75,5 @@ public class CustomUserAlbumRepositoryImpl implements CustomUserAlbumRepository 
         // NullPointerException주의 사항 무시 (null로 들어갈 일이 없음)
         return PageableExecutionUtils.getPage(results, page, () -> total.fetchOne());
     }
-
 
 }

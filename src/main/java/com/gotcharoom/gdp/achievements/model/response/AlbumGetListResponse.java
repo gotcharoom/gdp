@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class AlbumGetListResponse {
     private Long id;
+    private Long displayStandId;
     private String title;
     private String image;
     private LocalDateTime create_date;

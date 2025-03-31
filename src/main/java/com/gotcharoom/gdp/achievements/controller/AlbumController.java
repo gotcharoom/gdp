@@ -1,5 +1,6 @@
 package com.gotcharoom.gdp.achievements.controller;
 
+import com.gotcharoom.gdp.achievements.entity.UserAlbum;
 import com.gotcharoom.gdp.achievements.model.request.AlbumSaveRequest;
 import com.gotcharoom.gdp.achievements.model.response.AlbumGetListResponse;
 import com.gotcharoom.gdp.achievements.model.response.AlbumGetResponse;
@@ -12,6 +13,8 @@ import org.springframework.data.web.PagedModel;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/api/v1/displayStand/album")
 @AllArgsConstructor
@@ -43,7 +46,6 @@ public class AlbumController {
         return ApiResponse.success("ok");
     }
 
-
     @Operation(
             summary = "앨범 삭제",
             description = "선택한 앨범을 지우기"
@@ -65,23 +67,32 @@ public class AlbumController {
     }
 
     @Operation(
-            summary = "앨범 목록 가져오기",
+            summary = "해당 전시대 앨범 목록 가져오기",
             description = "앨범 정보 가져오기"
     )
     @GetMapping
     public ApiResponse<PagedModel<AlbumGetListResponse>> getAlbumList(
+            @RequestParam("display_stand_id") Long displayStandId,
             @RequestParam("page_no") int pageNo,
             @RequestParam(value = "page_size", required = false, defaultValue = "10") int pageSize) {
-        return ApiResponse.success(new PagedModel<>(albumService.getUserAlbums(pageNo, pageSize)));
+        return ApiResponse.success(new PagedModel<>(albumService.getUserAlbums(displayStandId, pageNo, pageSize)));
     }
 
     // --------------------------------------- TEST API ---------------------------------------
-
     @Operation(
-            summary = "테스트",
+            summary = "앨범 전체 목록 가져오기 (모든 전시대 앨범)",
             description = "테스트 중"
     )
     @GetMapping("/test")
+    public ApiResponse<List<UserAlbum>> all() {
+        return ApiResponse.success(albumService.allList());
+    }
+
+    @Operation(
+            summary = "쿼리 dsl 테스트",
+            description = "테스트 중"
+    )
+    @GetMapping("/test2")
     public ApiResponse<Object> test() {
         return ApiResponse.success(albumService.test());
     }

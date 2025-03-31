@@ -6,8 +6,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Builder
@@ -32,11 +30,6 @@ public class UserDisplayStand {
     @Column(name="user_id", nullable = false)
     private String userId;
 
-    // 전시대와 연동할 앨범 목록
-    @OneToMany(mappedBy = "userDisplayStand", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default // 빌드 패턴으로 빈 리스트 작성을 위한 필수 설정
-    private List<DisplayStandAlbumList> albums = new ArrayList<>();
-
     // 생성 날짜
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -47,9 +40,4 @@ public class UserDisplayStand {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // 연관관계 편의 메서드
-    public void addAlbum(DisplayStandAlbumList albumList) {
-        albums.add(albumList);
-        albumList.updateDisplayStand(this);
-    }
 }

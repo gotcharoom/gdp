@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AlbumSaveRequest {
+    private Long displayStandId;
+
     private String title;
 
     private String contentText;
@@ -25,6 +27,7 @@ public class AlbumSaveRequest {
     public UserAlbum toEntity(String userName, Long id) {
         return UserAlbum.builder()
                 .id(id)
+                .displayStandId(this.getDisplayStandId())
                 .title(this.getTitle())
                 .contentText(this.getContentText())
                 .image(this.getImage())

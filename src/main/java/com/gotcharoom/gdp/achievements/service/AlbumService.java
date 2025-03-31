@@ -28,10 +28,10 @@ public class AlbumService {
     // --------------------------------------------- CRUD ---------------------------------------------
 
     // 앨범 전체 목록 가져오기
-    public Page<AlbumGetListResponse> getUserAlbums(int pageNo, int pageSize) {
+    public Page<AlbumGetListResponse> getUserAlbums(Long displayStandId, int pageNo, int pageSize) {
         pageNo = pageNo == 0 || pageNo < 0 ? 0 : pageNo-1;
         System.out.println("page 넘버는 " + pageNo);
-        return userAlbumRepository.findPageBy(PageRequest.of(pageNo, pageSize));
+        return userAlbumRepository.findPageBy(displayStandId, PageRequest.of(pageNo, pageSize));
     }
 
     // 앨범 내용 가져오기 (details)
@@ -123,6 +123,10 @@ public class AlbumService {
     }
 
     // --------------------------------------------- Test ---------------------------------------------
+
+    public List<UserAlbum> allList() {
+        return userAlbumRepository.findAll();
+    }
 
     public Page<AlbumGetListResponse> test() {
         return userAlbumRepository.findAllByTitleContains("수정된 앨범", PageRequest.of(0, 5));

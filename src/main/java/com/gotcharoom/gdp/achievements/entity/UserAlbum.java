@@ -21,6 +21,10 @@ public class UserAlbum {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 전시대 데이터가 필요할 가능성이 없으므로 @ManyToOne 비사용
+    @Column(name="display_stand_id", nullable = false)
+    private Long displayStandId;
+
     @Column(name="title", nullable = false)
     private String title;
 

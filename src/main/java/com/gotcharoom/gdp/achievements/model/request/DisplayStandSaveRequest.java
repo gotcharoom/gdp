@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Getter
 @Builder
 @AllArgsConstructor
@@ -18,9 +16,6 @@ public class DisplayStandSaveRequest {
     private String contentText;
 
     private String image;
-
-    // 연동한 앨범 id값
-    private List<Long> albums;
 
     public UserDisplayStand toEntity(String userName, Long id) {
         return UserDisplayStand.builder()

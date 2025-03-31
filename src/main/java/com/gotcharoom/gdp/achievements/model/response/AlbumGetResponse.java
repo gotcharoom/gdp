@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class AlbumGetResponse {
     private Long id;
+    private Long displayStandId;
     private String title;
     private String contentText;
     private String image;
@@ -26,6 +27,7 @@ public class AlbumGetResponse {
     public static AlbumGetResponse fromAlbumDetail(UserAlbum album, List<UserSteamAchievement> achievementList) {
         return AlbumGetResponse.builder()
                 .id(album.getId())
+                .displayStandId(album.getDisplayStandId())
                 .title(album.getTitle())
                 .contentText(album.getContentText())
                 .image(album.getImage())

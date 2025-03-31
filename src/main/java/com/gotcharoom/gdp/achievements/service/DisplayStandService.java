@@ -4,7 +4,6 @@ import com.gotcharoom.gdp.achievements.entity.*;
 import com.gotcharoom.gdp.achievements.model.request.DisplayStandSaveRequest;
 import com.gotcharoom.gdp.achievements.model.response.DisplayStandGetListResponse;
 import com.gotcharoom.gdp.achievements.model.response.DisplayStandGetResponse;
-import com.gotcharoom.gdp.achievements.repository.DisplayStandAlbumListRepository;
 import com.gotcharoom.gdp.achievements.repository.UserDisplayStandRepository;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +15,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @Service
 public class DisplayStandService {
     private final UserDisplayStandRepository userDisplayStandRepository;
-    private final DisplayStandAlbumListRepository displayStandAlbumListRepository;
 
     // --------------------------------------------- CRUD ---------------------------------------------
 
@@ -38,24 +34,13 @@ public class DisplayStandService {
         UserDisplayStand displayStand = userDisplayStandRepository.findById(id)
                 .orElseThrow(() -> new EmptyResultDataAccessException("해당 ID의 전시대가 존재하지 않습니다.", 1));
 
-        List<UserAlbum> albumList = displayStandAlbumListRepository.findAlbumList(id);
+        return DisplayStandGetResponse.fromDisplayStandDetail(displayStand);
 
-        return DisplayStandGetResponse.fromDisplayStandDetail(displayStand, albumList);
     }
 
     // 전시대 저장 기능
     public void saveUserDisplayStand(String userName,DisplayStandSaveRequest requestData) {
-        // 전시대 수정 시 중간 테이블(DisplayStandAlbumList)도 자동으로 갱신됨 (DB Cascade 설정)
-
         UserDisplayStand newDisplayStandData = requestData.toEntity(userName, null);
-
-        requestData.getAlbums().forEach(item -> {
-            UserAlbum sample = UserAlbum.builder().id(item).build();
-
-            DisplayStandAlbumList newAlbum = DisplayStandAlbumList.builder().userAlbum(sample).build();
-
-            newDisplayStandData.addAlbum(newAlbum);
-        });
 
         try {
             userDisplayStandRepository.save(newDisplayStandData);
@@ -76,15 +61,6 @@ public class DisplayStandService {
         isCorrectUser(userName, oldAlbumData);
 
         UserDisplayStand newDisplayStandData = requestData.toEntity(userName, displayStandId);
-
-        // 전시대에 연동된 앨범 데이터를 전시대 객체에 세팅
-        requestData.getAlbums().forEach(item -> {
-            UserAlbum sample = UserAlbum.builder().id(item).build();
-
-            DisplayStandAlbumList newAlbum = DisplayStandAlbumList.builder().userAlbum(sample).build();
-
-            newDisplayStandData.addAlbum(newAlbum);
-        });
 
         try {
             userDisplayStandRepository.save(newDisplayStandData);
